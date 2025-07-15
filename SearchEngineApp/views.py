@@ -13,7 +13,7 @@ import pandas as pd
 
 # import Project files
 from .utils import main_func
-from .response import BAD_RESPONSE , Success_RESPONSE
+from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 
 class SemanticSearchView(APIView):
 
@@ -28,8 +28,14 @@ class SemanticSearchView(APIView):
             # GET DIR PATH
             DirPath = os.path.join(Path.cwd(), "Data")
 
-            Response = main_func(DirPath , user_query)
-            return Success_RESPONSE(user_query , Response)
+            result_dict = main_func(DirPath , user_query)
+
+            print("result_dict ", result_dict)
+
+            if not result_dict:
+                return DATA_NOT_FOUND("No any match found related your query ...")
+
+            return Success_RESPONSE(user_query , result_dict)
 
 
         except Exception as e:

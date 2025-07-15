@@ -3,6 +3,18 @@ env
 .env
 
 #ignore cache
-SearchEngineApp/pycache
+SearchEngineApp/__pycache__
 . pycache
 
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# LibreOffice lock files
+.~lock.*
+
+# Django migrations cache
+*.sqlite3

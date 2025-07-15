@@ -104,16 +104,18 @@ class ReadDataDir:
             final_data_list =[]
 
             results_with_scores = retriever.vectorstore.similarity_search_with_score(user_query)
+            sorted_results = sorted(results_with_scores, key=lambda x: x[1])
 
-            for doc, score in results_with_scores:
+            for doc, score in sorted_results:
                 for line in doc:
-
-                    if isinstance(line , tuple) and line[0] =="page_content":
+                    
+                    if (isinstance(line, tuple) and line[0] == "page_content" and 0.3 < float(score) <= 0.9):
                         content_list = line[1].split("\n")
+                        print("score ", score  ,"content_list  ", content_list)
                         data_dict = ListToDict(content_list)
                         final_data_list.append(data_dict)
                     else:
-                        print(f"Skipping Line because it has no needed info : {line}")
+                        print(f"Skipping Line because it has no needed info : {line}",float(score))
 
             return final_data_list
 
