@@ -1,0 +1,40 @@
+from django.shortcuts import render
+
+# Create your views here.
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+
+# Import python packages
+import os 
+import sys
+from pathlib import Path
+import pandas as pd
+
+# import Project files
+from .utils import main_func
+from .response import BAD_RESPONSE , Success_RESPONSE
+
+class SemanticSearchView(APIView):
+
+    def post(self , request , format=None):
+        try:
+            
+            user_query = request.data.get("query")
+
+            if not user_query:
+                return BAD_RESPONSE("user query is required ")
+            
+            # GET DIR PATH
+            DirPath = os.path.join(Path.cwd(), "Data")
+
+            Response = main_func(DirPath , user_query)
+            return Success_RESPONSE(user_query , Response)
+
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
+            print(error_message)
+            return []
+

@@ -1,0 +1,8 @@
+# Ignore Environment file
+env
+.env
+
+#ignore cache
+SearchEngineApp/pycache
+. pycache
+
