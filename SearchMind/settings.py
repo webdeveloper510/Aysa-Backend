@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-i2q=wdx5iypoy=$4pjybd^@f_@j=p7k6*4%i#z*^#h--n8bew+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = ["127.0.0.1", "api.the-aysa.com"]
 
 
 # Application definition
