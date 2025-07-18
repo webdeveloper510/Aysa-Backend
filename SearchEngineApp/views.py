@@ -30,7 +30,6 @@ class SemanticSearchView(APIView):
 
             result_dict = main_func(DirPath , user_query)
 
-            print("result_dict ", result_dict)
 
             if not result_dict:
                 return DATA_NOT_FOUND("No any match found related your query ...")
@@ -43,4 +42,6 @@ class SemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
+
+
 

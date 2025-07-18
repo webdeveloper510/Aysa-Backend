@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 # Ignore warnings 
 import os
@@ -80,9 +82,9 @@ WSGI_APPLICATION = 'SearchMind.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': "MohyDatabase",
-        'USER': 'root',
-        "PASSWORD": '12345',
+        'NAME': os.getenv('NAME'),
+        'USER': os.getenv("USER"),
+        "PASSWORD": os.getenv("PASSWORD"),
         "HOST": 'localhost' ,
         "PORT" : 3306
     }
