@@ -1,25 +1,15 @@
-import os
-from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import status
 
+def BAD_RESPONSE(message):
+    return Response({"error": message}, status=status.HTTP_400_BAD_REQUEST)
 
+def DATA_NOT_FOUND(message):
+    return Response({"error": message}, status=status.HTTP_404_NOT_FOUND)
 
-def DATA_NOT_FOUND(message : str):
+def Success_RESPONSE(query, result_dict):
     return Response({
-        "message": message,
-        'status': status.HTTP_404_NOT_FOUND
-    })
-
-
-def BAD_RESPONSE(message : str):
-    return Response({
-        "message": message,
-        'status': status.HTTP_400_BAD_REQUEST
-    })
-
-def Success_RESPONSE(question : str , answer : str):
-    return Response({
-        "question": question ,
-        "answer": answer,
-        'status': status.HTTP_200_OK
+        "query": query,
+        "result": result_dict,
+        "status": status.HTTP_200_OK
     })
