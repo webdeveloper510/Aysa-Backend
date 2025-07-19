@@ -72,8 +72,8 @@ class ProductDataTrainPipeline:
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(f"[ERROR] Embedding failed. Reason: {str(e)} (line {exc_tb.tb_lineno})")
-            return None
+            error_message = f"[ERROR] Embedding failed. Reason: {str(e)} (line {exc_tb.tb_lineno})"
+            return error_message
 
 
 # Product data inference 
@@ -112,8 +112,8 @@ class InferenceProduct:
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(f"[ERROR] Model inference failed. Reason: {str(e)} (line {exc_tb.tb_lineno})")
-            return []
+            error_message = f"[ERROR] Model inference failed. Reason: {str(e)} (line {exc_tb.tb_lineno})"
+            return error_message
 
 
 

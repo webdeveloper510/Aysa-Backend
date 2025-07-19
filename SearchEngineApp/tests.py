@@ -72,3 +72,11 @@ Context:
 """
 
 
+
+
+import requests
+
+
+url = 'https://api.the-aysa.com/product-data-train'
+response = requests.get(url)
+print(response)
