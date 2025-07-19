@@ -119,16 +119,3 @@ class InferenceProduct:
 
 
 
-
-
-# Function to inference model
-def inference(local_db_path , user_query):
-    inference_obj = InferenceProduct(local_db_path)
-
-    # STEP 1 
-    retriever = inference_obj.LoadVectorDB()
-
-    response = inference_obj.ModelInference(retriever, user_query)
-    return response
-
-

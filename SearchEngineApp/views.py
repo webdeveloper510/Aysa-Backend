@@ -12,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 # import Project files
-from .product_pipeline import ProductDataTrainPipeline , inference
+from .product_pipeline import ProductDataTrainPipeline , InferenceProduct
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 
 class ProductTrainPipeline(APIView):
@@ -52,7 +52,7 @@ class ProductTrainPipeline(APIView):
                 "message": result_message,
             }, status=status.HTTP_200_OK)
         
-        
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
@@ -78,7 +78,13 @@ class ProductSemanticSearchView(APIView):
             VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Product_DB", "faiss_index")
 
             # Call Product Inference Model
-            result_dict =inference(VectoDB_Path, user_query)
+            # Function to inference model
+            inference_obj = InferenceProduct(VectoDB_Path)
+
+            # STEP 1 
+            retriever = inference_obj.LoadVectorDB()
+
+            result_dict = inference_obj.ModelInference(retriever, user_query)
 
             return Success_RESPONSE(user_query , result_dict)
 
