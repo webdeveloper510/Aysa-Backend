@@ -12,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 
 # import Project files
-from .product_pipeline import product_data_train_pipeline , inference
+from .product_pipeline import ProductDataTrainPipeline , inference
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 
 class ProductTrainPipeline(APIView):
@@ -28,13 +28,31 @@ class ProductTrainPipeline(APIView):
             if not os.path.exists(File_path):
                 return DATA_NOT_FOUND(f"File Not Found with Name : {File_path}")
 
-            # call main fuinction 
-            response_data = product_data_train_pipeline(vector_db_dir, File_path)
+            # function to train model
+            class_obj = ProductDataTrainPipeline(File_path)
 
-            http_status = status.HTTP_200_OK if response_data["status"] == "success" else status.HTTP_500_INTERNAL_SERVER_ERROR
-            return Response(response_data, status=http_status)
+            # STEP 1 : DATA INGESTION
+            documents = class_obj.DataIngestion(File_path)
+            if not documents:
+                return BAD_RESPONSE("Failed to ingest data")
+
+            # STEP 2: DATA CHUNKING
+            chunks = class_obj.DataChunking(documents)
+            if not chunks:
+                return BAD_RESPONSE("Failed to chunk data.")
+            
+
+            # STEP 3: VECTORIZATION AND SAVE AT LOCAL
+            result_message = class_obj.TextEmbeddingAndVectorDb(vector_db_dir,chunks)
+            if result_message is None:
+                return BAD_RESPONSE("Failed to Vectorization data")
 
 
+            return Response({
+                "message": result_message,
+            }, status=status.HTTP_200_OK)
+        
+        
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
