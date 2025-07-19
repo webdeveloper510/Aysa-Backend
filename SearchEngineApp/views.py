@@ -12,27 +12,57 @@ from pathlib import Path
 import pandas as pd
 
 # import Project files
-from .utils import main_func
+from .product_pipeline import product_data_train_pipeline , inference
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 
-class SemanticSearchView(APIView):
+class ProductTrainPipeline(APIView):
+    def post(self, request, format =None):
+        try:
+            # Vector Database dir path
+            vector_db_dir = os.path.join(os.getcwd() , "VectorDBS", "Product_DB")
+            os.makedirs(vector_db_dir , exist_ok=True)
+
+            #CSV file name
+            File_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
+
+            if not os.path.exists(File_path):
+                return DATA_NOT_FOUND(f"File Not Found with Name : {File_path}")
+
+
+            # call main fuinction 
+            response = product_data_train_pipeline(vector_db_dir ,File_path)
+            
+            return Response({
+                "status": status.HTTP_200_OK, 
+                "message": response
+            })
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
+            return Response({
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                "message": error_message
+            })
+
+
+from langchain_ollama import OllamaEmbeddings
+from langchain_community.vectorstores import FAISS
+
+# API to inference product trained model
+class ProductSemanticSearchView(APIView):
 
     def post(self , request , format=None):
         try:
             
             user_query = request.data.get("query")
-
             if not user_query:
                 return BAD_RESPONSE("user query is required ")
             
-            # GET DIR PATH
-            DirPath = os.path.join(Path.cwd(), "Data")
+            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Product_DB", "faiss_index")
 
-            result_dict = main_func(DirPath , user_query)
-
-
-            if not result_dict:
-                return DATA_NOT_FOUND("No any match found related your query ...")
+            # Call Product Inference Model
+            result_dict =inference(VectoDB_Path, user_query)
 
             return Success_RESPONSE(user_query , result_dict)
 

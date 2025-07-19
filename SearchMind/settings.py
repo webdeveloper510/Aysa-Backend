@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-i2q=wdx5iypoy=$4pjybd^@f_@j=p7k6*4%i#z*^#h--n8bew+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "api.the-aysa.com"]
+ALLOWED_HOSTS = ['api.the-aysa.com','localhost','127.0.0.1']
 
 
 # Application definition
@@ -79,12 +79,13 @@ WSGI_APPLICATION = 'SearchMind.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('NAME'),
-        'USER': os.getenv("USER"),
-        "PASSWORD": os.getenv("PASSWORD"),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": 'localhost' ,
         "PORT" : 3306
     }

@@ -22,46 +22,18 @@ def ListToDict(input_list):
         data_dict[split_item[0]] =split_item[1]
     return data_dict
 
-
-class ReadDataDir:
-
-    def __init__(self, dir_path):
-        self.dir_path = dir_path
-
-    def ReadDir(self):
-        print(f"Step 1: Reading CSV files from directory: {self.dir_path}")
-        try:
-            if not os.path.exists(self.dir_path):
-                print(f"[ERROR] Directory does not exist: {self.dir_path}")
-                return []
-
-            dataFilesList = []
-            for root, dirs, files in os.walk(self.dir_path):
-                csv_files = [os.path.join(root, file) for file in files if file.endswith(".csv")]
-                dataFilesList.extend(csv_files)
-
-            if not dataFilesList:
-                print("No CSV files found.")
-            else:
-                print(f"Found {len(dataFilesList)} CSV files.")
-
-            return dataFilesList
-
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(f"[ERROR] Failed to read CSV files. Reason: {str(e)} (line {exc_tb.tb_lineno})")
-            return []
+# Product data train Pipeline
+class ProductDataTrainPipeline:
+    def __init__(self, ProductCSV):
+        self.fileName = ProductCSV
 
     @staticmethod
-    def DataIngestion(fileList: list) -> list:
-        print("Step 2: Starting data ingestion...")
+    def DataIngestion(FILEPATH: list) -> list:
+        print("Step 1: Starting data ingestion...")
         try:
-            documents = []
-            for file in fileList:
-                loader = CSVLoader(file_path=file)
-                docs = loader.load()
-                documents.extend(docs)
-            return documents
+            loader = CSVLoader(file_path=FILEPATH)
+            docs = loader.load()
+            return docs
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -70,7 +42,7 @@ class ReadDataDir:
 
     @staticmethod
     def DataChunking(documents: list) -> list:
-        print("Step 3: Chunking data...")
+        print("Step 2: Chunking data...")
         try:
             # Use record-level chunking
             splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
@@ -84,18 +56,37 @@ class ReadDataDir:
             return []
 
     @staticmethod
-    def TextEmbeddingAndVectorDb(chunks: list):
+    def TextEmbeddingAndVectorDb(VECTORDB_DIR_PATH, chunks: list):
         print("Step 4: Embedding chunks and creating vector store...")
         try:
             embedding = OllamaEmbeddings(model="mxbai-embed-large:latest")
             vectorstoreDB = FAISS.from_documents(chunks, embedding)
-            retriever = vectorstoreDB.as_retriever()
-            return retriever
+
+            # Save the FAISS index locally
+            db_path = os.path.join(VECTORDB_DIR_PATH,"faiss_index")
+
+            vectorstoreDB.save_local(db_path)
+            print(f"[INFO] FAISS index saved to '{db_path}'")
+
+            return f"Model Trained and update successfully ..."
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             print(f"[ERROR] Embedding failed. Reason: {str(e)} (line {exc_tb.tb_lineno})")
-            return []
+            return None
+
+
+# Product data inference 
+class InferenceProduct:
+    def __init__(self , model_path):
+        self.model_path = model_path
+        
+    # function to load vector DB
+    def LoadVectorDB(self):
+        embedding = OllamaEmbeddings(model="mxbai-embed-large:latest")
+        vector_db = FAISS.load_local(self.model_path,embedding,allow_dangerous_deserialization=True)
+        retriever = vector_db.as_retriever()
+        return retriever 
 
     @staticmethod
     def ModelInference(retriever, user_query):
@@ -126,26 +117,36 @@ class ReadDataDir:
 
 
 
+# function to train model
+def product_data_train_pipeline(VECTORDB_DIR_PATH , FilePath):
+    class_obj = ProductDataTrainPipeline(FilePath)
 
-def main_func(dir_path, user_query):
-    class_obj = ReadDataDir(dir_path)
-
-    file_list = class_obj.ReadDir()
-    if not file_list:
-        return DATA_NOT_FOUND(f"No CSV files found in directory: {dir_path}")
-
-    documents = class_obj.DataIngestion(file_list)
+    # STEP 1
+    documents = class_obj.DataIngestion(FilePath)
     if not documents:
         return DATA_NOT_FOUND("Failed to ingest data.")
 
+    # STEP 2
     chunks = class_obj.DataChunking(documents)
-
     if not chunks:
         return DATA_NOT_FOUND("Failed to chunk data.")
 
-    retriever = class_obj.TextEmbeddingAndVectorDb(chunks)
-    if not retriever:
-        return DATA_NOT_FOUND("Failed to create vector store.")
+    # STEP 3
+    Response = class_obj.TextEmbeddingAndVectorDb(VECTORDB_DIR_PATH,chunks)
+    if Response is None:
+        return DATA_NOT_FOUND("Failed Train DATA.")
+    return Response
 
-    response = class_obj.ModelInference(retriever, user_query)
+
+
+# Function to inference model
+def inference(local_db_path , user_query):
+    inference_obj = InferenceProduct(local_db_path)
+
+    # STEP 1 
+    retriever = inference_obj.LoadVectorDB()
+
+    response = inference_obj.ModelInference(retriever, user_query)
     return response
+
+
