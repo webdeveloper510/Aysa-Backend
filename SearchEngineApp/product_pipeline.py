@@ -121,21 +121,19 @@ class InferenceProduct:
 def product_data_train_pipeline(VECTORDB_DIR_PATH , FilePath):
     class_obj = ProductDataTrainPipeline(FilePath)
 
-    # STEP 1
     documents = class_obj.DataIngestion(FilePath)
     if not documents:
-        return DATA_NOT_FOUND("Failed to ingest data.")
+        return {"status": "failed", "message": "Failed to ingest data."}
 
-    # STEP 2
     chunks = class_obj.DataChunking(documents)
     if not chunks:
-        return DATA_NOT_FOUND("Failed to chunk data.")
+        return {"status": "failed", "message": "Failed to chunk data."}
 
-    # STEP 3
-    Response = class_obj.TextEmbeddingAndVectorDb(VECTORDB_DIR_PATH,chunks)
-    if Response is None:
-        return DATA_NOT_FOUND("Failed Train DATA.")
-    return Response
+    result_message = class_obj.TextEmbeddingAndVectorDb(VECTORDB_DIR_PATH,chunks)
+    if result_message is None:
+        return {"status": "failed", "message": "Failed to train data."}
+
+    return {"status": "success", "message": result_message}
 
 
 
