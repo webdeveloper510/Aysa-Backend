@@ -16,7 +16,7 @@ from .product_pipeline import product_data_train_pipeline , inference
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 
 class ProductTrainPipeline(APIView):
-    def post(self, request, format =None):
+    def get(self, request, format =None):
         try:
             # Vector Database dir path
             vector_db_dir = os.path.join(os.getcwd() , "VectorDBS", "Product_DB")
