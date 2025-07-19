@@ -72,16 +72,3 @@ Context:
 """
 
 
-
-
-# import requests
-
-
-# url = 'https://api.the-aysa.com/product-data-train'
-# response = requests.get(url)
-
-# print("original Response ", response)
-# if response.status_code ==200:
-#     data = response.json()
-
-#     print(data)

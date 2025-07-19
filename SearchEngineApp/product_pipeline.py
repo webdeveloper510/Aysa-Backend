@@ -23,7 +23,7 @@ def ListToDict(input_list):
     return data_dict
 
 # Product data train Pipeline
-class ProductDataTrainPipeline:
+class DataTrainPipeline:
     def __init__(self, ProductCSV):
         self.fileName = ProductCSV
 
@@ -77,12 +77,13 @@ class ProductDataTrainPipeline:
 
 
 # Product data inference 
-class InferenceProduct:
+class UserInference:
     def __init__(self , model_path):
         self.model_path = model_path
         
     # function to load vector DB
     def LoadVectorDB(self):
+        print("Step 1: Starting to load local saved database ....")
         embedding = OllamaEmbeddings(model="mxbai-embed-large:latest")
         vector_db = FAISS.load_local(self.model_path,embedding,allow_dangerous_deserialization=True)
         retriever = vector_db.as_retriever()
@@ -90,7 +91,7 @@ class InferenceProduct:
 
     @staticmethod
     def ModelInference(retriever, user_query):
-        print("Step 5: Running model inference...")
+        print("Step 2: Running model inference...")
         try:
             final_data_list =[]
 
