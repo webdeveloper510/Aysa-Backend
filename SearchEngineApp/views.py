@@ -68,26 +68,18 @@ class ProductTrainPipeline(APIView):
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
 
-    def post(self , request , format=None):
+    def get(self,format=None):
         try:
+
+            product_data  = ProductModel.objects.all().values()
             
-            #CSV file name
-            File_path = os.path.join(os.getcwd() , "Data", 'ceo_vs_worker_pay.csv')
-
-            df = pd.read_csv(File_path)
-
-            for idx , row_data in df.iterrows():
-                CEOWokrerModel.objects.create(
-                    company_name =   row_data.get("Company Name"),
-                    year =  row_data.get("Year"),
-                    ceo_name =  row_data.get("CEO Name"),
-                    ceo_total_compensation = row_data.get("CEO Total Compensation"),
-                    worker_salary = row_data.get("Frontline Worker Salary")
-                )
-
+            if not product_data:
+                return DATA_NOT_FOUND("DATA NOT FOUND")
+            
             return Response({
                 "status": status.HTTP_200_OK ,
-                "message": "Data created successfully"
+                "message": "Data created successfully",
+                'data': product_data
             })
         
         except Exception as e:
@@ -149,25 +141,19 @@ class TaxTrainPipeline(APIView):
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
 
-    def post(self , request , format=None):
+    def get(self ,format=None):
         try:
+          
+            tax_data  = TaxModel.objects.all().values()
             
-            user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("user query is required ")
+            if not tax_data:
+                return DATA_NOT_FOUND("DATA NOT FOUND")
             
-            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Tax_DB", "faiss_index")
-
-            # Call Product Inference Model
-            # Function to inference model
-            inference_obj = UserInference(VectoDB_Path)
-
-            # STEP 1 
-            retriever = inference_obj.LoadVectorDB()
-
-            result_dict = inference_obj.ModelInference(retriever, user_query)
-
-            return Success_RESPONSE(user_query , result_dict)
+            return Response({
+                "status": status.HTTP_200_OK ,
+                "message": "Data created successfully",
+                'data': tax_data
+            })
 
 
         except Exception as e:
@@ -228,25 +214,19 @@ class CEOWorkerTrainPipeline(APIView):
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
 
-    def post(self , request , format=None):
+    def post(self , format=None):
         try:
             
-            user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("user query is required ")
+            ceo_worker_data  = CEOWokrerModel.objects.all().values()
             
-            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Ceo_Worker", "faiss_index")
-
-            # Call Product Inference Model
-            # Function to inference model
-            inference_obj = UserInference(VectoDB_Path)
-
-            # STEP 1 
-            retriever = inference_obj.LoadVectorDB()
-
-            result_dict = inference_obj.ModelInference(retriever, user_query)
-
-            return Success_RESPONSE(user_query , result_dict)
+            if not ceo_worker_data:
+                return DATA_NOT_FOUND("DATA NOT FOUND")
+            
+            return Response({
+                "status": status.HTTP_200_OK ,
+                "message": "Data created successfully",
+                'data': ceo_worker_data
+            })
 
 
         except Exception as e:
