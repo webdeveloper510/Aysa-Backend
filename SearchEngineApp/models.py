@@ -13,9 +13,16 @@ class ProductModel(models.Model):
     profit_margin = models.CharField(max_length = 255,blank=True, null=True)  
 
 
-
 class TaxModel(models.Model):
     company_name = models.CharField(max_length=500 , blank=True , null=True)
     year = models.CharField(max_length=500 , blank=True , null=True)
     tax_paid = models.CharField(max_length=500 , blank=True , null=True)
     tax_avoid = models.CharField(max_length = 255 ,blank=True, null=True)
+
+
+class CEOWokrerModel(models.Model):
+    company_name = models.CharField(max_length=500 , blank=True , null=True)
+    year = models.CharField(max_length=500 , blank=True , null=True)
+    ceo_name = models.CharField(max_length=500 , blank=True , null=True)
+    ceo_total_compensation = models.CharField(max_length = 500 ,blank=True, null=True)
+    worker_salary = models.CharField(max_length = 500 ,blank=True, null=True)
