@@ -14,6 +14,7 @@ import pandas as pd
 # import Project files
 from .product_pipeline import UserInference , DataTrainPipeline
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
+from .models import *
 
 # API FOR PRODUCT DATA TRAIN 
 class ProductTrainPipeline(APIView):
@@ -70,30 +71,36 @@ class ProductSemanticSearchView(APIView):
     def post(self , request , format=None):
         try:
             
-            user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("user query is required ")
-            
-            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Product_DB", "faiss_index")
+            #CSV file name
+            File_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
 
-            # Call Product Inference Model
-            # Function to inference model
-            inference_obj = UserInference(VectoDB_Path)
+            df = pd.read_csv(File_path)
+            ['Brand', 'Product Name', 'Type', 'Production Year', 'Link to Product Pictures', 'Market Price', 'Profit Made', 'Profit Margin']
 
-            # STEP 1 
-            retriever = inference_obj.LoadVectorDB()
+            for idx , row_data in df.iterrows():
+                
+                ProductModel.objects.create(
+                    brand  = row_data.get("Brand"),
+                    product_name = row_data.get("Product Name"),
+                    Type = row_data.get("Type"),
+                    year =row_data.get("Production Year"),
+                    product_url = row_data.get("Link to Product Pictures"),
+                    profit_price =row_data.get("Market Price"),
+                    profit_made = row_data.get("Profit Made"),
+                    profit_margin = row_data.get("Profit Margin"),
+                )
 
-            result_dict = inference_obj.ModelInference(retriever, user_query)
-
-            return Success_RESPONSE(user_query , result_dict)
-
-
+            return Response({
+                "status": status.HTTP_200_OK ,
+                "message": "Data created successfully"
+            })
+        
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
-
+        
 
 
 # API FOR Tax  DATA TRAIN 
