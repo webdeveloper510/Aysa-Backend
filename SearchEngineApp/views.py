@@ -72,22 +72,18 @@ class ProductSemanticSearchView(APIView):
         try:
             
             #CSV file name
-            File_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
+            File_path = os.path.join(os.getcwd() , "Data", 'corporate_tax_data.csv')
 
             df = pd.read_csv(File_path)
-            ['Brand', 'Product Name', 'Type', 'Production Year', 'Link to Product Pictures', 'Market Price', 'Profit Made', 'Profit Margin']
+
 
             for idx , row_data in df.iterrows():
                 
-                ProductModel.objects.create(
-                    brand  = row_data.get("Brand"),
-                    product_name = row_data.get("Product Name"),
-                    Type = row_data.get("Type"),
-                    year =row_data.get("Production Year"),
-                    product_url = row_data.get("Link to Product Pictures"),
-                    profit_price =row_data.get("Market Price"),
-                    profit_made = row_data.get("Profit Made"),
-                    profit_margin = row_data.get("Profit Margin"),
+                TaxModel.objects.create(
+                    company_name =   row_data.get("Company Name"),
+                    year =  row_data.get("Year"),
+                    tax_paid =  row_data.get("Tax Paid"),
+                    tax_avoid = row_data.get("Tax Avoided"),
                 )
 
             return Response({

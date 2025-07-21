@@ -11,3 +11,11 @@ class ProductModel(models.Model):
     profit_price = models.CharField(max_length = 255 ,blank=True, null=True)
     profit_made = models.CharField(max_length=255 , blank=True, null=True)
     profit_margin = models.CharField(max_length = 255,blank=True, null=True)  
+
+
+
+class TaxModel(models.Model):
+    company_name = models.CharField(max_length=500 , blank=True , null=True)
+    year = models.CharField(max_length=500 , blank=True , null=True)
+    tax_paid = models.CharField(max_length=500 , blank=True , null=True)
+    tax_avoid = models.CharField(max_length = 255 ,blank=True, null=True)
