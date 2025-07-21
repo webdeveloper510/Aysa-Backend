@@ -214,7 +214,7 @@ class CEOWorkerTrainPipeline(APIView):
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
 
-    def post(self , format=None):
+    def get(self , format=None):
         try:
             
             ceo_worker_data  = CEOWokrerModel.objects.all().values()
