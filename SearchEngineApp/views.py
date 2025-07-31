@@ -15,12 +15,7 @@ import pandas as pd
 from .product_pipeline import UserInference , DataTrainPipeline
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 from .models import *
-from textblob import TextBlob
-
-# function to check grammer corrector
-def SpellCorrector(input_str:str) -> str:
-    correct_string = TextBlob(input_str)
-    return str(correct_string.correct()).lower()
+from .utils import *
 
 
 
@@ -84,15 +79,13 @@ class ProductSemanticSearchView(APIView):
             VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Product_DB", "faiss_index")
 
             # Function to inference model
-            inference_obj = UserInference(VectoDB_Path)
+            inference_obj = UserInference(VectoDB_Path, PRODUCT_DATA_KEYS)
 
-            # STEP 1 
             retriever = inference_obj.LoadVectorDB()
 
             result_dict = inference_obj.ModelInference(retriever, user_query)
 
             return Success_RESPONSE(user_query , result_dict)
-
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -147,7 +140,6 @@ class TaxTrainPipeline(APIView):
                 "message": error_message
             })
 
-
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
 
@@ -164,7 +156,7 @@ class TaxSemanticSearchView(APIView):
 
             # Call Product Inference Model
             # Function to inference model
-            inference_obj = UserInference(VectoDB_Path)
+            inference_obj = UserInference(VectoDB_Path , TAX_DATA_KEYS)
 
             # STEP 1 
             retriever = inference_obj.LoadVectorDB()
@@ -180,7 +172,6 @@ class TaxSemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
-
 
 # API FOR  CEO WORKER DATA TRAIN 
 class CEOWorkerTrainPipeline(APIView):
@@ -229,7 +220,6 @@ class CEOWorkerTrainPipeline(APIView):
                 "message": error_message
             })
 
-
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
 
@@ -245,14 +235,10 @@ class CEOWorkerSemanticSearchView(APIView):
             
             VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Ceo_Worker", "faiss_index")
 
-            # Call Product Inference Model
             # Function to inference model
-            inference_obj = UserInference(VectoDB_Path)
+            inference_obj = UserInference(VectoDB_Path, CEO_WORKER_DATA_KEYS)
 
-            # STEP 1 
             retriever = inference_obj.LoadVectorDB()
-
-
 
             result_dict = inference_obj.ModelInference(retriever, user_query)
 
