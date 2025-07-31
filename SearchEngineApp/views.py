@@ -15,10 +15,18 @@ import pandas as pd
 from .product_pipeline import UserInference , DataTrainPipeline
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
 from .models import *
+from textblob import TextBlob
+
+# function to check grammer corrector
+def SpellCorrector(input_str:str) -> str:
+    correct_string = TextBlob(input_str)
+    return str(correct_string.correct()).lower()
+
+
 
 # API FOR PRODUCT DATA TRAIN 
 class ProductTrainPipeline(APIView):
-    def get(self, request, format =None):
+    def get(self,format =None):
         try:
             # Vector Database dir path
             vector_db_dir = os.path.join(os.getcwd() , "VectorDBS", "Product_DB")
@@ -68,15 +76,13 @@ class ProductSemanticSearchView(APIView):
     def post(self , request , format=None):
         try:
             
-            print("True ")
             user_query = request.data.get("query")
-            print("user query ", user_query)
+
             if not user_query:
-                return BAD_RESPONSE("user query is required, Please provide with key name : 'query' ")
+                return BAD_RESPONSE("user input is required, Please provide with key name : 'query' ")
             
             VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Product_DB", "faiss_index")
 
-            # Call Product Inference Model
             # Function to inference model
             inference_obj = UserInference(VectoDB_Path)
 
@@ -148,9 +154,11 @@ class TaxSemanticSearchView(APIView):
     def post(self , request , format=None):
         try:
             
-            user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("user query is required ")
+            user_input = request.data.get("query")
+            if not user_input:
+                return BAD_RESPONSE("user input is required , Please provide with key name : 'query'")
+            
+            user_query =SpellCorrector(user_input)
             
             VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Tax_DB", "faiss_index")
 
@@ -162,6 +170,7 @@ class TaxSemanticSearchView(APIView):
             retriever = inference_obj.LoadVectorDB()
 
             result_dict = inference_obj.ModelInference(retriever, user_query)
+            print("result dict ", result_dict)
 
             return Success_RESPONSE(user_query , result_dict)
 
@@ -171,7 +180,6 @@ class TaxSemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
-
 
 
 # API FOR  CEO WORKER DATA TRAIN 
@@ -228,9 +236,12 @@ class CEOWorkerSemanticSearchView(APIView):
     def post(self , request , format=None):
         try:
             
-            user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("user query is required ")
+            user_input = request.data.get("query")
+            if not user_input:
+                return BAD_RESPONSE("user query is required , Please provide with key name : 'query' ")
+            
+
+            user_query =SpellCorrector(user_input)
             
             VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Ceo_Worker", "faiss_index")
 
@@ -240,6 +251,8 @@ class CEOWorkerSemanticSearchView(APIView):
 
             # STEP 1 
             retriever = inference_obj.LoadVectorDB()
+
+
 
             result_dict = inference_obj.ModelInference(retriever, user_query)
 

@@ -13,3 +13,4 @@ langchain_experimental
 tabulate
 cryptography
 django-cors-headers
+textblob

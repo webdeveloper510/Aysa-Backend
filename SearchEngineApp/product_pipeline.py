@@ -59,7 +59,7 @@ class DataTrainPipeline:
 
     @staticmethod
     def TextEmbeddingAndVectorDb(VECTORDB_DIR_PATH, chunks: list):
-        print("Step 4: Embedding chunks and creating vector store...")
+        print("Step 3: Embedding chunks and creating vector store...")
         try:
             embedding = OllamaEmbeddings(model="mxbai-embed-large:latest")
             vectorstoreDB = FAISS.from_documents(chunks, embedding)
