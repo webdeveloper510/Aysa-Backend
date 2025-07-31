@@ -40,6 +40,11 @@ class DataTrainPipeline:
     def DataChunking(documents: list) -> list:
         print("Step 2: Chunking data...")
         try:
+            
+            # Apply lower case 
+            for doc in documents:
+                doc.page_content = doc.page_content.lower()
+
             # Use record-level chunking
             splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
             chunks = splitter.split_documents(documents)
@@ -99,37 +104,35 @@ class UserInference:
 
             for doc, score in sorted_results:
                 for line in doc:
-
-                    if isinstance(line, tuple) and line[0] == "page_content" and 0.3 < float(score) <= 1.0:
+                    
+                    print(f'score : {score} ==>  line: {line}')
+                    if isinstance(line, tuple) and line[0] == "page_content" and 0.25 < float(score) <= 1.0:
                         content_list = line[1].split("\n")
 
                         # Skip if the content list is empty or doesn't contain key-value format
                         if not content_list or ":" not in content_list[0]:
-                            print("Invalid content format, skipping this line.")
                             continue
 
                         try:
+                            content_list = [x.strip() for x in line[1].split("\n") if ":" in x]
+
                             data_dict = ListToDict(content_list)
 
-                            final_data_list.append(data_dict)
+                            dict_keys = list(data_dict.keys())
+
+                            if set(dict_keys) == set(self.required_keys):
+
+                                final_data_list.append(data_dict)
+
                         except Exception as e:
-                            print(f"ListToDict failed: {e}, skipping line.")
                             continue
                     else:
-                        print(f"Skipping Line because it has no needed info : {line}", float(score))
+                        pass
 
-            filtered_result = [item for item in final_data_list if is_valid_product(item, self.required_keys)]
-            if filtered_result:
-                return filtered_result
-
-            return []
+            return final_data_list
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Model inference failed. Reason: {str(e)} (line {exc_tb.tb_lineno})"
             return error_message
-
-
-
-
 
