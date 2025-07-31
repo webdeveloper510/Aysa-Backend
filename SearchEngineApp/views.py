@@ -63,33 +63,37 @@ class ProductTrainPipeline(APIView):
                 "message": error_message
             })
 
-
-
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
-
-    def get(self,format=None):
+    def post(self , request , format=None):
         try:
+            
+            print("True ")
+            user_query = request.data.get("query")
+            print("user query ", user_query)
+            if not user_query:
+                return BAD_RESPONSE("user query is required, Please provide with key name : 'query' ")
+            
+            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Product_DB", "faiss_index")
 
-            product_data  = ProductModel.objects.all().values()
-            
-            if not product_data:
-                return DATA_NOT_FOUND("DATA NOT FOUND")
-            
-            return Response({
-                "status": status.HTTP_200_OK ,
-                "message": "Data created successfully",
-                'data': product_data
-            })
-        
+            # Call Product Inference Model
+            # Function to inference model
+            inference_obj = UserInference(VectoDB_Path)
+
+            # STEP 1 
+            retriever = inference_obj.LoadVectorDB()
+
+            result_dict = inference_obj.ModelInference(retriever, user_query)
+
+            return Success_RESPONSE(user_query , result_dict)
+
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
         
-
-
 # API FOR Tax  DATA TRAIN 
 class TaxTrainPipeline(APIView):
     def get(self, format =None):
@@ -141,19 +145,25 @@ class TaxTrainPipeline(APIView):
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
 
-    def get(self ,format=None):
+    def post(self , request , format=None):
         try:
-          
-            tax_data  = TaxModel.objects.all().values()
             
-            if not tax_data:
-                return DATA_NOT_FOUND("DATA NOT FOUND")
+            user_query = request.data.get("query")
+            if not user_query:
+                return BAD_RESPONSE("user query is required ")
             
-            return Response({
-                "status": status.HTTP_200_OK ,
-                "message": "Data created successfully",
-                'data': tax_data
-            })
+            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Tax_DB", "faiss_index")
+
+            # Call Product Inference Model
+            # Function to inference model
+            inference_obj = UserInference(VectoDB_Path)
+
+            # STEP 1 
+            retriever = inference_obj.LoadVectorDB()
+
+            result_dict = inference_obj.ModelInference(retriever, user_query)
+
+            return Success_RESPONSE(user_query , result_dict)
 
 
         except Exception as e:
@@ -161,6 +171,7 @@ class TaxSemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
+
 
 
 # API FOR  CEO WORKER DATA TRAIN 
@@ -214,19 +225,25 @@ class CEOWorkerTrainPipeline(APIView):
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
 
-    def get(self , format=None):
+    def post(self , request , format=None):
         try:
             
-            ceo_worker_data  = CEOWokrerModel.objects.all().values()
+            user_query = request.data.get("query")
+            if not user_query:
+                return BAD_RESPONSE("user query is required ")
             
-            if not ceo_worker_data:
-                return DATA_NOT_FOUND("DATA NOT FOUND")
-            
-            return Response({
-                "status": status.HTTP_200_OK ,
-                "message": "Data created successfully",
-                'data': ceo_worker_data
-            })
+            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Ceo_Worker", "faiss_index")
+
+            # Call Product Inference Model
+            # Function to inference model
+            inference_obj = UserInference(VectoDB_Path)
+
+            # STEP 1 
+            retriever = inference_obj.LoadVectorDB()
+
+            result_dict = inference_obj.ModelInference(retriever, user_query)
+
+            return Success_RESPONSE(user_query , result_dict)
 
 
         except Exception as e:
@@ -234,9 +251,6 @@ class CEOWorkerSemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return []
-
-
-
 
 
 

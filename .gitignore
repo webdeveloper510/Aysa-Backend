@@ -21,3 +21,6 @@ __pycache__/
 
 # Ignore Migrations
 SearchEngineApp/migrations
+
+# Ignore vector DB 
+VectorDBS

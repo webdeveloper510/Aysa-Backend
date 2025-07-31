@@ -18,7 +18,7 @@ from .tests import *
 def ListToDict(input_list):
     data_dict ={}
     for item in input_list :
-        split_item=  item.split(":")
+        split_item=  item.split(":", 1)
         data_dict[split_item[0]] =split_item[1]
     return data_dict
 
@@ -26,6 +26,8 @@ def ListToDict(input_list):
 class DataTrainPipeline:
     def __init__(self, ProductCSV):
         self.fileName = ProductCSV
+
+
 
     @staticmethod
     def DataIngestion(FILEPATH: list) -> list:
@@ -100,8 +102,9 @@ class UserInference:
 
             for doc, score in sorted_results:
                 for line in doc:
+                    print("score ", score)
                     
-                    if (isinstance(line, tuple) and line[0] == "page_content" and 0.3 < float(score) <= 0.9):
+                    if (isinstance(line, tuple) and line[0] == "page_content" and 0.3 < float(score) <= 1.0):
                         content_list = line[1].split("\n")
                         print("score ", score  ,"content_list  ", content_list)
                         data_dict = ListToDict(content_list)
