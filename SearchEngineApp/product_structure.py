@@ -70,7 +70,6 @@ class ProductModelStructure:
             df = df.dropna().drop_duplicates()
             df.columns = df.columns.str.strip()
             df = df.copy()
-            print(df)
 
             df["Production Year"] = df["Production Year"].fillna("").apply(
                 lambda x: str(int(x)) if x != "" else ""

@@ -97,7 +97,7 @@ class ProductSemanticSearchView(APIView):
             results = df.sort_values('similarity', ascending=False).head(self.top_n)
             Mapped_DF = results[[
                 "Brand", "Product Name", "Type", "Production Year",
-                "Profit Margin", "similarity", "cluster"
+                "Profit Margin", "similarity", "cluster", 'Link to Product Pictures'
             ]]
 
             return Mapped_DF
