@@ -27,3 +27,7 @@ VectorDBS
 
 # Ignore Jupyter file
 SearchEngineApp/work.ipynb
+
+
+# Ignore Transfer model 
+transfer_model

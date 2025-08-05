@@ -34,9 +34,19 @@ class ProductModelStructure:
         self.csv_path = csv_path
         self.max_range = 20
         self.random_state_value = 42
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
         self.device= torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.top_n = 5
+
+    def DownloadUpdateModel(self , TransferModelDir):
+        model_path = os.path.join(TransferModelDir, "all-MiniLM-L6-v2")
+        if not os.path.exists(model_path):
+            model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+            model.save(model_path)
+        else:
+            model = SentenceTransformer(model_path)
+
+        return model
+
 
     def read_csv(self):
         print("Step 1: Reading CSV file...")
@@ -73,10 +83,10 @@ class ProductModelStructure:
         except Exception as e:
             raise Exception(f"Text preprocessing failed: {e}")
 
-    def encode_text(self, df):
+    def encode_text(self, df, model):
         print("Step 3: Generating embeddings...")
         try:
-            embeddings = self.model.encode(df['Text'].tolist(), show_progress_bar=True)
+            embeddings = model.encode(df['Text'].tolist(), show_progress_bar=True)
 
             if len(embeddings) == 0:
                 raise ValueError("No embeddings generated. Check input data.")
@@ -115,12 +125,13 @@ class ProductModelStructure:
             raise Exception(f"KMeans clustering failed: {e}")
 
 
-def product_main(file_path, embedding_dir_path ,ModelDirPath):
+def product_main(file_path, embedding_dir_path ,ModelDirPath , TransferModelDir):
     try:
         product_structure = ProductModelStructure(file_path)
+        model = product_structure.DownloadUpdateModel(TransferModelDir)
         df = product_structure.read_csv()
         cleaned_df = product_structure.preprocess_text_data(df)
-        encoded_df, embeddings = product_structure.encode_text(cleaned_df)
+        encoded_df, embeddings = product_structure.encode_text(cleaned_df, model)
         best_k = GetBestK_score(product_structure.max_range, embeddings)
         response = product_structure.apply_kmeans(encoded_df, embeddings, best_k, embedding_dir_path, ModelDirPath)
 

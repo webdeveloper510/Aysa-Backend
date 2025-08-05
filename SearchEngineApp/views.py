@@ -38,7 +38,11 @@ class ProductTrainPipeline(APIView):
             if not os.path.exists(input_csv_file_path):
                 return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
             
-            model_response = product_main(input_csv_file_path, Emedding_dir_path, ModelDirPath)
+            # Transformer model 
+            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
+            os.makedirs(TransferModelDir , exist_ok=True)
+            
+            model_response = product_main(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
 
             return Response({
                 "message": model_response,
@@ -61,8 +65,17 @@ class ProductSemanticSearchView(APIView):
     # function to get product search
     def ProductSearch(self ,user_query , embedding_df_path, kmeans_model_path):
         try:
-            model = SentenceTransformer('all-MiniLM-L6-v2')
+            
+            # Import Transfer sentence model 
+            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
+            os.makedirs(TransferModelDir , exist_ok=True)
+            production_obj= ProductModelStructure()
+            model = production_obj.DownloadUpdateModel()
+
+            # Read Pickle file
             df = pd.read_pickle(embedding_df_path)
+
+            # Load Cluster Model
             kmeans = joblib.load(kmeans_model_path)
 
             # Encode user query
