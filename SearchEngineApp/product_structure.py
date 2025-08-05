@@ -89,9 +89,13 @@ class ProductModelStructure:
         except Exception as e:
             raise Exception(f"Text preprocessing failed: {e}")
 
-    def encode_text(self, df, model):
+    def encode_text(self, df):
         print("Step 3: Generating embeddings...")
         try:
+
+            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
+            model = SentenceTransformer(transfer_model_path)
+
             embeddings = model.encode(df['Text'].tolist(), show_progress_bar=True)
 
             if len(embeddings) == 0:
@@ -137,7 +141,7 @@ def product_main(file_path, embedding_dir_path ,ModelDirPath , TransferModelDir)
         model = product_structure.DownloadUpdateModel(TransferModelDir)
         df = product_structure.read_csv()
         cleaned_df = product_structure.preprocess_text_data(df)
-        encoded_df, embeddings = product_structure.encode_text(cleaned_df, model)
+        encoded_df, embeddings = product_structure.encode_text(cleaned_df)
         best_k = GetBestK_score(product_structure.max_range, embeddings)
         response = product_structure.apply_kmeans(encoded_df, embeddings, best_k, embedding_dir_path, ModelDirPath)
 
