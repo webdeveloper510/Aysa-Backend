@@ -24,3 +24,6 @@ SearchEngineApp/migrations
 
 # Ignore vector DB 
 VectorDBS
+
+# Ignore Jupyter file
+SearchEngineApp/work.ipynb
