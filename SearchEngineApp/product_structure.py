@@ -38,10 +38,15 @@ class ProductModelStructure:
         self.top_n = 5
 
     def DownloadUpdateModel(self , TransferModelDir):
+        import os
+        os.environ['HF_HOME'] = os.path.join(os.getcwd(), 'huggingface_cache')
+
         model_path = os.path.join(TransferModelDir, "all-MiniLM-L6-v2")
+
         if not os.path.exists(model_path):
             model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
             model.save(model_path)
+            
         else:
             model = SentenceTransformer(model_path)
 
