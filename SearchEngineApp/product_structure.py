@@ -46,8 +46,9 @@ class ProductModelStructure:
         if not os.path.exists(model_path):
             model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
             model.save(model_path)
-            
+
         else:
+            print("model path ", model_path)
             model = SentenceTransformer(model_path)
 
         return model

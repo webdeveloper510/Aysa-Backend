@@ -65,17 +65,14 @@ class ProductSemanticSearchView(APIView):
     # function to get product search
     def ProductSearch(self ,user_query , embedding_df_path, kmeans_model_path):
         try:
-            
-            # Import Transfer sentence model 
-            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
-            os.makedirs(TransferModelDir , exist_ok=True)
-            production_obj= ProductModelStructure()
-            model = production_obj.DownloadUpdateModel()
+            # Make a path of senetence tranfer model
+            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
+            model = SentenceTransformer(transfer_model_path)
 
-            # Read Pickle file
+            # Read saved dataframe
             df = pd.read_pickle(embedding_df_path)
 
-            # Load Cluster Model
+            # Load Model
             kmeans = joblib.load(kmeans_model_path)
 
             # Encode user query
