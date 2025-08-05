@@ -111,8 +111,10 @@ class ProductSemanticSearchView(APIView):
 
     def filter_highest_and_lowest_margin_rows(self,compare_df: pd.DataFrame) -> pd.DataFrame:
         # Clean up the data
+        print("compare df is prinitng ...")
+        print(compare_df)
         compare_df = compare_df.copy()
-        compare_df.loc[:, "Profit Margin"] = compare_df["Profit Margin"].str.replace('%', '').astype(int)
+        compare_df.loc[:, "Profit Margin"] = compare_df["Profit Margin"].str.replace('%', '').astype(float)
         compare_df.loc[:, "Production Year"] = compare_df["Production Year"].astype(int)
 
         filtered_rows = []
