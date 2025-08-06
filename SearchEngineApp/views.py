@@ -117,6 +117,8 @@ class ProductSemanticSearchView(APIView):
         # Clean up the data
         compare_df = compare_df.copy()
 
+        print('compare df is printing ...')
+        print(compare_df)
 
         latest_year_df = compare_df[compare_df["Production Year"] == latest_year]
 
@@ -136,7 +138,7 @@ class ProductSemanticSearchView(APIView):
 
             # Convert columns back to original format
             filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(str) + '%'
-            
+
             # Optional: sort by Brand and Profit Margin
             filtered_df = filtered_df.sort_values(["Brand", "Profit Margin"], ascending=[True, False])
 
@@ -187,13 +189,18 @@ class ProductSemanticSearchView(APIView):
                 df = df.drop(['cluster'], axis=1)
 
                 matched_df = df         
-                latest_row = matched_df.loc[matched_df['similarity'].idxmax()]
+                latest_row_series = matched_df.loc[matched_df['similarity'].idxmax()]
+                latest_row = latest_row_series.to_dict()
+                
+                if "similarity" in latest_row:
+                    latest_row.pop('similarity')
+
                 compare_df =pd.DataFrame()   
         
             
             # if there is multiple df get highest and lowest profit margin based on the year and brand
             elif len(updated_data_dict) >1 :
-
+                print("sdbgasddashfvhfvdhfvds")
                 # Get Values list of Updated Data Dict 
                 Sorted_Values_list = list(updated_data_dict.values())
 
@@ -213,7 +220,12 @@ class ProductSemanticSearchView(APIView):
                 matched_df = filtered_matched_df.drop(['cluster'], axis=1)
 
                 # Get single Row with latest year
-                latest_row = matched_df.loc[matched_df['similarity'].idxmax()]
+                latest_row_series = matched_df.loc[matched_df['similarity'].idxmax()]
+
+                latest_row = latest_row_series.to_dict()
+
+                if "similarity" in latest_row:
+                    latest_row.pop('similarity')
 
                 # get latest year
                 latest_year =  latest_row['Production Year']
@@ -229,11 +241,14 @@ class ProductSemanticSearchView(APIView):
                 # call function to get another brands highest and lower margin difference
                 compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf , latest_year)
 
+                if not isinstance(compare_df , list) and not compare_df.empty:
+                    compare_df = compare_df.drop(['similarity'], axis=1)
+
 
             return Response({
                 "message": "success",
                 "status": status.HTTP_200_OK,
-                "matched_data": [latest_row.to_dict()],
+                "matched_data":  [latest_row],
                 "compare_data": compare_df.to_dict(orient="records") if not isinstance(compare_df , list) else []
             })
                 
