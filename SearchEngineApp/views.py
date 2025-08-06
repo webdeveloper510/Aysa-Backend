@@ -95,9 +95,10 @@ class ProductSemanticSearchView(APIView):
 
             # Sort by similarity and get top N
             results = df.sort_values('similarity', ascending=False).head(self.top_n)
+
             Mapped_DF = results[[
                 "Brand", "Product Name", "Type", "Production Year",
-                "Profit Margin", "similarity", "cluster", 'Link to Product Pictures'
+                "Profit Margin", "similarity", "cluster", 'Link to Product Pictures',"Release Price","Profit Made"
             ]]
 
             return Mapped_DF
@@ -111,8 +112,6 @@ class ProductSemanticSearchView(APIView):
 
     def filter_highest_and_lowest_margin_rows(self,compare_df: pd.DataFrame) -> pd.DataFrame:
         # Clean up the data
-        print("compare df is prinitng ...")
-        print(compare_df)
         compare_df = compare_df.copy()
         compare_df.loc[:, "Profit Margin"] = compare_df["Profit Margin"].str.replace('%', '').astype(float)
         compare_df.loc[:, "Production Year"] = compare_df["Production Year"].astype(int)
@@ -201,11 +200,9 @@ class ProductSemanticSearchView(APIView):
                 # Sort list 
                 Sorted_Values_list.sort()
             
-                print("Sorted_Values_list ", Sorted_Values_list)
                 # Get largest value from list 
                 max_value_count  = max(Sorted_Values_list)
 
-                print("max_value_count ", max_value_count)
 
                 # Get matched df based on multiple rows data matched
                 top_brands = [key for key, value in brand_dict.items() if value == max_value_count]
@@ -223,8 +220,6 @@ class ProductSemanticSearchView(APIView):
                 else:
                     CompareDf = df[~df['Brand'].isin(top_brands)] 
 
-                print("compare dataframe is printing ....")
-                print(CompareDf)
                 # call function to get another brands highest and lower margin difference
                 compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf)
 
