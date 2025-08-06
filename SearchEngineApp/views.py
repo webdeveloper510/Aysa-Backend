@@ -96,6 +96,7 @@ class ProductSemanticSearchView(APIView):
 
             # Sort by similarity and get top N
             results = df.sort_values('similarity', ascending=False).head(self.top_n)
+            print("==========> ", results[["Brand", "Product Name", "similarity"]])
 
             Mapped_DF = results[[
                 "Brand", "Product Name", "Type", "Production Year",
@@ -122,13 +123,12 @@ class ProductSemanticSearchView(APIView):
         if not latest_year_df.empty:
 
             latest_year_df.loc[:, "Profit Margin"] = latest_year_df["Profit Margin"].str.replace('%', '').astype(float)
-            latest_year_df.loc[:, "Production Year"] = latest_year_df["Production Year"].astype(int)
 
             filtered_rows = []
 
             for brand, group in latest_year_df.groupby("Brand"):
 
-                highest = group.loc[group["Profit Margin"].idxmax()]
+                highest = group.loc[group["similarity"].idxmax()]
                 filtered_rows.extend([highest])
 
             # Create the final filtered DataFrame
@@ -136,13 +136,12 @@ class ProductSemanticSearchView(APIView):
 
             # Convert columns back to original format
             filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(str) + '%'
-            filtered_df["Production Year"] = filtered_df["Production Year"].astype(str)
-
+            
             # Optional: sort by Brand and Profit Margin
             filtered_df = filtered_df.sort_values(["Brand", "Profit Margin"], ascending=[True, False])
 
             # Remove unneccessary columns from the dataframe
-            filtered_df = filtered_df.drop(['similarity', 'cluster'], axis=1)
+            filtered_df = filtered_df.drop(['cluster'], axis=1)
             return filtered_df
         
         return []
@@ -185,10 +184,10 @@ class ProductSemanticSearchView(APIView):
            
             # if there is only one brand return all data 
             if len(updated_data_dict) ==1:
-                df = df.drop(['similarity', 'cluster'], axis=1)
+                df = df.drop(['cluster'], axis=1)
 
                 matched_df = df         
-                latest_row = matched_df.loc[matched_df['Production Year'].idxmax()]
+                latest_row = matched_df.loc[matched_df['similarity'].idxmax()]
                 compare_df =pd.DataFrame()   
         
             
@@ -211,15 +210,14 @@ class ProductSemanticSearchView(APIView):
 
                 filtered_matched_df  = df[df['Brand'] == matched_brand]
 
-                matched_df = filtered_matched_df.drop(['similarity', 'cluster'], axis=1)
+                matched_df = filtered_matched_df.drop(['cluster'], axis=1)
 
                 # Get single Row with latest year
-                latest_row = matched_df.loc[matched_df['Production Year'].idxmax()]
+                latest_row = matched_df.loc[matched_df['similarity'].idxmax()]
 
                 # get latest year
                 latest_year =  latest_row['Production Year']
 
-                
                 CompareDf =pd.DataFrame()
 
                 if len(top_brands) > 1:
@@ -321,7 +319,6 @@ class TaxSemanticSearchView(APIView):
             retriever = inference_obj.LoadVectorDB()
 
             result_dict = inference_obj.ModelInference(retriever, user_query)
-            print("result dict ", result_dict)
 
             return Success_RESPONSE(user_query , result_dict)
 
