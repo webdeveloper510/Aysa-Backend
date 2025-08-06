@@ -116,31 +116,36 @@ class ProductSemanticSearchView(APIView):
         # Clean up the data
         compare_df = compare_df.copy()
 
+
         latest_year_df = compare_df[compare_df["Production Year"] == latest_year]
 
-        latest_year_df.loc[:, "Profit Margin"] = latest_year_df["Profit Margin"].str.replace('%', '').astype(float)
-        latest_year_df.loc[:, "Production Year"] = latest_year_df["Production Year"].astype(int)
+        if not latest_year_df.empty:
 
-        filtered_rows = []
+            latest_year_df.loc[:, "Profit Margin"] = latest_year_df["Profit Margin"].str.replace('%', '').astype(float)
+            latest_year_df.loc[:, "Production Year"] = latest_year_df["Production Year"].astype(int)
 
-        for brand, group in latest_year_df.groupby("Brand"):
+            filtered_rows = []
 
-            highest = group.loc[group["Profit Margin"].idxmax()]
-            filtered_rows.extend([highest])
+            for brand, group in latest_year_df.groupby("Brand"):
 
-        # Create the final filtered DataFrame
-        filtered_df = pd.DataFrame(filtered_rows)
+                highest = group.loc[group["Profit Margin"].idxmax()]
+                filtered_rows.extend([highest])
 
-        # Convert columns back to original format
-        filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(str) + '%'
-        filtered_df["Production Year"] = filtered_df["Production Year"].astype(str)
+            # Create the final filtered DataFrame
+            filtered_df = pd.DataFrame(filtered_rows)
 
-        # Optional: sort by Brand and Profit Margin
-        filtered_df = filtered_df.sort_values(["Brand", "Profit Margin"], ascending=[True, False])
+            # Convert columns back to original format
+            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(str) + '%'
+            filtered_df["Production Year"] = filtered_df["Production Year"].astype(str)
 
-        # Remove unneccessary columns from the dataframe
-        filtered_df = filtered_df.drop(['similarity', 'cluster'], axis=1)
-        return filtered_df
+            # Optional: sort by Brand and Profit Margin
+            filtered_df = filtered_df.sort_values(["Brand", "Profit Margin"], ascending=[True, False])
+
+            # Remove unneccessary columns from the dataframe
+            filtered_df = filtered_df.drop(['similarity', 'cluster'], axis=1)
+            return filtered_df
+        
+        return []
 
     def post(self, request, format=None):
         try:
@@ -213,6 +218,7 @@ class ProductSemanticSearchView(APIView):
 
                 # get latest year
                 latest_year =  latest_row['Production Year']
+
                 
                 CompareDf =pd.DataFrame()
 
@@ -225,11 +231,12 @@ class ProductSemanticSearchView(APIView):
                 # call function to get another brands highest and lower margin difference
                 compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf , latest_year)
 
+
             return Response({
                 "message": "success",
                 "status": status.HTTP_200_OK,
                 "matched_data": [latest_row.to_dict()],
-                "compare_data": compare_df.to_dict(orient="records")
+                "compare_data": compare_df.to_dict(orient="records") if not isinstance(compare_df , list) else []
             })
                 
 
