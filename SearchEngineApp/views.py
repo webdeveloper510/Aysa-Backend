@@ -185,7 +185,7 @@ class ProductSemanticSearchView(APIView):
             # create new dict with updated values with same keys
             updated_data_dict = dict(zip(list(brand_dict.keys()) , values_list))
 
-    
+           
             # if there is only one brand return all data 
             if len(updated_data_dict) ==1:
                 df = df.drop(['similarity', 'cluster'], axis=1)
@@ -200,23 +200,31 @@ class ProductSemanticSearchView(APIView):
 
                 # Sort list 
                 Sorted_Values_list.sort()
-
+            
+                print("Sorted_Values_list ", Sorted_Values_list)
                 # Get largest value from list 
-                first_largest_value = Sorted_Values_list[-1]
+                max_value_count  = max(Sorted_Values_list)
+
+                print("max_value_count ", max_value_count)
 
                 # Get matched df based on multiple rows data matched
-                top_brands = [key for key, value in brand_dict.items() if value == first_largest_value]
+                top_brands = [key for key, value in brand_dict.items() if value == max_value_count]
 
                 matched_brand = top_brands[0]
+
 
                 filtered_matched_df  = df[df['Brand'] == matched_brand]
                 matched_df = filtered_matched_df.drop(['similarity', 'cluster'], axis=1)
 
-                # LOGIC FOR ANOTHER BRAND MATCHED BRAND
+                CompareDf =pd.DataFrame()
+                if len(top_brands) > 1:
+                    top_brands.remove(matched_brand)
+                    CompareDf = df[df['Brand'].isin(top_brands)] 
+                else:
+                    CompareDf = df[~df['Brand'].isin(top_brands)] 
 
-                # remove all rows from database where Largest values key matched
-                CompareDf = df[~df['Brand'].isin(top_brands)]
-
+                print("compare dataframe is printing ....")
+                print(CompareDf)
                 # call function to get another brands highest and lower margin difference
                 compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf)
 
