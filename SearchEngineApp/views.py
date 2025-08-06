@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 import torch
+import json
 
 # import Project files
 from .model_pipeline import UserInference , DataTrainPipeline
@@ -110,30 +111,22 @@ class ProductSemanticSearchView(APIView):
             return None
 
 
-    def filter_highest_and_lowest_margin_rows(self,compare_df: pd.DataFrame) -> pd.DataFrame:
+    def filter_highest_and_lowest_margin_rows(self,compare_df: pd.DataFrame , latest_year : str) -> pd.DataFrame:
+
         # Clean up the data
         compare_df = compare_df.copy()
-        compare_df.loc[:, "Profit Margin"] = compare_df["Profit Margin"].str.replace('%', '').astype(float)
-        compare_df.loc[:, "Production Year"] = compare_df["Production Year"].astype(int)
+
+        latest_year_df = compare_df[compare_df["Production Year"] == latest_year]
+
+        latest_year_df.loc[:, "Profit Margin"] = latest_year_df["Profit Margin"].str.replace('%', '').astype(float)
+        latest_year_df.loc[:, "Production Year"] = latest_year_df["Production Year"].astype(int)
 
         filtered_rows = []
 
-        for brand, group in compare_df.groupby("Brand"):
-            # Highest profit margin with highest production year
-            max_margin = group["Profit Margin"].max()
-            highest_group = group[group["Profit Margin"] == max_margin]
-            highest = highest_group.loc[highest_group["Production Year"].idxmax()]
+        for brand, group in latest_year_df.groupby("Brand"):
 
-            # Lowest profit margin with lowest production year
-            min_margin = group["Profit Margin"].min()
-            lowest_group = group[group["Profit Margin"] == min_margin]
-            lowest = lowest_group.loc[lowest_group["Production Year"].idxmin()]
-
-            # Avoid duplicate row (in case highest == lowest)
-            if highest.equals(lowest):
-                filtered_rows.append(highest)
-            else:
-                filtered_rows.extend([highest, lowest])
+            highest = group.loc[group["Profit Margin"].idxmax()]
+            filtered_rows.extend([highest])
 
         # Create the final filtered DataFrame
         filtered_df = pd.DataFrame(filtered_rows)
@@ -149,10 +142,9 @@ class ProductSemanticSearchView(APIView):
         filtered_df = filtered_df.drop(['similarity', 'cluster'], axis=1)
         return filtered_df
 
-
     def post(self, request, format=None):
         try:
-            matched_df =None
+            latest_row =None
             compare_df =None
 
             user_query = request.data.get("query")
@@ -166,6 +158,7 @@ class ProductSemanticSearchView(APIView):
 
             # Load model and data
             df  = self.ProductSearch(user_query , embedding_df_path, kmeans_model_path)
+
             if df.empty:
                 return Response({
                     "message": "Dataframe is empty",
@@ -188,8 +181,11 @@ class ProductSemanticSearchView(APIView):
             # if there is only one brand return all data 
             if len(updated_data_dict) ==1:
                 df = df.drop(['similarity', 'cluster'], axis=1)
+
                 matched_df = df         
-                compare_df =pd.DataFrame()            
+                latest_row = matched_df.loc[matched_df['Production Year'].idxmax()]
+                compare_df =pd.DataFrame()   
+        
             
             # if there is multiple df get highest and lowest profit margin based on the year and brand
             elif len(updated_data_dict) >1 :
@@ -203,17 +199,23 @@ class ProductSemanticSearchView(APIView):
                 # Get largest value from list 
                 max_value_count  = max(Sorted_Values_list)
 
-
                 # Get matched df based on multiple rows data matched
                 top_brands = [key for key, value in brand_dict.items() if value == max_value_count]
 
                 matched_brand = top_brands[0]
 
-
                 filtered_matched_df  = df[df['Brand'] == matched_brand]
+
                 matched_df = filtered_matched_df.drop(['similarity', 'cluster'], axis=1)
 
+                # Get single Row with latest year
+                latest_row = matched_df.loc[matched_df['Production Year'].idxmax()]
+
+                # get latest year
+                latest_year =  latest_row['Production Year']
+                
                 CompareDf =pd.DataFrame()
+
                 if len(top_brands) > 1:
                     top_brands.remove(matched_brand)
                     CompareDf = df[df['Brand'].isin(top_brands)] 
@@ -221,12 +223,12 @@ class ProductSemanticSearchView(APIView):
                     CompareDf = df[~df['Brand'].isin(top_brands)] 
 
                 # call function to get another brands highest and lower margin difference
-                compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf)
+                compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf , latest_year)
 
             return Response({
                 "message": "success",
                 "status": status.HTTP_200_OK,
-                "matched_data": matched_df.to_dict(orient="records"),
+                "matched_data": [latest_row.to_dict()],
                 "compare_data": compare_df.to_dict(orient="records")
             })
                 
