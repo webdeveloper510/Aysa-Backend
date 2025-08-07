@@ -14,7 +14,7 @@ import torch
 
 # import Project files
 from .model_pipeline import UserInference , DataTrainPipeline
-from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND
+from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND, ProductResponse
 from .models import *
 from .utils import *
 from .product_structure import *
@@ -123,37 +123,77 @@ class ProductSemanticSearchView(APIView):
             # Load model and data
             df = self.ProductSearch(user_query, embedding_df_path, kmeans_model_path)
 
-            if not df.empty:
-                # Get best match
-                matched_row = df.loc[df["similarity"].idxmax()]
-                matched_data = matched_row.to_dict()
+            if df.empty:
+                return ProductResponse("failed", [], [])
 
-                # Exclude matched brand
-                excluded_brand = matched_data.get("Brand")  # Make sure it's lowercase if df column is lowercase
-                filtered_df = df[~df["Brand"].isin([excluded_brand])]
+            # Filter by similarity if similarity score is greater than 0.45
+            filtered_df = df[df["similarity"] > 0.45]
+            
+            if filtered_df.empty:
+                return ProductResponse("failed", [], [])
 
-                compare_df = pd.DataFrame()
+            # make a copy of filtered df
+            df = filtered_df.copy()
 
-                if not filtered_df.empty:
-                    # Get highest similarity per remaining brand
-                    compare_df = filtered_df.loc[filtered_df.groupby("Brand")["similarity"].idxmax().dropna()]
+            # Ensure Production Year is numeric
+            df["Production Year"] = pd.to_numeric(df["Production Year"], errors="coerce")
+            df = df[df["Production Year"].notnull()]
+            df["Production Year"] = df["Production Year"].astype(int)
 
-                    # Drop unwanted columns
+            # Get matched row (highest similarity)
+            matched_row = df.loc[df["similarity"].idxmax()]
+            
+            # Convert matched series data into dictionary
+            matched_data = matched_row.to_dict()               
+
+            # Remove unwanted keys
+            matched_data.pop("similarity", None)
+            matched_data.pop("cluster", None)
+
+            # Get values for exclusion/filtering
+            matched_brand = matched_data.get("Brand")
+            matched_year = matched_data.get("Production Year")
+
+
+            # Filter out same brand and items with higher production year
+            exclude_df = df[
+                     df["Brand"].str.strip().str.lower() != str(matched_brand).strip().lower()
+                ]
+
+            compare_df = pd.DataFrame()
+            compare_rows = []
+
+            if not exclude_df.empty:
+                for brand , group in exclude_df.groupby("Brand"):
+                    
+                    group = group[group["Production Year"] <= matched_year]
+                    if group.empty:
+                        continue
+
+                    years = sorted(group["Production Year"].unique(), reverse=True) 
+
+                    selected_row = None
+                    for yr in years:
+                        # Filter group by current year
+                        year_group = group[group["Production Year"] == yr]
+
+                        if not year_group.empty:
+                            # Select the row with the highest similarity for this year
+                            selected_row = year_group.loc[year_group["similarity"].idxmax()]
+                            break  # we found the most recent year available, so stop
+
+                    if selected_row is not None:
+                        compare_rows.append(selected_row)
+
+                # Convert to DataFrame and clean up
+                if compare_rows:
+                    compare_df = pd.DataFrame(compare_rows)
                     compare_df = compare_df.drop(columns=["similarity", "cluster"], errors="ignore")
-
-                return Response({
-                    "message": "success",
-                    "status": status.HTTP_200_OK,
-                    "matched_data": [matched_data],
-                    "compare_data": compare_df.to_dict(orient="records") if not compare_df.empty else []
-                })
-
-            return Response({
-                "message": "success",
-                "status": status.HTTP_200_OK,
-                "matched_data": [],
-                "compare_data": []
-            })
+                    compare_df = compare_df.to_dict(orient="records")
+                else:
+                    compare_df = []
+            
+            return ProductResponse("success", matched_data, compare_df)
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
