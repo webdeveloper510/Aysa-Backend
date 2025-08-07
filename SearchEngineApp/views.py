@@ -11,7 +11,6 @@ import sys
 from pathlib import Path
 import pandas as pd
 import torch
-import json
 
 # import Project files
 from .model_pipeline import UserInference , DataTrainPipeline
@@ -96,7 +95,6 @@ class ProductSemanticSearchView(APIView):
 
             # Sort by similarity and get top N
             results = df.sort_values('similarity', ascending=False).head(self.top_n)
-            print("==========> ", results[["Brand", "Product Name", "similarity"]])
 
             Mapped_DF = results[[
                 "Brand", "Product Name", "Type", "Production Year",
@@ -110,148 +108,52 @@ class ProductSemanticSearchView(APIView):
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return None
-
-
-    def filter_highest_and_lowest_margin_rows(self,compare_df: pd.DataFrame , latest_year : str) -> pd.DataFrame:
-
-        # Clean up the data
-        compare_df = compare_df.copy()
-
-        print('compare df is printing ...')
-        print(compare_df)
-
-        latest_year_df = compare_df[compare_df["Production Year"] == latest_year]
-
-        if not latest_year_df.empty:
-
-            latest_year_df.loc[:, "Profit Margin"] = latest_year_df["Profit Margin"].str.replace('%', '').astype(float)
-
-            filtered_rows = []
-
-            for brand, group in latest_year_df.groupby("Brand"):
-
-                highest = group.loc[group["similarity"].idxmax()]
-                filtered_rows.extend([highest])
-
-            # Create the final filtered DataFrame
-            filtered_df = pd.DataFrame(filtered_rows)
-
-            # Convert columns back to original format
-            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(str) + '%'
-
-            # Optional: sort by Brand and Profit Margin
-            filtered_df = filtered_df.sort_values(["Brand", "Profit Margin"], ascending=[True, False])
-
-            # Remove unneccessary columns from the dataframe
-            filtered_df = filtered_df.drop(['cluster'], axis=1)
-            return filtered_df
-        
-        return []
-
+   
     def post(self, request, format=None):
         try:
-            latest_row =None
-            compare_df =None
-
             user_query = request.data.get("query")
 
             if not user_query:
-                return BAD_RESPONSE("user input is required, Please provide with key name: 'query'")
+                return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
             # Define paths
             embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "product.pkl")
             kmeans_model_path = os.path.join(os.getcwd(), "Model", "product_model.pkl")
 
             # Load model and data
-            df  = self.ProductSearch(user_query , embedding_df_path, kmeans_model_path)
+            df = self.ProductSearch(user_query, embedding_df_path, kmeans_model_path)
 
-            if df.empty:
+            if not df.empty:
+                # Get best match
+                matched_row = df.loc[df["similarity"].idxmax()]
+                matched_data = matched_row.to_dict()
+
+                # Exclude matched brand
+                excluded_brand = matched_data.get("Brand")  # Make sure it's lowercase if df column is lowercase
+                filtered_df = df[~df["Brand"].isin([excluded_brand])]
+
+                compare_df = pd.DataFrame()
+
+                if not filtered_df.empty:
+                    # Get highest similarity per remaining brand
+                    compare_df = filtered_df.loc[filtered_df.groupby("Brand")["similarity"].idxmax().dropna()]
+
+                    # Drop unwanted columns
+                    compare_df = compare_df.drop(columns=["similarity", "cluster"], errors="ignore")
+
                 return Response({
-                    "message": "Dataframe is empty",
-                    "status": status.HTTP_404_NOT_FOUND
-                    })
-            
-            # Get total brand comes in dataframe 
-            Total_brand = df["Brand"].value_counts()
-
-            # convert into dictionary 
-            brand_dict = dict(Total_brand)
-
-            # convert values int64 to int type 
-            values_list = list(map(lambda x: int(x), brand_dict.values()))
-
-            # create new dict with updated values with same keys
-            updated_data_dict = dict(zip(list(brand_dict.keys()) , values_list))
-
-           
-            # if there is only one brand return all data 
-            if len(updated_data_dict) ==1:
-                df = df.drop(['cluster'], axis=1)
-
-                matched_df = df         
-                latest_row_series = matched_df.loc[matched_df['similarity'].idxmax()]
-                latest_row = latest_row_series.to_dict()
-                
-                if "similarity" in latest_row:
-                    latest_row.pop('similarity')
-
-                compare_df =pd.DataFrame()   
-        
-            
-            # if there is multiple df get highest and lowest profit margin based on the year and brand
-            elif len(updated_data_dict) >1 :
-                print("sdbgasddashfvhfvdhfvds")
-                # Get Values list of Updated Data Dict 
-                Sorted_Values_list = list(updated_data_dict.values())
-
-                # Sort list 
-                Sorted_Values_list.sort()
-            
-                # Get largest value from list 
-                max_value_count  = max(Sorted_Values_list)
-
-                # Get matched df based on multiple rows data matched
-                top_brands = [key for key, value in brand_dict.items() if value == max_value_count]
-
-                matched_brand = top_brands[0]
-
-                filtered_matched_df  = df[df['Brand'] == matched_brand]
-
-                matched_df = filtered_matched_df.drop(['cluster'], axis=1)
-
-                # Get single Row with latest year
-                latest_row_series = matched_df.loc[matched_df['similarity'].idxmax()]
-
-                latest_row = latest_row_series.to_dict()
-
-                if "similarity" in latest_row:
-                    latest_row.pop('similarity')
-
-                # get latest year
-                latest_year =  latest_row['Production Year']
-
-                CompareDf =pd.DataFrame()
-
-                if len(top_brands) > 1:
-                    top_brands.remove(matched_brand)
-                    CompareDf = df[df['Brand'].isin(top_brands)] 
-                else:
-                    CompareDf = df[~df['Brand'].isin(top_brands)] 
-
-                # call function to get another brands highest and lower margin difference
-                compare_df = self.filter_highest_and_lowest_margin_rows(CompareDf , latest_year)
-
-                if not isinstance(compare_df , list) and not compare_df.empty:
-                    compare_df = compare_df.drop(['similarity'], axis=1)
-
+                    "message": "success",
+                    "status": status.HTTP_200_OK,
+                    "matched_data": [matched_data],
+                    "compare_data": compare_df.to_dict(orient="records") if not compare_df.empty else []
+                })
 
             return Response({
                 "message": "success",
                 "status": status.HTTP_200_OK,
-                "matched_data":  [latest_row],
-                "compare_data": compare_df.to_dict(orient="records") if not isinstance(compare_df , list) else []
+                "matched_data": [],
+                "compare_data": []
             })
-                
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -260,9 +162,10 @@ class ProductSemanticSearchView(APIView):
             return Response({
                 "message": error_message,
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "matched_data":[],
-                "compare_data":[]
+                "matched_data": [],
+                "compare_data": []
             })
+
         
 # API FOR Tax  DATA TRAIN 
 class TaxTrainPipeline(APIView):
