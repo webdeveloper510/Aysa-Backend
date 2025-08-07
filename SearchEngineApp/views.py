@@ -61,7 +61,7 @@ class ProductTrainPipeline(APIView):
 class ProductSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     top_n = 10
-
+    similarity = 0.40
     # function to get product search
     def ProductSearch(self ,user_query , embedding_df_path, kmeans_model_path):
         try:
@@ -126,10 +126,25 @@ class ProductSemanticSearchView(APIView):
             if df.empty:
                 return ProductResponse("failed", [], [])
 
+            # Implement logic when someone search on single brand
+            df["Brand"] = df["Brand"].str.strip().str.lower()
+            number_of_brands = df["Brand"].nunique()
+
+            if number_of_brands == 1:
+                # Make sure the year is numeric
+                sorted_df = df.sort_values("Production Year", ascending=False)
+                max_sim_row = sorted_df.loc[sorted_df['similarity'].idxmax()]
+                # Convert the single row to dict inside a list
+                matched_row = [max_sim_row.to_dict()]
+
+                return ProductResponse("sucess", matched_row, [])
+
+
             # Filter by similarity if similarity score is greater than 0.45
-            filtered_df = df[df["similarity"] > 0.45]
+            filtered_df = df[df["similarity"] >= self.similarity]
             
             if filtered_df.empty:
+
                 return ProductResponse("failed", [], [])
 
             # make a copy of filtered df

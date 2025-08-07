@@ -17,9 +17,11 @@ def Success_RESPONSE(query, result_dict):
 
 
 def ProductResponse(message , matched_data , compare_df):
+
+
     return Response({
         "message": message ,
         "status": status.HTTP_200_OK if message =='success' else 404,
-        "matched_data": [matched_data] if isinstance(matched_data,dict) else [],
+        "matched_data": matched_data,
         "compare_data": compare_df
     })
