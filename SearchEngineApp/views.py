@@ -130,6 +130,10 @@ class ProductSemanticSearchView(APIView):
             df["Brand"] = df["Brand"].str.strip().str.lower()
             number_of_brands = df["Brand"].nunique()
 
+            # Again change in title case
+            df["Brand"] = df["Brand"].str.strip().str.title()
+
+            # if user can search only one brand 
             if number_of_brands == 1:
                 # Make sure the year is numeric
                 sorted_df = df.sort_values("Production Year", ascending=False)
