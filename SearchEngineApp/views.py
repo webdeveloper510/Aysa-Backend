@@ -122,6 +122,8 @@ class ProductSemanticSearchView(APIView):
 
             # Load model and data
             df = self.ProductSearch(user_query, embedding_df_path, kmeans_model_path)
+            print("original daraframe is ...")
+            print(df)
 
             if df.empty:
                 return ProductResponse("failed", [], [])
@@ -226,6 +228,40 @@ class ProductSemanticSearchView(APIView):
             })
 
         
+
+# API For get all profit margin data
+class GetProfitMarginData(APIView):
+    def get(self,request,format=None):
+        try:
+            #CSV file name
+            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
+            if not os.path.exists(input_csv_file_path):
+                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
+            
+            # Read csv 
+            df = pd.read_csv(input_csv_file_path)
+
+            # Clean NaN and infinity values
+            if not df.empty:
+                df.dropna(inplace=True)
+            
+            # Return Response
+            return Response({
+                "message": "success" if not df.empty else "failed",
+                "status": status.HTTP_200_OK if not df.empty  else 404, 
+                "data": df.to_dict(orient="records") if not df.empty else []
+            })
+            
+
+            
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
+            return Response({
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                "message": error_message
+            })
+
 # API FOR Tax  DATA TRAIN 
 class TaxTrainPipeline(APIView):
 
