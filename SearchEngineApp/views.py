@@ -42,10 +42,14 @@ class ProductTrainPipeline(APIView):
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
             os.makedirs(TransferModelDir , exist_ok=True)
             
-            model_response = product_main(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
+            # Call function to train model with all rows
+            model_response = AllProductDetailMain(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
+            
+            # train model only brand ,Product type data 
+            model_response = BrandProductMain(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
 
             return Response({
-                "message": model_response,
+                "message": "Both model train successfully ...",
             }, status=status.HTTP_200_OK)
         
 
@@ -116,9 +120,13 @@ class ProductSemanticSearchView(APIView):
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
-            # Define paths
+            # Define paths of all rows embedding model
             embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "product.pkl")
             kmeans_model_path = os.path.join(os.getcwd(), "Model", "product_model.pkl")
+
+            # Load model and df for brand and type 
+            brand_product_df = os.path.join(os.getcwd(), "EmbeddingDir", "brand_product.pkl")
+            brand_product_kmeans_model = os.path.join(os.getcwd(), "Model", "brand_product_model.pkl")
 
             # Load model and data
             df = self.ProductSearch(user_query, embedding_df_path, kmeans_model_path)
@@ -128,31 +136,25 @@ class ProductSemanticSearchView(APIView):
             if df.empty:
                 return ProductResponse("failed", [], [])
 
-            # Implement logic when someone search on single brand
-            df["Brand"] = df["Brand"].str.strip().str.lower()
-            number_of_brands = df["Brand"].nunique()
-
-            # Again change in title case
-            df["Brand"] = df["Brand"].str.strip().str.title()
-
-            # if user can search only one brand 
-            if number_of_brands == 1:
-                # Make sure the year is numeric
-                sorted_df = df.sort_values("Production Year", ascending=False)
-                max_sim_row = sorted_df.loc[sorted_df['similarity'].idxmax()]
-                # Convert the single row to dict inside a list
-                matched_row = [max_sim_row.to_dict()]
-
-                return ProductResponse("sucess", matched_row, [])
-
-
+            
             # Filter by similarity if similarity score is greater than 0.45
             filtered_df = df[df["similarity"] >= self.similarity]
-            
+
             if filtered_df.empty:
 
-                return ProductResponse("failed", [], [])
+                # call second model 
+                brand_df = self.ProductSearch(user_query, brand_product_df, brand_product_kmeans_model)
+                print("brand_df daraframe is ...")
+                print(brand_df)
 
+                if brand_df.empty:
+                    return ProductResponse("failed", [], [])
+                
+                filtered_df = brand_df[brand_df["similarity"] >= self.similarity]
+
+                if filtered_df.empty:
+                    return ProductResponse("failed", [], [])
+            
             # make a copy of filtered df
             df = filtered_df.copy()
 
@@ -174,7 +176,6 @@ class ProductSemanticSearchView(APIView):
             # Get values for exclusion/filtering
             matched_brand = matched_data.get("Brand")
             matched_year = matched_data.get("Production Year")
-
 
             # Filter out same brand and items with higher production year
             exclude_df = df[
