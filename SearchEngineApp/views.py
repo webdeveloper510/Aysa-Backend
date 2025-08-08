@@ -60,7 +60,7 @@ class ProductTrainPipeline(APIView):
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    top_n = 10
+    top_n = 30
     similarity = 0.40
     # function to get product search
     def ProductSearch(self ,user_query , embedding_df_path, kmeans_model_path):

@@ -76,7 +76,7 @@ class ProductModelStructure:
             )
 
             df["Text"] = (
-                df["Brand"].astype(str) + " " +
+                #df["Brand"].astype(str) + " " +
                 df["Product Name"].astype(str) + " " +
                 df["Type"].astype(str) + " " +
                 df["Production Year"].astype(str) + " " +
