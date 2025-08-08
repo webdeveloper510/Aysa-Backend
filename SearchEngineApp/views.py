@@ -210,10 +210,16 @@ class ProductSemanticSearchView(APIView):
                 if compare_rows:
                     compare_df = pd.DataFrame(compare_rows)
                     compare_df = compare_df.drop(columns=["similarity", "cluster"], errors="ignore")
+
+                    # Only print 2 rows of compare data
+                    if len(compare_df) > 2:
+                        compare_df = compare_df.iloc[0:2]
+
                     compare_df = compare_df.to_dict(orient="records")
                 else:
                     compare_df = []
             
+
             return ProductResponse("success", matched_data, compare_df)
 
         except Exception as e:
