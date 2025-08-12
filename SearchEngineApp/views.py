@@ -65,14 +65,12 @@ class ProductSemanticSearchView(APIView):
     similarity = 0.75
 
     # function to get product search
-    def ProductSearch(self ,user_query, full_embedding_df_path):
+    def ProductSearch(self ,user_query, full_embedding_df_path , model):
         try:
-            # Make a path of senetence tranfer model
-            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
-            model = SentenceTransformer(transfer_model_path)
-
+ 
             # Reaf full model and save mode
             df = pd.read_pickle(full_embedding_df_path)
+           
             original_df = df.copy()
 
             # convert_user_query in embedding 
@@ -83,19 +81,19 @@ class ProductSemanticSearchView(APIView):
             full_text_embedding_tensor = torch.stack(full_embeddings)
 
             # Convert all sub Text  embeddings to tensor
-            subText_embeddings = [torch.tensor(e).to(self.device) for e in df['sub_text_embedding']]
-            sub_text_embedding_tensor = torch.stack(subText_embeddings)
+            Brand_embeddings = [torch.tensor(e).to(self.device) for e in df['brand_embedding']]
+            brand_embedding_tensor = torch.stack(Brand_embeddings)
 
             # Cosine similarity on full Text
             fullText_similarities = util.cos_sim(query_embedding, full_text_embedding_tensor)[0].cpu().numpy()
             df['full_text_similarity'] = fullText_similarities
 
             # Cosine similarity on Sub Text
-            SubText_similarities = util.cos_sim(query_embedding, sub_text_embedding_tensor)[0].cpu().numpy()
-            df['sub_text_similarity'] = SubText_similarities
+            Brand_similarities = util.cos_sim(query_embedding, brand_embedding_tensor)[0].cpu().numpy()
+            df["brand_similarity"] = Brand_similarities
 
             embedding_df = (
-                df.drop(columns=['sub_text_embedding', 'sub_text_similarity'])
+                df.drop(columns=['Type_encoded', "full_text_embedding" , "brand_embedding"])
                 .sort_values('full_text_similarity', ascending=False)
                 .head(self.top_n)
             )
@@ -110,17 +108,23 @@ class ProductSemanticSearchView(APIView):
    
     def post(self, request, format=None):
         try:
-            final_data = []
 
             user_query = request.data.get("query")
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
+            # Split user query
+            split_query = user_query.split(" ")
+
             # Define paths of all rows embedding model
             full_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
 
+            # Make a path of senetence tranfer model
+            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
+            model = SentenceTransformer(transfer_model_path)
+
             # call function to get highest similar data
-            embedding_df , original_df = self.ProductSearch(user_query, full_embedding_df_path)
+            embedding_df , original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
             
             # Hamdle
             if embedding_df.empty:
@@ -132,35 +136,36 @@ class ProductSemanticSearchView(APIView):
             # convert into dictionary
             matched_row_data = matched_row.to_dict()
 
-            # Get variables
+            #Get variables
             BrandName = matched_row_data.get("Brand")
-            Product_Name = matched_row_data.get("Product Name")
-            Type = matched_row_data.get("Type")
-            Predict_label = matched_row_data.get('Type_encoded')
+            Product_type=matched_row_data.get("Type")
             product_category = matched_row_data.get("Category")
             matched_year = matched_row_data.get("Production Year")
 
-            # Filtere dataframe based on the query
-            filtered_df = original_df.loc[(original_df["Brand"] != BrandName) & (original_df["Production Year"] ==matched_year) & (original_df["Category"]==product_category)]
-
-            # Handle if filtered df is empty
-            if filtered_df.empty:
-                return ProductResponse("failed", [])
+            #Filtere dataframe based on the query
+            filtered_df = original_df.loc[
+                (original_df["Brand"] != BrandName) & 
+                (original_df["Type"].str.contains(Product_type, case=False, na=False))&
+                (original_df["Production Year"] ==matched_year) & 
+                (original_df["Category"]==product_category)]
             
-            # function to gte compare product
-            compare_df = select_most_similar_by_brand_year(filtered_df)
+
+            filtered_df= filtered_df.drop(columns=['Type_encoded', "full_text_embedding" , "brand_embedding"])
+            if not filtered_df.empty:
+                filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
+
 
             # convert Series columbn to dataframe
             matched_df = pd.DataFrame([matched_row])
 
             # Merge dataframe 
-            merge_df = pd.concat([matched_df ,compare_df]).reset_index(drop=True)
+            merge_df = pd.concat([matched_df ,filtered_df]).reset_index(drop=True)
 
             # Drop unnecessary columns
-            merge_df = merge_df.drop(columns=["full_text_embedding", "sub_text_embedding", "full_text_similarity", "text", "sub_text", "Type_encoded"])
+            merge_df = merge_df.drop(columns=["brand_similarity","brand" , "text" , "full_text_similarity", "text"])
 
-            if len(merge_df) > 5:
-                merge_df = merge_df.iloc[0:5]
+            if len(merge_df)>3:
+                merge_df = merge_df.iloc[0:3]
 
             json_output = merge_df.to_dict(orient="records")
 

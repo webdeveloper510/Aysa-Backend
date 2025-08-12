@@ -63,14 +63,6 @@ class ProductModelStructure:
             # remove duplicacy 
             df.drop_duplicates(inplace=True)
 
-            """Extra works """
-
-            category = "Smartphones"
-            filter_df = df.loc[df["Category"] ==category]
-
-            unique_types = filter_df["Type"].unique().tolist()
-            print("unique_types ", unique_types)
-
             return df
         
         except Exception as e:
@@ -91,11 +83,11 @@ class ProductModelStructure:
 
             # Add two column with different columns groups
             df["text"] = (df["Brand"] +" " + df["Product Name"] + " " +df["Type"])
-            df["sub_text"] = (df["Product Name"] + " " + df["Type"])
+            df["brand"] = df["Brand"]
 
             # Apply preprocess columns on both column
             df["text"] = df["text"].apply(preprocess_text)
-            df["sub_text"] = df["sub_text"].apply(preprocess_text)
+            df["brand"] = df["brand"].apply(preprocess_text)
             return df
         
         except Exception as e:
@@ -135,10 +127,10 @@ class ProductModelStructure:
             model = SentenceTransformer(transfer_model_path)
 
             embeddings_full_text = model.encode(df['text'].tolist(), show_progress_bar=True)
-            embeddings_sub_text = model.encode(df['sub_text'].tolist(), show_progress_bar=True)
+            embeddings_sub_text = model.encode(df['brand'].tolist(), show_progress_bar=True)
 
             df["full_text_embedding"] = list(embeddings_full_text)
-            df["sub_text_embedding"] = list(embeddings_sub_text)
+            df["brand_embedding"] = list(embeddings_sub_text)
 
             # save embedding df
             full_text_embedding_path = os.path.join(embedding_dir_path,"profit_embedding.pkl")
@@ -165,18 +157,18 @@ def AllProductDetailMain(file_path, embedding_dir_path , TransferModelDir):
         if isinstance(df, list): 
             return None
 
-        # # Get cleaned df 
-        # cleaned_df = product_structure.preprocess_text_data(df)
-        # if isinstance(cleaned_df, list): 
-        #     return None
+        # Get cleaned df 
+        cleaned_df = product_structure.preprocess_text_data(df)
+        if isinstance(cleaned_df, list): 
+            return None
         
-        # encoded_df = product_structure.Label_Encoding(cleaned_df)
-        # if isinstance(cleaned_df, list): 
-        #     return None
+        encoded_df = product_structure.Label_Encoding(cleaned_df)
+        if isinstance(cleaned_df, list): 
+            return None
 
-        # response = product_structure.apply_kmeans(encoded_df, embedding_dir_path)
+        response = product_structure.apply_kmeans(encoded_df, embedding_dir_path)
 
-        # return response     
+        return response     
 
     except Exception as e:
         error_message = f" Failed to process product model structure: {e}"

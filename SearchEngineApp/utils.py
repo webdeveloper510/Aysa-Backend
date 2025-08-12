@@ -41,7 +41,7 @@ def preprocess_text(text):
 def select_most_similar_by_brand_year(df):
     import pandas as pd
     compare_rows = []
-    
+
     for brand, group in df.groupby("Brand"):
         # Get available years in descending order
         highest_margin = group.loc[group["Profit Margin"].idxmax()]
