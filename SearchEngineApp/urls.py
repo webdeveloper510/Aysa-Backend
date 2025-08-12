@@ -4,7 +4,7 @@ from .views import *
 
 urlpatterns = [
     path('product-data-train' ,ProductTrainPipeline.as_view()),
-    path('tax-data-train' ,TaxTrainPipeline.as_view()),
+    path('tax-data-train' ,TaxDataTrainPipeline.as_view()),
     path('ceo-worker-data-train' ,CEOWorkerTrainPipeline.as_view()),
 
     path('product-semantic-search' ,ProductSemanticSearchView.as_view()),
@@ -14,6 +14,8 @@ urlpatterns = [
     # GET ALL product margin data 
     path("get-profit-margin-data", GetProfitMarginData.as_view())
 ]
+
+
 
 
 

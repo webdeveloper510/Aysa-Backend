@@ -16,12 +16,10 @@ def Success_RESPONSE(query, result_dict):
 
 
 
-def ProductResponse(message , matched_data , compare_df):
-
+def ProductResponse(message , final_data):
 
     return Response({
         "message": message ,
         "status": status.HTTP_200_OK if message =='success' else 404,
-        "matched_data": [matched_data] if isinstance(matched_data , dict) else matched_data,
-        "compare_data": compare_df
+        "data": final_data
     })

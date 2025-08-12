@@ -18,6 +18,7 @@ from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND, ProductR
 from .models import *
 from .utils import *
 from .product_structure import *
+from .tax_paid import *
 from sentence_transformers import SentenceTransformer , util
 
 
@@ -26,12 +27,8 @@ class ProductTrainPipeline(APIView):
     def get(self,format =None):
         try:
             # Vector Database dir path
-            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir")
+            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "Profit_Margin")
             os.makedirs(Emedding_dir_path , exist_ok=True)
-
-            # Vector Database dir path
-            ModelDirPath = os.path.join(os.getcwd() ,"Model")
-            os.makedirs(ModelDirPath , exist_ok=True)
 
             #CSV file name
             input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
@@ -43,13 +40,13 @@ class ProductTrainPipeline(APIView):
             os.makedirs(TransferModelDir , exist_ok=True)
             
             # Call function to train model with all rows
-            model_response = AllProductDetailMain(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
+            model_response = AllProductDetailMain(input_csv_file_path, Emedding_dir_path, TransferModelDir)
             
-            # train model only brand ,Product type data 
-            model_response = BrandProductMain(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
+            if model_response is None:
+                return Response({"message": "Failed","status": status.HTTP_500_INTERNAL_SERVER_ERROR})
 
             return Response({
-                "message": "Both model train successfully ...",
+                "message": model_response,
             }, status=status.HTTP_200_OK)
         
 
@@ -64,168 +61,116 @@ class ProductTrainPipeline(APIView):
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    top_n = 30
-    similarity = 0.40
+    top_n = 80
+    similarity = 0.75
+
     # function to get product search
-    def ProductSearch(self ,user_query , embedding_df_path, kmeans_model_path):
+    def ProductSearch(self ,user_query, full_embedding_df_path):
         try:
             # Make a path of senetence tranfer model
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
             model = SentenceTransformer(transfer_model_path)
 
-            # Read saved dataframe
-            df = pd.read_pickle(embedding_df_path)
+            # Reaf full model and save mode
+            df = pd.read_pickle(full_embedding_df_path)
+            original_df = df.copy()
 
-            # Load Model
-            kmeans = joblib.load(kmeans_model_path)
-
-            # Encode user query
+            # convert_user_query in embedding 
             query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
 
-            # Convert all saved embeddings to tensor
-            all_embeddings = [torch.tensor(e).to(self.device) for e in df['embedding']]
-            all_embeddings_tensor = torch.stack(all_embeddings)
+            # Convert all full Text  embeddings to tensor
+            full_embeddings = [torch.tensor(e).to(self.device) for e in df['full_text_embedding']]
+            full_text_embedding_tensor = torch.stack(full_embeddings)
 
-            # Cosine similarity
-            similarities = util.cos_sim(query_embedding, all_embeddings_tensor)[0].cpu().numpy()
-            df['similarity'] = similarities
+            # Convert all sub Text  embeddings to tensor
+            subText_embeddings = [torch.tensor(e).to(self.device) for e in df['sub_text_embedding']]
+            sub_text_embedding_tensor = torch.stack(subText_embeddings)
 
-            # Predict cluster for the query
-            query_embedding_np = query_embedding.cpu().numpy().reshape(1, -1)
-            predicted_cluster = int(kmeans.predict(query_embedding_np)[0])
+            # Cosine similarity on full Text
+            fullText_similarities = util.cos_sim(query_embedding, full_text_embedding_tensor)[0].cpu().numpy()
+            df['full_text_similarity'] = fullText_similarities
 
-            # Add predicted cluster to result
-            df["predicted_cluster"] = predicted_cluster
+            # Cosine similarity on Sub Text
+            SubText_similarities = util.cos_sim(query_embedding, sub_text_embedding_tensor)[0].cpu().numpy()
+            df['sub_text_similarity'] = SubText_similarities
 
-            # Sort by similarity and get top N
-            results = df.sort_values('similarity', ascending=False).head(self.top_n)
+            embedding_df = (
+                df.drop(columns=['sub_text_embedding', 'sub_text_similarity'])
+                .sort_values('full_text_similarity', ascending=False)
+                .head(self.top_n)
+            )
 
-            Mapped_DF = results[[
-                "Brand", "Product Name", "Type", "Production Year",
-                "Profit Margin", "similarity", "cluster", 'Link to Product Pictures',"Release Price","Profit Made"
-            ]]
-
-            return Mapped_DF
+            return embedding_df , original_df
         
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
+            error_message = f"Failed tp get full and sub embed dataframe [ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return None
    
     def post(self, request, format=None):
         try:
-            user_query = request.data.get("query")
+            final_data = []
 
+            user_query = request.data.get("query")
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
             # Define paths of all rows embedding model
-            embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "product.pkl")
-            kmeans_model_path = os.path.join(os.getcwd(), "Model", "product_model.pkl")
+            full_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
 
-            # Load model and df for brand and type 
-            brand_product_df = os.path.join(os.getcwd(), "EmbeddingDir", "brand_product.pkl")
-            brand_product_kmeans_model = os.path.join(os.getcwd(), "Model", "brand_product_model.pkl")
-
-            # Load model and data
-            df = self.ProductSearch(user_query, embedding_df_path, kmeans_model_path)
-            print("original daraframe is ...")
-            print(df)
-
-            if df.empty:
-                return ProductResponse("failed", [], [])
-
+            # call function to get highest similar data
+            embedding_df , original_df = self.ProductSearch(user_query, full_embedding_df_path)
             
-            # Filter by similarity if similarity score is greater than 0.45
-            filtered_df = df[df["similarity"] >= self.similarity]
+            # Hamdle
+            if embedding_df.empty:
+                return ProductResponse("failed", [])
 
+            # Get most highest similar row
+            matched_row = embedding_df.loc[embedding_df["full_text_similarity"].idxmax()]
+
+            # convert into dictionary
+            matched_row_data = matched_row.to_dict()
+
+            # Get variables
+            BrandName = matched_row_data.get("Brand")
+            Product_Name = matched_row_data.get("Product Name")
+            Type = matched_row_data.get("Type")
+            Predict_label = matched_row_data.get('Type_encoded')
+            product_category = matched_row_data.get("Category")
+            matched_year = matched_row_data.get("Production Year")
+
+            # Filtere dataframe based on the query
+            filtered_df = original_df.loc[(original_df["Brand"] != BrandName) & (original_df["Production Year"] ==matched_year) & (original_df["Category"]==product_category)]
+
+            # Handle if filtered df is empty
             if filtered_df.empty:
-
-                # call second model 
-                brand_df = self.ProductSearch(user_query, brand_product_df, brand_product_kmeans_model)
-                print("brand_df daraframe is ...")
-                print(brand_df)
-
-                if brand_df.empty:
-                    return ProductResponse("failed", [], [])
-                
-                filtered_df = brand_df[brand_df["similarity"] >= self.similarity]
-
-                if filtered_df.empty:
-                    return ProductResponse("failed", [], [])
+                return ProductResponse("failed", [])
             
-            # make a copy of filtered df
-            df = filtered_df.copy()
+            # function to gte compare product
+            compare_df = select_most_similar_by_brand_year(filtered_df)
 
-            # Ensure Production Year is numeric
-            df["Production Year"] = pd.to_numeric(df["Production Year"], errors="coerce")
-            df = df[df["Production Year"].notnull()]
-            df["Production Year"] = df["Production Year"].astype(int)
+            # convert Series columbn to dataframe
+            matched_df = pd.DataFrame([matched_row])
 
-            # Get matched row (highest similarity)
-            matched_row = df.loc[df["similarity"].idxmax()]
-            
-            # Convert matched series data into dictionary
-            matched_data = matched_row.to_dict()               
+            # Merge dataframe 
+            merge_df = pd.concat([matched_df ,compare_df]).reset_index(drop=True)
 
-            # Remove unwanted keys
-            matched_data.pop("similarity", None)
-            matched_data.pop("cluster", None)
+            # Drop unnecessary columns
+            merge_df = merge_df.drop(columns=["full_text_embedding", "sub_text_embedding", "full_text_similarity", "text", "sub_text", "Type_encoded"])
 
-            # Get values for exclusion/filtering
-            matched_brand = matched_data.get("Brand")
-            matched_year = matched_data.get("Production Year")
+            if len(merge_df) > 5:
+                merge_df = merge_df.iloc[0:5]
 
-            # Filter out same brand and items with higher production year
-            exclude_df = df[
-                     df["Brand"].str.strip().str.lower() != str(matched_brand).strip().lower()
-                ]
+            json_output = merge_df.to_dict(orient="records")
 
-            compare_df = pd.DataFrame()
-            compare_rows = []
+            return ProductResponse("success", json_output)
 
-            if not exclude_df.empty:
-                for brand , group in exclude_df.groupby("Brand"):
-                    
-                    group = group[group["Production Year"] <= matched_year]
-                    if group.empty:
-                        continue
-
-                    years = sorted(group["Production Year"].unique(), reverse=True) 
-
-                    selected_row = None
-                    for yr in years:
-                        # Filter group by current year
-                        year_group = group[group["Production Year"] == yr]
-
-                        if not year_group.empty:
-                            # Select the row with the highest similarity for this year
-                            selected_row = year_group.loc[year_group["similarity"].idxmax()]
-                            break  # we found the most recent year available, so stop
-
-                    if selected_row is not None:
-                        compare_rows.append(selected_row)
-
-                # Convert to DataFrame and clean up
-                if compare_rows:
-                    compare_df = pd.DataFrame(compare_rows)
-                    compare_df = compare_df.drop(columns=["similarity", "cluster"], errors="ignore")
-
-                    # Only print 2 rows of compare data
-                    if len(compare_df) > 2:
-                        compare_df = compare_df.iloc[0:2]
-
-                    compare_df = compare_df.to_dict(orient="records")
-                else:
-                    compare_df = []
-            
-
-            return ProductResponse("success", matched_data, compare_df)
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
+            print(error_message)
 
             return Response({
                 "message": error_message,
@@ -234,7 +179,6 @@ class ProductSemanticSearchView(APIView):
                 "compare_data": []
             })
 
-        
 
 # API For get all profit margin data
 class GetProfitMarginData(APIView):
@@ -270,42 +214,34 @@ class GetProfitMarginData(APIView):
             })
 
 # API FOR Tax  DATA TRAIN 
-class TaxTrainPipeline(APIView):
-
-    def get(self, format =None):
+class TaxDataTrainPipeline(APIView):
+    def get(self,format =None):
         try:
             # Vector Database dir path
-            vector_db_dir = os.path.join(os.getcwd() , "VectorDBS", "Tax_DB")
-            os.makedirs(vector_db_dir , exist_ok=True)
+            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "Tax")
+            os.makedirs(Emedding_dir_path , exist_ok=True)
+
+            # Vector Database dir path
+            ModelDirPath = os.path.join(os.getcwd() ,"Model", "Tax")
+            os.makedirs(ModelDirPath , exist_ok=True)
 
             #CSV file name
-            File_path = os.path.join(os.getcwd() , "Data", 'corporate_tax_data.csv')
-
-            if not os.path.exists(File_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {File_path}")
-
-            # function to train model
-            class_obj = DataTrainPipeline(File_path)
-
-            # STEP 1 : DATA INGESTION
-            documents = class_obj.DataIngestion(File_path)
-            if not documents:
-                return BAD_RESPONSE("Failed to ingest data")
-
-            # STEP 2: DATA CHUNKING
-            chunks = class_obj.DataChunking(documents)
-            if not chunks:
-                return BAD_RESPONSE("Failed to chunk data.")
+            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'Tax_Avoidance.csv')
+            if not os.path.exists(input_csv_file_path):
+                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
             
-
-            # STEP 3: VECTORIZATION AND SAVE AT LOCAL
-            result_message = class_obj.TextEmbeddingAndVectorDb(vector_db_dir,chunks)
-            if result_message is None:
-                return BAD_RESPONSE("Failed to Vectorization data")
-
+            # Transformer model 
+            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
+            os.makedirs(TransferModelDir , exist_ok=True)
+            
+            # Call function to train model with all rows
+            TaxModelResponse = Tax_main(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
+            
+            # train model only brand ,Product type data 
+            # model_response = BrandProductMain(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
 
             return Response({
-                "message": result_message,
+                "message": TaxModelResponse,
             }, status=status.HTTP_200_OK)
         
 
@@ -316,7 +252,6 @@ class TaxTrainPipeline(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
                 "message": error_message
             })
-
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
 

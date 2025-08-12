@@ -36,3 +36,23 @@ def preprocess_text(text):
     text = re.sub(r'\s+', ' ', text).strip()          # Remove extra spaces
     return text
 
+
+
+def select_most_similar_by_brand_year(df):
+    import pandas as pd
+    compare_rows = []
+    
+    for brand, group in df.groupby("Brand"):
+        # Get available years in descending order
+        highest_margin = group.loc[group["Profit Margin"].idxmax()]
+        lowest_margin = group.loc[group["Profit Margin"].idxmin()]
+
+        # extend in compare rows
+        compare_rows.extend([highest_margin, lowest_margin])
+
+    
+    # Create DataFrame from results
+    compare_df = pd.DataFrame(compare_rows).reset_index(drop=True)
+    return compare_df
+        
+

@@ -1,0 +1,1951 @@
+Company Name,Year,Taxes Paid,Taxes Avoided
+Amazon,2021,$2.1 billion,$5.4 billion
+Amazon,2022,$700 million,$6.5 billion
+Amazon,2023,$1.3 billion,$5.2 billion
+Amazon,2024,$500 million,$7.1 billion
+Apple,2021,$14.5 billion,$4.1 billion
+Apple,2022,$13.9 billion,$4.8 billion
+Apple,2023,$15.2 billion,$3.6 billion
+Apple,2024,$14.1 billion,$4.2 billion
+Microsoft,2021,$8.5 billion,$5.7 billion
+Microsoft,2022,$7.9 billion,$6.2 billion
+Microsoft,2023,$9.1 billion,$5.3 billion
+Microsoft,2024,$8.6 billion,$5.9 billion
+Alphabet (Google),2021,$4.9 billion,$6.4 billion
+Alphabet (Google),2022,$5.3 billion,$6.1 billion
+Alphabet (Google),2023,$6.0 billion,$5.7 billion
+Alphabet (Google),2024,$5.8 billion,$6.0 billion
+Meta (Facebook),2021,$2.3 billion,$3.7 billion
+Meta (Facebook),2022,$1.8 billion,$4.1 billion
+Meta (Facebook),2023,$2.5 billion,$3.3 billion
+Meta (Facebook),2024,$2.0 billion,$3.9 billion
+Tesla,2021,$300 million,$1.1 billion
+Tesla,2022,$0.00,$2.3 billion
+Tesla,2023,$0.00,$2.7 billion
+Tesla,2024,$0.00,$3.1 billion
+Netflix,2021,$800 million,$900 million
+Netflix,2022,$700 million,$1.0 billion
+Netflix,2023,$900 million,$800 million
+Netflix,2024,$600 million,$1.1 billion
+Nvidia,2021,$1.0 billion,$1.3 billion
+Nvidia,2022,$900 million,$1.5 billion
+Nvidia,2023,$1.1 billion,$1.2 billion
+Nvidia,2024,$700 million,$1.6 billion
+Oracle,2021,$1.2 billion,$1.8 billion
+Oracle,2022,$1.1 billion,$2.0 billion
+Oracle,2023,$1.3 billion,$1.6 billion
+Oracle,2024,$1.0 billion,$2.1 billion
+IBM,2021,$600 million,$1.0 billion
+IBM,2022,$500 million,$1.2 billion
+IBM,2023,$700 million,$900 million
+IBM,2024,$400 million,$1.3 billion
+Intel,2021,$1.8 billion,$1.7 billion
+Intel,2022,$1.2 billion,$2.1 billion
+Intel,2023,$1.0 billion,$2.5 billion
+Intel,2024,$900 million,$2.6 billion
+Salesforce,2021,$900 million,$1.2 billion
+Salesforce,2022,$800 million,$1.4 billion
+Salesforce,2023,$900 million,$1.3 billion
+Salesforce,2024,$1.0 billion,$1.5 billion
+Adobe,2021,$1.1 billion,$900 million
+Adobe,2022,$1.0 billion,$1.0 billion
+Adobe,2023,$1.2 billion,$800 million
+Adobe,2024,$1.1 billion,$900 million
+Qualcomm,2021,$600 million,$1.4 billion
+Qualcomm,2022,$500 million,$1.6 billion
+Qualcomm,2023,$700 million,$1.3 billion
+Qualcomm,2024,$800 million,$1.5 billion
+Cisco,2021,$1.3 billion,$1.2 billion
+Cisco,2022,$1.1 billion,$1.3 billion
+Cisco,2023,$1.4 billion,$1.0 billion
+Cisco,2024,$1.2 billion,$1.1 billion
+AMD,2021,$400 million,$900 million
+AMD,2022,$300 million,$1.1 billion
+AMD,2023,$500 million,$800 million
+AMD,2024,$600 million,$900 million
+Uber,2021,$0.00,$800 million
+Uber,2022,$0.00,$1.0 billion
+Uber,2023,$0.00,$1.2 billion
+Uber,2024,$0.00,$1.4 billion
+Palantir,2021,$0.00,$500 million
+Palantir,2022,$0.00,$600 million
+Palantir,2023,$0.00,$700 million
+Palantir,2024,$0.00,$900 million
+Broadcom,2021,$1.0 billion,$1.3 billion
+Broadcom,2022,$1.2 billion,$1.1 billion
+Broadcom,2023,$1.4 billion,$1.0 billion
+Broadcom,2024,$1.3 billion,$1.2 billion
+HP Inc.,2021,$900 million,$700 million
+HP Inc.,2022,$800 million,$800 million
+HP Inc.,2023,$700 million,$900 million
+HP Inc.,2024,$600 million,$1.0 billion
+Zoom Video,2021,$200 million,$500 million
+Zoom Video,2022,$100 million,$600 million
+Zoom Video,2023,$100 million,$700 million
+Zoom Video,2024,$100 million,$800 million
+Snap Inc.,2021,$0,$400 million
+Snap Inc.,2022,$0,$500 million
+Snap Inc.,2023,$0,$600 million
+Snap Inc.,2024,$0,$700 million
+Twitter/X,2021,$0,$600 million
+Twitter/X,2022,$0,$700 million
+Twitter/X,2023,$0,$800 million
+Twitter/X,2024,$0,$900 million
+eBay,2021,$500 million,$600 million
+eBay,2022,$400 million,$700 million
+eBay,2023,$300 million,$800 million
+eBay,2024,$300 million,$900 million
+Dropbox,2021,$0,$200 million
+Dropbox,2022,$0,$300 million
+Dropbox,2023,$0,$300 million
+Dropbox,2024,$0,$400 million
+Spotify (U.S.),2021,$0,$200 million
+Spotify (U.S.),2022,$0,$300 million
+Spotify (U.S.),2023,$0,$300 million
+Spotify (U.S.),2024,$0,$400 million
+Workday,2021,$100 million,$200 million
+Workday,2022,$100 million,$300 million
+Workday,2023,$100 million,$300 million
+Workday,2024,$100 million,$400 million
+Atlassian,2021,$100 million,$200 million
+Atlassian,2022,$100 million,$300 million
+Atlassian,2023,$100 million,$300 million
+Atlassian,2024,$100 million,$400 million
+Micron,2021,$700 million,$1.1 billion
+Micron,2022,$600 million,$1.3 billion
+Micron,2023,$700 million,$1.5 billion
+Micron,2024,$800 million,$1.6 billion
+ServiceNow,2021,$300 million,$700 million
+ServiceNow,2022,$300 million,$800 million
+ServiceNow,2023,$400 million,$900 million
+ServiceNow,2024,$400 million,$1.0 billion
+Intuit,2021,$500 million,$900 million
+Intuit,2022,$500 million,$1.0 billion
+Intuit,2023,$600 million,$1.1 billion
+Intuit,2024,$700 million,$1.2 billion
+Square/Block,2021,$0,$500 million
+Square/Block,2022,$0,$600 million
+Square/Block,2023,$0,$700 million
+Square/Block,2024,$0,$800 million
+X,2021,$0,$400 million
+X,2022,$0,$500 million
+X,2023,$0,$600 million
+X,2024,$0,$700 million
+Dropbox,2021,$0,$200 million
+Dropbox,2022,$0,$300 million
+Dropbox,2023,$0,$300 million
+Dropbox,2024,$0,$400 million
+Zscaler,2021,$0,$100 million
+Zscaler,2022,$0,$200 million
+Zscaler,2023,$0,$200 million
+Zscaler,2024,$0,$300 million
+RingCentral,2021,$100 million,$300 million
+RingCentral,2022,$100 million,$400 million
+RingCentral,2023,$100 million,$400 million
+RingCentral,2024,$100 million,$500 million
+DocuSign,2021,$0,$300 million
+DocuSign,2022,$0,$400 million
+DocuSign,2023,$0,$400 million
+DocuSign,2024,$0,$500 million
+CrowdStrike,2021,$0,$200 million
+CrowdStrike,2022,$0,$300 million
+CrowdStrike,2023,$0,$300 million
+CrowdStrike,2024,$0,$400 million
+Snowflake,2021,$0,$100 million
+Snowflake,2022,$0,$200 million
+Snowflake,2023,$0,$200 million
+Snowflake,2024,$0,$300 million
+Splunk,2021,$200 million,$300 million
+Splunk,2022,$200 million,$400 million
+Splunk,2023,$200 million,$400 million
+Splunk,2024,$300 million,$500 million
+PagerDuty,2021,$0,$100 million
+PagerDuty,2022,$0,$200 million
+PagerDuty,2023,$0,$200 million
+PagerDuty,2024,$0,$300 million
+Coupa Software,2021,$100 million,$200 million
+Coupa Software,2022,$100 million,$300 million
+Coupa Software,2023,$100 million,$300 million
+Coupa Software,2024,$100 million,$400 million
+Okta,2021,$0,$200 million
+Okta,2022,$0,$300 million
+Okta,2023,$0,$300 million
+Okta,2024,$0,$400 million
+Elastic,2021,$0,$100 million
+Elastic,2022,$0,$200 million
+Elastic,2023,$0,$200 million
+Elastic,2024,$0,$300 million
+Box,2021,$0,$100 million
+Box,2022,$0,$100 million
+Box,2023,$0,$100 million
+Box,2024,$0,$200 million
+Twilio,2021,$0,$300 million
+Twilio,2022,$0,$400 million
+Twilio,2023,$0,$400 million
+Twilio,2024,$0,$500 million
+Cloudflare,2021,$0,$200 million
+Cloudflare,2022,$0,$300 million
+Cloudflare,2023,$0,$300 million
+Cloudflare,2024,$0,$400 million
+Fastly,2021,$0,$100 million
+Fastly,2022,$0,$100 million
+Fastly,2023,$0,$100 million
+Fastly,2024,$0,$200 million
+MongoDB,2021,$0,$200 million
+MongoDB,2022,$0,$300 million
+MongoDB,2023,$0,$300 million
+MongoDB,2024,$0,$400 million
+Nutanix,2021,$0,$100 million
+Nutanix,2022,$0,$100 million
+Nutanix,2023,$0,$100 million
+Nutanix,2024,$0,$100 million
+Zebra Technologies,2021,$200 million,$300 million
+Zebra Technologies,2022,$200 million,$300 million
+Zebra Technologies,2023,$300 million,$400 million
+Zebra Technologies,2024,$300 million,$400 million
+Workday,2021,$100 million,$300 million
+Workday,2022,$100 million,$300 million
+Workday,2023,$100 million,$400 million
+Workday,2024,$200 million,$400 million
+Fortinet,2021,$100 million,$200 million
+Fortinet,2022,$100 million,$300 million
+Fortinet,2023,$100 million,$300 million
+Fortinet,2024,$100 million,$400 million
+NortonLifeLock,2021,$0.00,$100 million
+NortonLifeLock,2022,$0.00,$100 million
+NortonLifeLock,2023,$0.00,$100 million
+NortonLifeLock,2024,$0.00,$100 million
+HubSpot,2021,$0,$200 million
+HubSpot,2022,$0,$300 million
+HubSpot,2023,$0,$300 million
+HubSpot,2024,$0,$400 million
+Synopsys,2021,$100 million,$200 million
+Synopsys,2022,$100 million,$200 million
+Synopsys,2023,$100 million,$200 million
+Synopsys,2024,$100 million,$300 million
+Cadence Design,2021,$100 million,$200 million
+Cadence Design,2022,$100 million,$200 million
+Cadence Design,2023,$100 million,$300 million
+Cadence Design,2024,$100 million,$300 million
+Marvell Technology,2021,$100 million,$200 million
+Marvell Technology,2022,$100 million,$200 million
+Marvell Technology,2023,$100 million,$300 million
+Marvell Technology,2024,$100 million,$300 million
+NetApp,2021,$100 million,$200 million
+NetApp,2022,$100 million,$200 million
+NetApp,2023,$100 million,$300 million
+NetApp,2024,$100 million,$300 million
+Western Digital,2021,$100 million,$300 million
+Western Digital,2022,$100 million,$300 million
+Western Digital,2023,$100 million,$300 million
+Western Digital,2024,$100 million,$400 million
+F5 Networks,2021,$0.00,$100 million
+F5 Networks,2022,$0.00,$100 million
+F5 Networks,2023,$0.00,$100 million
+F5 Networks,2024,$0.00,$100 million
+Teradata,2021,$0.00,$100 million
+Teradata,2022,$0.00,$100 million
+Teradata,2023,$0.00,$100 million
+Teradata,2024,$0.00,$100 million
+Alteryx,2021,$0.00,$100 million
+Alteryx,2022,$0.00,$100 million
+Alteryx,2023,$0.00,$100 million
+Alteryx,2024,$0.00,$100 million
+Synaptics,2021,$0.00,$50 million
+Synaptics,2022,$0.00,$50 million
+Synaptics,2023,$0.00,$60 million
+Synaptics,2024,$0.00,$70 million
+Anaplan,2021,$0.00,$40 million
+Anaplan,2022,$0.00,$50 million
+Anaplan,2023,$0.00,$60 million
+Anaplan,2024,$0.00,$70 million
+Mimecast,2021,$0.00,$30 million
+Mimecast,2022,$0.00,$40 million
+Mimecast,2023,$0.00,$50 million
+Mimecast,2024,$0.00,$50 million
+Zendesk,2021,$0.00,$50 million
+Zendesk,2022,$0.00,$60 million
+Zendesk,2023,$0.00,$70 million
+Zendesk,2024,$0.00,$80 million
+Qualtrics,2021,$0.00,$40 million
+Qualtrics,2022,$0.00,$50 million
+Qualtrics,2023,$0.00,$50 million
+Qualtrics,2024,$0.00,$60 million
+Avalara,2021,$0.00,$20 million
+Avalara,2022,$0.00,$30 million
+Avalara,2023,$0.00,$30 million
+Avalara,2024,$0.00,$40 million
+Appian,2021,$0.00,$20 million
+Appian,2022,$0.00,$30 million
+Appian,2023,$0.00,$30 million
+Appian,2024,$0.00,$40 million
+Smartsheet,2021,$0.00,$50 million
+Smartsheet,2022,$0.00,$60 million
+Smartsheet,2023,$0.00,$60 million
+Smartsheet,2024,$0.00,$70 million
+LogMeIn,2021,$0.00,$40 million
+LogMeIn,2022,$0.00,$50 million
+LogMeIn,2023,$0.00,$50 million
+LogMeIn,2024,$0.00,$60 million
+New Relic,2021,$0.00,$30 million
+New Relic,2022,$0.00,$40 million
+New Relic,2023,$0.00,$40 million
+New Relic,2024,$0.00,$50 million
+Elastic,2021,$0.00,$40 million
+Elastic,2022,$0.00,$50 million
+Elastic,2023,$0.00,$50 million
+Elastic,2024,$0.00,$60 million
+Coupa Software,2021,$0.00,$30 million
+Coupa Software,2022,$0.00,$40 million
+Coupa Software,2023,$0.00,$40 million
+Coupa Software,2024,$0.00,$50 million
+SS&C Technologies,2021,$0.00,$30 million
+SS&C Technologies,2022,$0.00,$30 million
+SS&C Technologies,2023,$0.00,$40 million
+SS&C Technologies,2024,$0.00,$40 million
+SailPoint,2021,$0.00,$20 million
+SailPoint,2022,$0.00,$30 million
+SailPoint,2023,$0.00,$30 million
+SailPoint,2024,$0.00,$40 million
+BlackLine,2021,$0.00,$20 million
+BlackLine,2022,$0.00,$20 million
+BlackLine,2023,$0.00,$30 million
+BlackLine,2024,$0.00,$30 million
+Varonis,2021,$0.00,$10 million
+Varonis,2022,$0.00,$20 million
+Varonis,2023,$0.00,$20 million
+Varonis,2024,$0.00,$20 million
+Zscaler,2021,$0.00,$30 million
+Zscaler,2022,$0.00,$40 million
+Zscaler,2023,$0.00,$40 million
+Zscaler,2024,$0.00,$50 million
+Tenable,2021,$0.00,$10 million
+Tenable,2022,$0.00,$20 million
+Tenable,2023,$0.00,$20 million
+Tenable,2024,$0.00,$30 million
+Snap Inc.,2021,$0.00,$400 million
+Snap Inc.,2022,$0.00,$600 million
+Snap Inc.,2023,$0.00,$700 million
+Snap Inc.,2024,$0.00,$800 million
+Pinterest,2021,$0.00,$300 million
+Pinterest,2022,$0.00,$300 million
+Pinterest,2023,$100 million,$200 million
+Pinterest,2024,$100 million,$200 million
+Reddit,2021,$0.00,$100 million
+Reddit,2022,$0.00,$200 million
+Reddit,2023,$0.00,$200 million
+Reddit,2024,$0.00,$300 million
+Discord,2021,$0.00,$100 million
+Discord,2022,$0.00,$200 million
+Discord,2023,$0.00,$200 million
+Discord,2024,$0.00,$300 million
+Nextdoor,2021,$0.00,$100 million
+Nextdoor,2022,$0.00,$100 million
+Nextdoor,2023,$0.00,$100 million
+Nextdoor,2024,$0.00,$100 million
+OnlyFans,2021,$0.00,$200 million
+OnlyFans,2022,$100 million,$200 million
+OnlyFans,2023,$100 million,$300 million
+OnlyFans,2024,$200 million,$300 million
+Truth Social,2021,$0.00,$10 million
+Truth Social,2022,$0.00,$20 million
+Truth Social,2023,$0.00,$30 million
+Truth Social,2024,$0.00,$40 million
+BeReal,2021,$0.00,$0.00
+BeReal,2022,$0.00,$20 million
+BeReal,2023,$0.00,$30 million
+BeReal,2024,$0.00,$40 million
+Clubhouse,2021,$0.00,$100 million
+Clubhouse,2022,$0.00,$100 million
+Clubhouse,2023,$0.00,$100 million
+Clubhouse,2024,$0.00,$100 million
+Rumble,2021,$0.00,$50 million
+Rumble,2022,$0.00,$60 million
+Rumble,2023,$0.00,$70 million
+Rumble,2024,$0.00,$80 million
+Koo (US ops),2021,$0.00,$10 million
+Koo (US ops),2022,$0.00,$10 million
+Koo (US ops),2023,$0.00,$20 million
+Koo (US ops),2024,$0.00,$20 million
+eHarmony,2021,$0.00,$50 million
+eHarmony,2022,$0.00,$60 million
+eHarmony,2023,$0.00,$60 million
+eHarmony,2024,$0.00,$70 million
+Whisper,2021,$0.00,$10 million
+Whisper,2022,$0.00,$10 million
+Whisper,2023,$0.00,$10 million
+Whisper,2024,$0.00,$10 million
+Yubo,2021,$0.00,$10 million
+Yubo,2022,$0.00,$10 million
+Yubo,2023,$0.00,$10 million
+Yubo,2024,$0.00,$10 million
+Wink (9 Count),2021,$0.00,$5 million
+Wink (9 Count),2022,$0.00,$7 million
+Wink (9 Count),2023,$0.00,$10 million
+Wink (9 Count),2024,$0.00,$10 million
+Locket Widget,2022,$0.00,$3 million
+Locket Widget,2023,$0.00,$5 million
+Locket Widget,2024,$0.00,$6 million
+Lemon8 (ByteDance US),2022,$0.00,$10 million
+Lemon8 (ByteDance US),2023,$0.00,$20 million
+Lemon8 (ByteDance US),2024,$0.00,$20 million
+Triller,2021,$0.00,$30 million
+Triller,2022,$0.00,$40 million
+Triller,2023,$0.00,$50 million
+Triller,2024,$0.00,$60 million
+Grindr,2021,$0.00,$40 million
+Grindr,2022,$0.00,$50 million
+Grindr,2023,$0.00,$60 million
+Grindr,2024,$10 million,$50 million
+Bumble,2021,$0.00,$100 million
+Bumble,2022,$20 million,$110 million
+Bumble,2023,$30 million,$120 million
+Bumble,2024,$40 million,$130 million
+Zoosk,2021,$0.00,$30 million
+Zoosk,2022,$0.00,$30 million
+Zoosk,2023,$0.00,$40 million
+Zoosk,2024,$0.00,$40 million
+Christian Mingle,2021,$0.00,$10 million
+Christian Mingle,2022,$0.00,$20 million
+Christian Mingle,2023,$0.00,$20 million
+Christian Mingle,2024,$0.00,$30 million
+Coffee Meets Bagel,2021,$0.00,$20 million
+Coffee Meets Bagel,2022,$0.00,$20 million
+Coffee Meets Bagel,2023,$0.00,$20 million
+Coffee Meets Bagel,2024,$0.00,$20 million
+Her,2021,$0.00,$5 million
+Her,2022,$0.00,$7 million
+Her,2023,$0.00,$8 million
+Her,2024,$0.00,$10 million
+Feeld,2021,$0.00,$10 million
+Feeld,2022,$0.00,$10 million
+Feeld,2023,$0.00,$10 million
+Feeld,2024,$0.00,$10 million
+Toyota,2021,$2.5 billion,$500 million
+Toyota,2022,$2.7 billion,$400 million
+Toyota,2023,$2.9 billion,$300 million
+Toyota,2024,$3.0 billion,$200 million
+Volkswagen,2021,$2.2 billion,$600 million
+Volkswagen,2022,$2.4 billion,$500 million
+Volkswagen,2023,$2.6 billion,$400 million
+Volkswagen,2024,$2.8 billion,$300 million
+Stellantis,2021,$1.8 billion,$400 million
+Stellantis,2022,$1.9 billion,$300 million
+Stellantis,2023,$2.0 billion,$300 million
+Stellantis,2024,$2.1 billion,$200 million
+Ford,2021,$1.5 billion,$300 million
+Ford,2022,$1.6 billion,$200 million
+Ford,2023,$1.7 billion,$200 million
+Ford,2024,$1.8 billion,$100 million
+General Motors,2021,$1.4 billion,$300 million
+General Motors,2022,$1.5 billion,$200 million
+General Motors,2023,$1.6 billion,$200 million
+General Motors,2024,$1.7 billion,$100 million
+Mercedes-Benz,2021,$1.3 billion,$300 million
+Mercedes-Benz,2022,$1.4 billion,$200 million
+Mercedes-Benz,2023,$1.5 billion,$200 million
+Mercedes-Benz,2024,$1.6 billion,$100 million
+BMW,2021,$1.2 billion,$300 million
+BMW,2022,$1.3 billion,$200 million
+BMW,2023,$1.4 billion,$200 million
+BMW,2024,$1.5 billion,$100 million
+Honda,2021,$1.1 billion,$200 million
+Honda,2022,$1.2 billion,$200 million
+Honda,2023,$1.3 billion,$200 million
+Honda,2024,$1.4 billion,$100 million
+Hyundai,2021,$1.0 billion,$200 million
+Hyundai,2022,$1.1 billion,$200 million
+Hyundai,2023,$1.2 billion,$200 million
+Hyundai,2024,$1.3 billion,$100 million
+SAIC Motor,2021,$900 million,$200 million
+SAIC Motor,2022,$1.0 billion,$200 million
+SAIC Motor,2023,$1.1 billion,$200 million
+SAIC Motor,2024,$1.2 billion,$100 million
+Tesla,2021,$800 million,$200 million
+Tesla,2022,$0.00,$2.1 billion
+Tesla,2023,$0.00,$2.3 billion
+Tesla,2024,$0.00,$2.5 billion
+Nissan,2021,$700 million,$200 million
+Nissan,2022,$800 million,$200 million
+Nissan,2023,$900 million,$200 million
+Nissan,2024,$1.0 billion,$100 million
+BYD,2021,$600 million,$100 million
+BYD,2022,$700 million,$100 million
+BYD,2023,$800 million,$100 million
+BYD,2024,$900 million,$100 million
+Kia,2021,$500 million,$100 million
+Kia,2022,$600 million,$100 million
+Kia,2023,$700 million,$100 million
+Kia,2024,$800 million,$100 million
+Renault,2021,$400 million,$100 million
+Renault,2022,$500 million,$100 million
+Renault,2023,$600 million,$100 million
+Renault,2024,$700 million,$100 million
+Volvo,2021,$300 million,$100 million
+Volvo,2022,$400 million,$100 million
+Volvo,2023,$500 million,$100 million
+Volvo,2024,$600 million,$100 million
+Tata Motors,2021,$200 million,$50 million
+Tata Motors,2022,$300 million,$50 million
+Tata Motors,2023,$400 million,$50 million
+Tata Motors,2024,$500 million,$50 million
+Porsche,2021,$200 million,$50 million
+Porsche,2022,$300 million,$50 million
+Porsche,2023,$400 million,$50 million
+Porsche,2024,$500 million,$50 million
+Suzuki,2021,$200 million,$50 million
+Suzuki,2022,$300 million,$50 million
+Suzuki,2023,$400 million,$50 million
+Suzuki,2024,$500 million,$50 million
+Mazda,2021,$100 million,$50 million
+Mazda,2022,$200 million,$50 million
+Mazda,2023,$300 million,$50 million
+Mazda,2024,$400 million,$50 million
+Subaru Corporation,2021,$150 million,$50 million
+Subaru Corporation,2022,$170 million,$40 million
+Subaru Corporation,2023,$180 million,$30 million
+Subaru Corporation,2024,$190 million,$20 million
+Geely Automobile,2021,$100 million,$60 million
+Geely Automobile,2022,$110 million,$50 million
+Geely Automobile,2023,$120 million,$40 million
+Geely Automobile,2024,$130 million,$30 million
+Great Wall Motor,2021,$80 million,$40 million
+Great Wall Motor,2022,$90 million,$30 million
+Great Wall Motor,2023,$100 million,$30 million
+Great Wall Motor,2024,$110 million,$20 million
+Changan Automobile,2021,$70 million,$30 million
+Changan Automobile,2022,$80 million,$30 million
+Changan Automobile,2023,$90 million,$20 million
+Changan Automobile,2024,$100 million,$20 million
+Dongfeng Motor,2021,$70 million,$30 million
+Dongfeng Motor,2022,$80 million,$20 million
+Dongfeng Motor,2023,$80 million,$20 million
+Dongfeng Motor,2024,$90 million,$10 million
+BAIC Group,2021,$60 million,$30 million
+BAIC Group,2022,$70 million,$20 million
+BAIC Group,2023,$70 million,$20 million
+BAIC Group,2024,$80 million,$10 million
+Chery Automobile,2021,$60 million,$20 million
+Chery Automobile,2022,$60 million,$20 million
+Chery Automobile,2023,$70 million,$10 million
+Chery Automobile,2024,$70 million,$10 million
+FAW Group,2021,$50 million,$20 million
+FAW Group,2022,$60 million,$20 million
+FAW Group,2023,$60 million,$10 million
+FAW Group,2024,$60 million,$10 million
+SAIC-GM-Wuling,2021,$50 million,$20 million
+SAIC-GM-Wuling,2022,$50 million,$10 million
+SAIC-GM-Wuling,2023,$50 million,$10 million
+SAIC-GM-Wuling,2024,$60 million,$10 million
+JAC Motors,2021,$40 million,$20 million
+JAC Motors,2022,$40 million,$10 million
+JAC Motors,2023,$40 million,$10 million
+JAC Motors,2024,$50 million,$10 million
+NIO Inc.,2021,$30 million,$20 million
+NIO Inc.,2022,$40 million,$20 million
+NIO Inc.,2023,$40 million,$20 million
+NIO Inc.,2024,$40 million,$10 million
+XPeng Inc.,2021,$30 million,$10 million
+XPeng Inc.,2022,$30 million,$10 million
+XPeng Inc.,2023,$30 million,$10 million
+XPeng Inc.,2024,$40 million,$10 million
+Li Auto Inc.,2021,$20 million,$10 million
+Li Auto Inc.,2022,$30 million,$10 million
+Li Auto Inc.,2023,$30 million,$10 million
+Li Auto Inc.,2024,$30 million,$10 million
+BAIC Motor,2021,$20 million,$10 million
+BAIC Motor,2022,$20 million,$10 million
+BAIC Motor,2023,$20 million,$10 million
+BAIC Motor,2024,$30 million,$10 million
+Haval,2021,$20 million,$10 million
+Haval,2022,$20 million,$10 million
+Haval,2023,$20 million,$10 million
+Haval,2024,$30 million,$10 million
+Lynk & Co,2021,$20 million,$10 million
+Lynk & Co,2022,$20 million,$10 million
+Lynk & Co,2023,$20 million,$10 million
+Lynk & Co,2024,$20 million,$10 million
+Roewe,2021,$10 million,$10 million
+Roewe,2022,$10 million,$10 million
+Roewe,2023,$10 million,$10 million
+Roewe,2024,$10 million,$10 million
+Zotye Auto,2021,$10 million,$10 million
+Zotye Auto,2022,$10 million,$10 million
+Zotye Auto,2023,$10 million,$10 million
+Zotye Auto,2024,$10 million,$10 million
+Haima Automobile,2021,$10 million,$10 million
+Haima Automobile,2022,$10 million,$10 million
+Haima Automobile,2023,$10 million,$10 million
+Haima Automobile,2024,$10 million,$10 million
+BAIC BJEV,2021,$10 million,$10 million
+BAIC BJEV,2022,$10 million,$10 million
+BAIC BJEV,2023,$10 million,$10 million
+BAIC BJEV,2024,$10 million,$10 million
+LVMH,2021,$900 million,$600 million
+LVMH,2022,$1.0 billion,$700 million
+LVMH,2023,$1.1 billion,$700 million
+LVMH,2024,$1.2 billion,$800 million
+Estée Lauder Companies,2021,$400 million,$300 million
+Estée Lauder Companies,2022,$500 million,$300 million
+Estée Lauder Companies,2023,$500 million,$300 million
+Estée Lauder Companies,2024,$600 million,$400 million
+Chanel,2021,$600 million,$400 million
+Chanel,2022,$700 million,$400 million
+Chanel,2023,$700 million,$500 million
+Chanel,2024,$800 million,$500 million
+Kering,2021,$500 million,$300 million
+Kering,2022,$600 million,$300 million
+Kering,2023,$600 million,$400 million
+Kering,2024,$700 million,$400 million
+Richemont,2021,$400 million,$300 million
+Richemont,2022,$400 million,$300 million
+Richemont,2023,$500 million,$300 million
+Richemont,2024,$500 million,$400 million
+L’Oréal,2021,$700 million,$500 million
+L’Oréal,2022,$800 million,$500 million
+L’Oréal,2023,$800 million,$500 million
+L’Oréal,2024,$900 million,$600 million
+Prada,2021,$300 million,$200 million
+Prada,2022,$300 million,$200 million
+Prada,2023,$300 million,$200 million
+Prada,2024,$400 million,$200 million
+Burberry,2021,$300 million,$200 million
+Burberry,2022,$300 million,$200 million
+Burberry,2023,$400 million,$200 million
+Burberry,2024,$400 million,$200 million
+Hermès,2021,$500 million,$300 million
+Hermès,2022,$600 million,$300 million
+Hermès,2023,$600 million,$400 million
+Hermès,2024,$700 million,$400 million
+Michael Kors,2021,$200 million,$100 million
+Michael Kors,2022,$200 million,$100 million
+Michael Kors,2023,$200 million,$100 million
+Michael Kors,2024,$200 million,$100 million
+Valentino,2021,$200 million,$100 million
+Valentino,2022,$200 million,$100 million
+Valentino,2023,$300 million,$100 million
+Valentino,2024,$300 million,$100 million
+Coach (Tapestry Inc.),2021,$300 million,$200 million
+Coach (Tapestry Inc.),2022,$300 million,$200 million
+Coach (Tapestry Inc.),2023,$300 million,$200 million
+Coach (Tapestry Inc.),2024,$400 million,$200 million
+Dolce & Gabbana,2021,$200 million,$100 million
+Dolce & Gabbana,2022,$200 million,$100 million
+Dolce & Gabbana,2023,$200 million,$100 million
+Dolce & Gabbana,2024,$300 million,$100 million
+Hugo Boss,2021,$150 million,$100 million
+Hugo Boss,2022,$160 million,$110 million
+Hugo Boss,2023,$170 million,$110 million
+Hugo Boss,2024,$180 million,$120 million
+Gap Inc.,2021,$200 million,$150 million
+Gap Inc.,2022,$210 million,$150 million
+Gap Inc.,2023,$220 million,$160 million
+Gap Inc.,2024,$230 million,$170 million
+"L Brands (Bath & Body Works, Victoria's Secret)",2021,$180 million,$120 million
+"L Brands (Bath & Body Works, Victoria's Secret)",2022,$190 million,$120 million
+"L Brands (Bath & Body Works, Victoria's Secret)",2023,$200 million,$130 million
+"L Brands (Bath & Body Works, Victoria's Secret)",2024,$210 million,$130 million
+ASOS,2021,$100 million,$80 million
+ASOS,2022,$110 million,$80 million
+ASOS,2023,$110 million,$90 million
+ASOS,2024,$120 million,$90 million
+Abercrombie & Fitch,2021,$120 million,$90 million
+Abercrombie & Fitch,2022,$130 million,$90 million
+Abercrombie & Fitch,2023,$130 million,$100 million
+Abercrombie & Fitch,2024,$140 million,$100 million
+Under Armour,2021,$140 million,$110 million
+Under Armour,2022,$150 million,$110 million
+Under Armour,2023,$150 million,$120 million
+Under Armour,2024,$160 million,$120 million
+New Balance,2021,$80 million,$60 million
+New Balance,2022,$90 million,$60 million
+New Balance,2023,$90 million,$60 million
+New Balance,2024,$100 million,$70 million
+Balenciaga (Kering),2021,$90 million,$70 million
+Balenciaga (Kering),2022,$100 million,$70 million
+Balenciaga (Kering),2023,$100 million,$70 million
+Balenciaga (Kering),2024,$110 million,$80 million
+Cartier (Richemont),2021,$100 million,$70 million
+Cartier (Richemont),2022,$110 million,$70 million
+Cartier (Richemont),2023,$110 million,$80 million
+Cartier (Richemont),2024,$120 million,$80 million
+Sephora (LVMH),2021,$130 million,$90 million
+Sephora (LVMH),2022,$140 million,$90 million
+Sephora (LVMH),2023,$140 million,$100 million
+Sephora (LVMH),2024,$150 million,$100 million
+Tiffany & Co. (LVMH),2021,$160 million,$110 million
+Tiffany & Co. (LVMH),2022,$170 million,$110 million
+Tiffany & Co. (LVMH),2023,$180 million,$120 million
+Tiffany & Co. (LVMH),2024,$190 million,$120 million
+Salvatore Ferragamo,2021,$70 million,$50 million
+Salvatore Ferragamo,2022,$70 million,$50 million
+Salvatore Ferragamo,2023,$80 million,$50 million
+Salvatore Ferragamo,2024,$80 million,$60 million
+Moncler,2021,$50 million,$30 million
+Moncler,2022,$60 million,$30 million
+Moncler,2023,$60 million,$30 million
+Moncler,2024,$70 million,$40 million
+Dr. Martens,2021,$40 million,$20 million
+Dr. Martens,2022,$40 million,$20 million
+Dr. Martens,2023,$50 million,$20 million
+Dr. Martens,2024,$50 million,$20 million
+Skechers,2021,$80 million,$50 million
+Skechers,2022,$90 million,$50 million
+Skechers,2023,$90 million,$50 million
+Skechers,2024,$100 million,$60 million
+VF Corporation,2021,$100 million,$70 million
+VF Corporation,2022,$110 million,$70 million
+VF Corporation,2023,$110 million,$70 million
+VF Corporation,2024,$120 million,$80 million
+Columbia Sportswear,2021,$50 million,$30 million
+Columbia Sportswear,2022,$60 million,$30 million
+Columbia Sportswear,2023,$60 million,$30 million
+Columbia Sportswear,2024,$70 million,$40 million
+Lululemon Athletica,2021,$120 million,$80 million
+Lululemon Athletica,2022,$130 million,$80 million
+Lululemon Athletica,2023,$140 million,$90 million
+Lululemon Athletica,2024,$150 million,$90 million
+Kiehl’s (L’Oréal),2021,$60 million,$40 million
+Kiehl’s (L’Oréal),2022,$70 million,$40 million
+Kiehl’s (L’Oréal),2023,$70 million,$40 million
+Kiehl’s (L’Oréal),2024,$80 million,$50 million
+Bath & Body Works (L Brands),2021,$70 million,$40 million
+Bath & Body Works (L Brands),2022,$80 million,$40 million
+Bath & Body Works (L Brands),2023,$80 million,$50 million
+Bath & Body Works (L Brands),2024,$90 million,$50 million
+Drunk Elephant (Shiseido),2021,$30 million,$20 million
+Drunk Elephant (Shiseido),2022,$30 million,$20 million
+Drunk Elephant (Shiseido),2023,$30 million,$20 million
+Drunk Elephant (Shiseido),2024,$40 million,$20 million
+The Estée Lauder Companies (Sub-brands),2021,$100 million,$60 million
+The Estée Lauder Companies (Sub-brands),2022,$110 million,$60 million
+The Estée Lauder Companies (Sub-brands),2023,$110 million,$70 million
+The Estée Lauder Companies (Sub-brands),2024,$120 million,$70 million
+Yves Saint Laurent (Kering),2021,$60 million,$40 million
+Yves Saint Laurent (Kering),2022,$70 million,$40 million
+Yves Saint Laurent (Kering),2023,$70 million,$40 million
+Yves Saint Laurent (Kering),2024,$80 million,$50 million
+Revlon,2021,$20 million,$10 million
+Revlon,2022,$20 million,$10 million
+Revlon,2023,$20 million,$10 million
+Revlon,2024,$30 million,$10 million
+Coty Inc.,2021,$30 million,$20 million
+Coty Inc.,2022,$30 million,$20 million
+Coty Inc.,2023,$30 million,$20 million
+Coty Inc.,2024,$40 million,$20 million
+Urban Decay (L'Oréal),2021,$20 million,$10 million
+Urban Decay (L'Oréal),2022,$20 million,$10 million
+Urban Decay (L'Oréal),2023,$20 million,$10 million
+Urban Decay (L'Oréal),2024,$30 million,$10 million
+L’Occitane,2021,$30 million,$20 million
+L’Occitane,2022,$30 million,$20 million
+L’Occitane,2023,$30 million,$20 million
+L’Occitane,2024,$40 million,$20 million
+E.L.F. Cosmetics,2021,$10 million,$10 million
+E.L.F. Cosmetics,2022,$10 million,$10 million
+E.L.F. Cosmetics,2023,$10 million,$10 million
+E.L.F. Cosmetics,2024,$10 million,$10 million
+Charlotte Tilbury,2021,$10 million,$10 million
+Charlotte Tilbury,2022,$10 million,$10 million
+Charlotte Tilbury,2023,$10 million,$10 million
+Charlotte Tilbury,2024,$20 million,$10 million
+Glossier,2021,$10 million,$10 million
+Glossier,2022,$10 million,$10 million
+Glossier,2023,$10 million,$10 million
+Glossier,2024,$10 million,$10 million
+La Mer (Estée Lauder),2021,$20 million,$10 million
+La Mer (Estée Lauder),2022,$20 million,$10 million
+La Mer (Estée Lauder),2023,$20 million,$10 million
+La Mer (Estée Lauder),2024,$30 million,$10 million
+Givenchy (LVMH),2021,$40 million,$30 million
+Givenchy (LVMH),2022,$40 million,$30 million
+Givenchy (LVMH),2023,$50 million,$30 million
+Givenchy (LVMH),2024,$50 million,$30 million
+Balmain,2021,$10 million,$10 million
+Balmain,2022,$10 million,$10 million
+Balmain,2023,$10 million,$10 million
+Balmain,2024,$10 million,$10 million
+Stila Cosmetics,2021,$10 million,$10 million
+Stila Cosmetics,2022,$10 million,$10 million
+Stila Cosmetics,2023,$10 million,$10 million
+Stila Cosmetics,2024,$10 million,$10 million
+Nike,2021,$850 million,$550 million
+Nike,2022,$900 million,$580 million
+Nike,2023,$950 million,$610 million
+Nike,2024,$1.0 billion,$640 million
+Adidas (US ops),2021,$300 million,$200 million
+Adidas (US ops),2022,$320 million,$210 million
+Adidas (US ops),2023,$330 million,$220 million
+Adidas (US ops),2024,$340 million,$220 million
+Wolverine Worldwide,2021,$30 million,$20 million
+Wolverine Worldwide,2022,$30 million,$20 million
+Wolverine Worldwide,2023,$30 million,$20 million
+Wolverine Worldwide,2024,$30 million,$20 million
+Deckers Brands,2021,$70 million,$50 million
+Deckers Brands,2022,$80 million,$50 million
+Deckers Brands,2023,$80 million,$50 million
+Deckers Brands,2024,$90 million,$60 million
+VF Corporation (Vans),2021,$100 million,$70 million
+VF Corporation (Vans),2022,$110 million,$70 million
+VF Corporation (Vans),2023,$110 million,$70 million
+VF Corporation (Vans),2024,$120 million,$80 million
+Bata USA,2021,$10 million,$10 million
+Bata USA,2022,$10 million,$10 million
+Bata USA,2023,$10 million,$10 million
+Bata USA,2024,$10 million,$10 million
+Converse (Nike),2021,$40 million,$30 million
+Converse (Nike),2022,$40 million,$30 million
+Converse (Nike),2023,$40 million,$30 million
+Converse (Nike),2024,$50 million,$30 million
+Reebok (Adidas US ops),2021,$30 million,$20 million
+Reebok (Adidas US ops),2022,$30 million,$20 million
+Reebok (Adidas US ops),2023,$30 million,$20 million
+Reebok (Adidas US ops),2024,$40 million,$20 million
+ASICS America,2021,$20 million,$10 million
+ASICS America,2022,$20 million,$10 million
+ASICS America,2023,$20 million,$10 million
+ASICS America,2024,$20 million,$10 million
+Aldo Group,2021,$20 million,$10 million
+Aldo Group,2022,$20 million,$10 million
+Aldo Group,2023,$20 million,$10 million
+Aldo Group,2024,$20 million,$10 million
+Steve Madden,2021,$30 million,$20 million
+Steve Madden,2022,$30 million,$20 million
+Steve Madden,2023,$30 million,$20 million
+Steve Madden,2024,$40 million,$20 million
+Crocs,2021,$40 million,$20 million
+Crocs,2022,$40 million,$20 million
+Crocs,2023,$50 million,$20 million
+Crocs,2024,$50 million,$30 million
+Camuto Group,2021,$10 million,$10 million
+Camuto Group,2022,$10 million,$10 million
+Camuto Group,2023,$10 million,$10 million
+Camuto Group,2024,$10 million,$10 million
+Toms Shoes,2021,$10 million,$10 million
+Toms Shoes,2022,$10 million,$10 million
+Toms Shoes,2023,$10 million,$10 million
+Toms Shoes,2024,$10 million,$10 million
+Merrell (Wolverine),2021,$10 million,$10 million
+Merrell (Wolverine),2022,$10 million,$10 million
+Merrell (Wolverine),2023,$10 million,$10 million
+Merrell (Wolverine),2024,$10 million,$10 million
+Ecco (US ops),2021,$20 million,$10 million
+Ecco (US ops),2022,$20 million,$10 million
+Ecco (US ops),2023,$20 million,$10 million
+Ecco (US ops),2024,$20 million,$10 million
+Naturalizer (Caleres),2021,$10 million,$10 million
+Naturalizer (Caleres),2022,$10 million,$10 million
+Naturalizer (Caleres),2023,$10 million,$10 million
+Naturalizer (Caleres),2024,$10 million,$10 million
+Dr. Martens (US ops),2021,$40 million,$20 million
+Dr. Martens (US ops),2022,$40 million,$20 million
+Dr. Martens (US ops),2023,$50 million,$20 million
+Dr. Martens (US ops),2024,$50 million,$20 million
+ASICS America (expanded),2021,$20 million,$10 million
+ASICS America (expanded),2022,$20 million,$10 million
+ASICS America (expanded),2023,$20 million,$10 million
+ASICS America (expanded),2024,$20 million,$10 million
+K-Swiss (Evolved within Caleres),2021,$10 million,$10 million
+K-Swiss (Evolved within Caleres),2022,$10 million,$10 million
+K-Swiss (Evolved within Caleres),2023,$10 million,$10 million
+K-Swiss (Evolved within Caleres),2024,$10 million,$10 million
+On Running (US ops),2021,$10 million,$10 million
+On Running (US ops),2022,$10 million,$10 million
+On Running (US ops),2023,$10 million,$10 million
+On Running (US ops),2024,$10 million,$10 million
+PUMA (US ops),2021,$30 million,$20 million
+PUMA (US ops),2022,$30 million,$20 million
+PUMA (US ops),2023,$30 million,$20 million
+PUMA (US ops),2024,$40 million,$20 million
+Walmart,2021,$3.4 billion,$2.6 billion
+Walmart,2022,$3.5 billion,$2.7 billion
+Walmart,2023,$3.6 billion,$2.8 billion
+Walmart,2024,$3.7 billion,$2.9 billion
+Target,2021,$1.1 billion,$900 million
+Target,2022,$1.2 billion,$1.0 billion
+Target,2023,$1.2 billion,$1.0 billion
+Target,2024,$1.3 billion,$1.0 billion
+Costco,2021,$900 million,$700 million
+Costco,2022,$1.0 billion,$800 million
+Costco,2023,$1.0 billion,$800 million
+Costco,2024,$1.1 billion,$800 million
+The Home Depot,2021,$1.3 billion,$1.0 billion
+The Home Depot,2022,$1.4 billion,$1.1 billion
+The Home Depot,2023,$1.4 billion,$1.1 billion
+The Home Depot,2024,$1.5 billion,$1.2 billion
+Lowe’s,2021,$1.0 billion,$800 million
+Lowe’s,2022,$1.1 billion,$900 million
+Lowe’s,2023,$1.1 billion,$900 million
+Lowe’s,2024,$1.2 billion,$900 million
+Walgreens Boots,2021,$600 million,$500 million
+Walgreens Boots,2022,$600 million,$500 million
+Walgreens Boots,2023,$700 million,$500 million
+Walgreens Boots,2024,$700 million,$500 million
+CVS Health,2021,$700 million,$600 million
+CVS Health,2022,$800 million,$600 million
+CVS Health,2023,$800 million,$600 million
+CVS Health,2024,$900 million,$700 million
+Best Buy,2021,$300 million,$200 million
+Best Buy,2022,$300 million,$200 million
+Best Buy,2023,$300 million,$200 million
+Best Buy,2024,$400 million,$200 million
+Macy’s,2021,$300 million,$200 million
+Macy’s,2022,$300 million,$200 million
+Macy’s,2023,$300 million,$200 million
+Macy’s,2024,$300 million,$200 million
+Dollar General,2021,$400 million,$300 million
+Dollar General,2022,$400 million,$300 million
+Dollar General,2023,$500 million,$300 million
+Dollar General,2024,$500 million,$300 million
+Kohl’s,2021,$200 million,$100 million
+Kohl’s,2022,$200 million,$100 million
+Kohl’s,2023,$200 million,$100 million
+Kohl’s,2024,$200 million,$100 million
+J.C. Penney,2021,$100 million,$100 million
+J.C. Penney,2022,$100 million,$100 million
+J.C. Penney,2023,$100 million,$100 million
+J.C. Penney,2024,$100 million,$100 million
+Nordstrom,2021,$300 million,$200 million
+Nordstrom,2022,$300 million,$200 million
+Nordstrom,2023,$300 million,$200 million
+Nordstrom,2024,$300 million,$200 million
+Michaels Stores,2021,$50 million,$40 million
+Michaels Stores,2022,$50 million,$40 million
+Michaels Stores,2023,$50 million,$40 million
+Michaels Stores,2024,$60 million,$40 million
+AutoZone,2021,$200 million,$150 million
+AutoZone,2022,$210 million,$160 million
+AutoZone,2023,$220 million,$160 million
+AutoZone,2024,$230 million,$170 million
+O’Reilly Auto Parts,2021,$180 million,$140 million
+O’Reilly Auto Parts,2022,$190 million,$150 million
+O’Reilly Auto Parts,2023,$190 million,$150 million
+O’Reilly Auto Parts,2024,$200 million,$150 million
+Bed Bath & Beyond,2021,$40 million,$30 million
+Bed Bath & Beyond,2022,$40 million,$30 million
+Bed Bath & Beyond,2023,$40 million,$30 million
+Bed Bath & Beyond,2024,$40 million,$30 million
+Dollar Tree,2021,$120 million,$90 million
+Dollar Tree,2022,$120 million,$90 million
+Dollar Tree,2023,$130 million,$90 million
+Dollar Tree,2024,$130 million,$90 million
+GameStop,2021,$20 million,$20 million
+GameStop,2022,$20 million,$20 million
+GameStop,2023,$20 million,$20 million
+GameStop,2024,$20 million,$20 million
+Burlington Stores,2021,$50 million,$40 million
+Burlington Stores,2022,$50 million,$40 million
+Burlington Stores,2023,$60 million,$40 million
+Burlington Stores,2024,$60 million,$40 million
+Nordstrom Rack,2021,$30 million,$20 million
+Nordstrom Rack,2022,$30 million,$20 million
+Nordstrom Rack,2023,$30 million,$20 million
+Nordstrom Rack,2024,$30 million,$20 million
+Five Below,2021,$40 million,$30 million
+Five Below,2022,$50 million,$30 million
+Five Below,2023,$50 million,$30 million
+Five Below,2024,$50 million,$30 million
+"L Brands (Bath & Body Works, Victoria’s Secret)",2021,$80 million,$60 million
+"L Brands (Bath & Body Works, Victoria’s Secret)",2022,$80 million,$60 million
+"L Brands (Bath & Body Works, Victoria’s Secret)",2023,$90 million,$60 million
+"L Brands (Bath & Body Works, Victoria’s Secret)",2024,$90 million,$60 million
+AutoNation,2021,$100 million,$70 million
+AutoNation,2022,$100 million,$70 million
+AutoNation,2023,$110 million,$70 million
+AutoNation,2024,$110 million,$70 million
+7-Eleven (US ops),2021,$60 million,$40 million
+7-Eleven (US ops),2022,$60 million,$40 million
+7-Eleven (US ops),2023,$60 million,$40 million
+7-Eleven (US ops),2024,$70 million,$40 million
+Tractor Supply Company,2021,$100 million,$70 million
+Tractor Supply Company,2022,$110 million,$70 million
+Tractor Supply Company,2023,$110 million,$70 million
+Tractor Supply Company,2024,$120 million,$70 million
+Ross Stores,2021,$120 million,$90 million
+Ross Stores,2022,$130 million,$90 million
+Ross Stores,2023,$130 million,$90 million
+Ross Stores,2024,$140 million,$100 million
+BJ’s Wholesale Club,2021,$80 million,$60 million
+BJ’s Wholesale Club,2022,$80 million,$60 million
+BJ’s Wholesale Club,2023,$90 million,$60 million
+BJ’s Wholesale Club,2024,$90 million,$60 million
+H-E-B Grocery,2021,$150 million,$110 million
+H-E-B Grocery,2022,$160 million,$120 million
+H-E-B Grocery,2023,$160 million,$120 million
+H-E-B Grocery,2024,$170 million,$120 million
+Sprouts Farmers Market,2021,$30 million,$20 million
+Sprouts Farmers Market,2022,$30 million,$20 million
+Sprouts Farmers Market,2023,$30 million,$20 million
+Sprouts Farmers Market,2024,$40 million,$20 million
+Sephora (US operations),2021,$50 million,$40 million
+Sephora (US operations),2022,$50 million,$40 million
+Sephora (US operations),2023,$60 million,$40 million
+Sephora (US operations),2024,$60 million,$40 million
+Dillard’s,2021,$40 million,$30 million
+Dillard’s,2022,$40 million,$30 million
+Dillard’s,2023,$40 million,$30 million
+Dillard’s,2024,$40 million,$30 million
+Ulta Beauty,2021,$60 million,$50 million
+Ulta Beauty,2022,$70 million,$50 million
+Ulta Beauty,2023,$70 million,$50 million
+Ulta Beauty,2024,$80 million,$50 million
+Big Lots,2021,$30 million,$20 million
+Big Lots,2022,$30 million,$20 million
+Big Lots,2023,$30 million,$20 million
+Big Lots,2024,$30 million,$20 million
+Fred Meyer (Kroger ops),2021,$100 million,$70 million
+Fred Meyer (Kroger ops),2022,$100 million,$70 million
+Fred Meyer (Kroger ops),2023,$110 million,$70 million
+Fred Meyer (Kroger ops),2024,$110 million,$70 million
+Kroger,2021,$1.2 billion,$900 million
+Kroger,2022,$1.30 billion,$1.00 billion
+Kroger,2023,$1.30 billion,$1.00 billion
+Kroger,2024,$1.40 billion,$1.00 billion
+Safeway (Albertsons),2021,$500 million,$400 million
+Safeway (Albertsons),2022,$500 million,$400 million
+Safeway (Albertsons),2023,$500 million,$400 million
+Safeway (Albertsons),2024,$600 million,$400 million
+Publix,2021,$600 million,$400 million
+Publix,2022,$600 million,$400 million
+Publix,2023,$700 million,$400 million
+Publix,2024,$700 million,$400 million
+Meijer,2021,$400 million,$300 million
+Meijer,2022,$400 million,$300 million
+Meijer,2023,$400 million,$300 million
+Meijer,2024,$500 million,$300 million
+Wegmans,2021,$200 million,$100 million
+Wegmans,2022,$200 million,$100 million
+Wegmans,2023,$200 million,$100 million
+Wegmans,2024,$200 million,$100 million
+Trader Joe’s,2021,$200 million,$100 million
+Trader Joe’s,2022,$200 million,$100 million
+Trader Joe’s,2023,$200 million,$100 million
+Trader Joe’s,2024,$200 million,$100 million
+Casey's General Stores,2021,$30 million,$20 million
+Casey's General Stores,2022,$30 million,$20 million
+Casey's General Stores,2023,$30 million,$20 million
+Casey's General Stores,2024,$30 million,$20 million
+BJ’s Restaurants,2021,$10 million,$10 million
+BJ’s Restaurants,2022,$10 million,$10 million
+BJ’s Restaurants,2023,$10 million,$10 million
+BJ’s Restaurants,2024,$10 million,$10 million
+Ingles Markets,2021,$20 million,$10 million
+Ingles Markets,2022,$20 million,$10 million
+Ingles Markets,2023,$20 million,$10 million
+Ingles Markets,2024,$20 million,$10 million
+Big Y Foods,2021,$10 million,$10 million
+Big Y Foods,2022,$10 million,$10 million
+Big Y Foods,2023,$10 million,$10 million
+Big Y Foods,2024,$10 million,$10 million
+Price Chopper,2021,$20 million,$10 million
+Price Chopper,2022,$20 million,$10 million
+Price Chopper,2023,$20 million,$10 million
+Price Chopper,2024,$20 million,$10 million
+Wegmans Food Markets,2021,$20 million,$10 million
+Wegmans Food Markets,2022,$20 million,$10 million
+Wegmans Food Markets,2023,$20 million,$10 million
+Wegmans Food Markets,2024,$20 million,$10 million
+Hy-Vee,2021,$30 million,$20 million
+Hy-Vee,2022,$30 million,$20 million
+Hy-Vee,2023,$30 million,$20 million
+Hy-Vee,2024,$30 million,$20 million
+Weis Markets,2021,$10 million,$10 million
+Weis Markets,2022,$10 million,$10 million
+Weis Markets,2023,$10 million,$10 million
+Weis Markets,2024,$10 million,$10 million
+Publix Super Markets,2021,$50 million,$40 million
+Publix Super Markets,2022,$50 million,$40 million
+Publix Super Markets,2023,$60 million,$40 million
+Publix Super Markets,2024,$60 million,$40 million
+Food Lion,2021,$30 million,$20 million
+Food Lion,2022,$30 million,$20 million
+Food Lion,2023,$30 million,$20 million
+Food Lion,2024,$30 million,$20 million
+Giant Food,2021,$40 million,$30 million
+Giant Food,2022,$40 million,$30 million
+Giant Food,2023,$40 million,$30 million
+Giant Food,2024,$40 million,$30 million
+Safeway,2021,$40 million,$30 million
+Safeway,2022,$40 million,$30 million
+Safeway,2023,$40 million,$30 million
+Safeway,2024,$40 million,$30 million
+Food 4 Less,2021,$10 million,$10 million
+Food 4 Less,2022,$10 million,$10 million
+Food 4 Less,2023,$10 million,$10 million
+Food 4 Less,2024,$10 million,$10 million
+Aldi US Operations,2021,$80 million,$60 million
+Aldi US Operations,2022,$80 million,$60 million
+Aldi US Operations,2023,$90 million,$60 million
+Aldi US Operations,2024,$90 million,$60 million
+Trader Joe's,2021,$50 million,$40 million
+Trader Joe's,2022,$50 million,$40 million
+Trader Joe's,2023,$60 million,$40 million
+Trader Joe's,2024,$60 million,$40 million
+ALDI US (Distinct ops),2021,$80 million,$60 million
+ALDI US (Distinct ops),2022,$80 million,$60 million
+ALDI US (Distinct ops),2023,$90 million,$60 million
+ALDI US (Distinct ops),2024,$90 million,$60 million
+Casey’s General Stores,2021,$30 million,$20 million
+Casey’s General Stores,2022,$30 million,$20 million
+Casey’s General Stores,2023,$30 million,$20 million
+Casey’s General Stores,2024,$30 million,$20 million
+Giant Food (Ahold Delhaize US),2021,$40 million,$30 million
+Giant Food (Ahold Delhaize US),2022,$40 million,$30 million
+Giant Food (Ahold Delhaize US),2023,$40 million,$30 million
+Giant Food (Ahold Delhaize US),2024,$40 million,$30 million
+Dollar General,2021,$300 million,$200 million
+Dollar General,2022,$300 million,$200 million
+Dollar General,2023,$300 million,$200 million
+Dollar General,2024,$300 million,$200 million
+Dollar Tree,2021,$200 million,$100 million
+Dollar Tree,2022,$200 million,$100 million
+Dollar Tree,2023,$200 million,$100 million
+Dollar Tree,2024,$200 million,$100 million
+Family Dollar,2021,$100 million,$70 million
+Family Dollar,2022,$100 million,$70 million
+Family Dollar,2023,$100 million,$70 million
+Family Dollar,2024,$100 million,$70 million
+The Fresh Market,2021,$10 million,$10 million
+The Fresh Market,2022,$10 million,$10 million
+The Fresh Market,2023,$10 million,$10 million
+The Fresh Market,2024,$10 million,$10 million
+Price Rite,2021,$10 million,$10 million
+Price Rite,2022,$10 million,$10 million
+Price Rite,2023,$10 million,$10 million
+Price Rite,2024,$10 million,$10 million
+Bashas',2021,$5 million,$4 million
+Bashas',2022,$5 million,$4 million
+Bashas',2023,$5 million,$4 million
+Bashas',2024,$5 million,$4 million
+Harris Teeter,2021,$10 million,$7 million
+Harris Teeter,2022,$10 million,$7 million
+Harris Teeter,2023,$10 million,$7 million
+Harris Teeter,2024,$10 million,$7 million
+Piggly Wiggly,2021,$4 million,$3 million
+Piggly Wiggly,2022,$4 million,$3 million
+Piggly Wiggly,2023,$4 million,$3 million
+Piggly Wiggly,2024,$4 million,$3 million
+PriceSmart,2021,$5 million,$4 million
+PriceSmart,2022,$5 million,$4 million
+PriceSmart,2023,$5 million,$4 million
+PriceSmart,2024,$5 million,$4 million
+Giant Eagle,2021,$20 million,$15 million
+Giant Eagle,2022,$20 million,$15 million
+Giant Eagle,2023,$20 million,$15 million
+Giant Eagle,2024,$20 million,$15 million
+Meijer,2021,$40 million,$30 million
+Meijer,2022,$40 million,$30 million
+Meijer,2023,$40 million,$30 million
+Meijer,2024,$40 million,$30 million
+H-E-B,2021,$50 million,$40 million
+H-E-B,2022,$50 million,$40 million
+H-E-B,2023,$60 million,$40 million
+H-E-B,2024,$60 million,$40 million
+WinCo Foods,2021,$10 million,$7 million
+WinCo Foods,2022,$10 million,$7 million
+WinCo Foods,2023,$10 million,$7 million
+WinCo Foods,2024,$10 million,$7 million
+Price Rite,2021,$10 million,$8 million
+Price Rite,2022,$10 million,$8 million
+Price Rite,2023,$10 million,$8 million
+Price Rite,2024,$10 million,$8 million
+Food Town,2021,$3 million,$2 million
+Food Town,2022,$3 million,$2 million
+Food Town,2023,$3 million,$2 million
+Food Town,2024,$3 million,$2 million
+Earth Fare,2021,$2 million,$1 million
+Earth Fare,2022,$2 million,$1 million
+Earth Fare,2023,$2 million,$1 million
+Earth Fare,2024,$2 million,$1 million
+Associated Wholesale Grocers,2021,$7 million,$5 million
+Associated Wholesale Grocers,2022,$7 million,$5 million
+Associated Wholesale Grocers,2023,$7 million,$5 million
+Associated Wholesale Grocers,2024,$7 million,$5 million
+Bashas’,2021,$4 million,$3 million
+Bashas’,2022,$4 million,$3 million
+Bashas’,2023,$4 million,$3 million
+Bashas’,2024,$4 million,$3 million
+Harps Food Stores,2021,$3 million,$2 million
+Harps Food Stores,2022,$3 million,$2 million
+Harps Food Stores,2023,$3 million,$2 million
+Harps Food Stores,2024,$3 million,$2 million
+Food City,2021,$4 million,$3 million
+Food City,2022,$4 million,$3 million
+Food City,2023,$4 million,$3 million
+Food City,2024,$4 million,$3 million
+FoodMaxx,2021,$2 million,$1 million
+FoodMaxx,2022,$2 million,$1 million
+FoodMaxx,2023,$2 million,$1 million
+FoodMaxx,2024,$2 million,$1 million
+Tyson Foods,2021,$350 million,$250 million
+Tyson Foods,2022,$380 million,$270 million
+Tyson Foods,2023,$400 million,$280 million
+Tyson Foods,2024,$420 million,$290 million
+JBS USA,2021,$300 million,$200 million
+JBS USA,2022,$320 million,$220 million
+JBS USA,2023,$340 million,$230 million
+JBS USA,2024,$350 million,$240 million
+Cargill Meat Solutions,2021,$280 million,$190 million
+Cargill Meat Solutions,2022,$290 million,$200 million
+Cargill Meat Solutions,2023,$300 million,$200 million
+Cargill Meat Solutions,2024,$310 million,$210 million
+Smithfield Foods,2021,$250 million,$180 million
+Smithfield Foods,2022,$270 million,$190 million
+Smithfield Foods,2023,$280 million,$200 million
+Smithfield Foods,2024,$290 million,$200 million
+Hormel Foods,2021,$200 million,$140 million
+Hormel Foods,2022,$210 million,$150 million
+Hormel Foods,2023,$220 million,$150 million
+Hormel Foods,2024,$230 million,$160 million
+Perdue Farms,2021,$120 million,$80 million
+Perdue Farms,2022,$130 million,$90 million
+Perdue Farms,2023,$130 million,$90 million
+Perdue Farms,2024,$140 million,$90 million
+Sanderson Farms,2021,$100 million,$70 million
+Sanderson Farms,2022,$110 million,$70 million
+Sanderson Farms,2023,$110 million,$70 million
+Sanderson Farms,2024,$120 million,$80 million
+National Beef Packing,2021,$90 million,$60 million
+National Beef Packing,2022,$100 million,$70 million
+National Beef Packing,2023,$100 million,$70 million
+National Beef Packing,2024,$110 million,$70 million
+Pilgrim’s Pride,2021,$110 million,$80 million
+Pilgrim’s Pride,2022,$120 million,$80 million
+Pilgrim’s Pride,2023,$130 million,$90 million
+Pilgrim’s Pride,2024,$130 million,$90 million
+West Liberty Foods,2021,$20 million,$10 million
+West Liberty Foods,2022,$20 million,$10 million
+West Liberty Foods,2023,$20 million,$10 million
+West Liberty Foods,2024,$20 million,$10 million
+Wayne Farms,2021,$50 million,$30 million
+Wayne Farms,2022,$60 million,$40 million
+Wayne Farms,2023,$60 million,$40 million
+Wayne Farms,2024,$60 million,$40 million
+Koch Foods,2021,$70 million,$50 million
+Koch Foods,2022,$80 million,$50 million
+Koch Foods,2023,$80 million,$60 million
+Koch Foods,2024,$80 million,$60 million
+Marfrig Global Foods,2021,$60 million,$40 million
+Marfrig Global Foods,2022,$70 million,$40 million
+Marfrig Global Foods,2023,$70 million,$40 million
+Marfrig Global Foods,2024,$70 million,$40 million
+The Chefs’ Warehouse,2021,$10 million,$7 million
+The Chefs’ Warehouse,2022,$10 million,$7 million
+The Chefs’ Warehouse,2023,$10 million,$7 million
+The Chefs’ Warehouse,2024,$10 million,$7 million
+Darling Ingredients,2021,$20 million,$15 million
+Darling Ingredients,2022,$20 million,$15 million
+Darling Ingredients,2023,$20 million,$15 million
+Darling Ingredients,2024,$20 million,$15 million
+Olymel,2021,$10 million,$7 million
+Olymel,2022,$10 million,$7 million
+Olymel,2023,$10 million,$7 million
+Olymel,2024,$10 million,$7 million
+General Mills,2021,$280 million,$190 million
+General Mills,2022,$300 million,$200 million
+General Mills,2023,$310 million,$210 million
+General Mills,2024,$330 million,$220 million
+Kellogg Company,2021,$220 million,$140 million
+Kellogg Company,2022,$230 million,$150 million
+Kellogg Company,2023,$240 million,$150 million
+Kellogg Company,2024,$250 million,$160 million
+Conagra Brands,2021,$250 million,$170 million
+Conagra Brands,2022,$270 million,$180 million
+Conagra Brands,2023,$280 million,$180 million
+Conagra Brands,2024,$290 million,$190 million
+Campbell Soup Company,2021,$120 million,$80 million
+Campbell Soup Company,2022,$130 million,$90 million
+Campbell Soup Company,2023,$130 million,$90 million
+Campbell Soup Company,2024,$140 million,$90 million
+Mondelez International,2021,$350 million,$220 million
+Mondelez International,2022,$370 million,$230 million
+Mondelez International,2023,$380 million,$240 million
+Mondelez International,2024,$400 million,$250 million
+Hormel Foods,2021,$200 million,$140 million
+Hormel Foods,2022,$210 million,$150 million
+Hormel Foods,2023,$220 million,$150 million
+Hormel Foods,2024,$230 million,$160 million
+TreeHouse Foods,2021,$50 million,$30 million
+TreeHouse Foods,2022,$50 million,$30 million
+TreeHouse Foods,2023,$50 million,$30 million
+TreeHouse Foods,2024,$60 million,$30 million
+B&G Foods,2021,$40 million,$30 million
+B&G Foods,2022,$40 million,$30 million
+B&G Foods,2023,$40 million,$30 million
+B&G Foods,2024,$40 million,$30 million
+Post Holdings,2021,$60 million,$40 million
+Post Holdings,2022,$70 million,$40 million
+Post Holdings,2023,$70 million,$40 million
+Post Holdings,2024,$70 million,$40 million
+Cal-Maine Foods,2021,$30 million,$20 million
+Cal-Maine Foods,2022,$30 million,$20 million
+Cal-Maine Foods,2023,$30 million,$20 million
+Cal-Maine Foods,2024,$30 million,$20 million
+Ingredion Incorporated,2021,$70 million,$50 million
+Ingredion Incorporated,2022,$70 million,$50 million
+Ingredion Incorporated,2023,$70 million,$50 million
+Ingredion Incorporated,2024,$80 million,$50 million
+J.M. Smucker Company,2021,$100 million,$70 million
+J.M. Smucker Company,2022,$110 million,$70 million
+J.M. Smucker Company,2023,$110 million,$70 million
+J.M. Smucker Company,2024,$120 million,$80 million
+Confectionery & Snacks,2021,$30 million,$20 million
+Confectionery & Snacks,2022,$30 million,$20 million
+Confectionery & Snacks,2023,$30 million,$20 million
+Confectionery & Snacks,2024,$30 million,$20 million
+Dean Foods,2021,$40 million,$30 million
+Dean Foods,2022,$40 million,$30 million
+Dean Foods,2023,$40 million,$30 million
+Dean Foods,2024,$40 million,$30 million
+Hostess Brands,2021,$20 million,$10 million
+Hostess Brands,2022,$20 million,$10 million
+Hostess Brands,2023,$20 million,$10 million
+Hostess Brands,2024,$20 million,$10 million
+Pinnacle Foods,2021,$30 million,$20 million
+Pinnacle Foods,2022,$30 million,$20 million
+Pinnacle Foods,2023,$30 million,$20 million
+Pinnacle Foods,2024,$30 million,$20 million
+American Airlines,2021,$0.0 billion,$0.5 billion
+American Airlines,2022,$0.04 billion,$0.2 billion
+American Airlines,2023,$0.2 billion,$0.3 billion
+American Airlines,2024,$0.3 billion,$0.2 billion
+Delta Air Lines,2021,$0.1 billion,$0.3 billion
+Delta Air Lines,2022,$0.6 billion,$0.4 billion
+Delta Air Lines,2023,$1.1 billion,$0.5 billion
+Delta Air Lines,2024,$1.3 billion,$0.4 billion
+United Airlines,2021,$0.0 billion,$0.4 billion
+United Airlines,2022,$0.2 billion,$0.3 billion
+United Airlines,2023,$0.9 billion,$0.2 billion
+United Airlines,2024,$1.0 billion,$0.2 billion
+Southwest Airlines,2021,$0.0 billion,$0.3 billion
+Southwest Airlines,2022,$0.2 billion,$0.2 billion
+Southwest Airlines,2023,$0.3 billion,$0.2 billion
+Southwest Airlines,2024,$0.4 billion,$0.1 billion
+Alaska Airlines,2021,$0.05 billion,$0.2 billion
+Alaska Airlines,2022,$0.0 billion,$0.1 billion
+Alaska Airlines,2023,$0.1 billion,$0.1 billion
+Alaska Airlines,2024,$0.2 billion,$0.1 billion
+JetBlue Airways,2021,$0 million,$200 million
+JetBlue Airways,2022,$0 million,$100 million
+JetBlue Airways,2023,$50 million,$100 million
+JetBlue Airways,2024,$100 million,$100 million
+Spirit Airlines,2021,$0 million,$100 million
+Spirit Airlines,2022,$0 million,$100 million
+Spirit Airlines,2023,$0 million,$100 million
+Spirit Airlines,2024,$50 million,$100 million
+Frontier Airlines,2021,$0 million,$100 million
+Frontier Airlines,2022,$0 million,$100 million
+Frontier Airlines,2023,$0 million,$100 million
+Frontier Airlines,2024,$50 million,$100 million
+Hawaiian Airlines,2021,$0 million,$50 million
+Hawaiian Airlines,2022,$0 million,$50 million
+Hawaiian Airlines,2023,$0 million,$50 million
+Hawaiian Airlines,2024,$50 million,$50 million
+Allegiant Air,2021,$0 million,$50 million
+Allegiant Air,2022,$0 million,$50 million
+Allegiant Air,2023,$0 million,$50 million
+Allegiant Air,2024,$50 million,$50 million
+Sun Country Airlines,2021,$0 million,$30 million
+Sun Country Airlines,2022,$0 million,$30 million
+Sun Country Airlines,2023,$0 million,$30 million
+Sun Country Airlines,2024,$20 million,$30 million
+Avelo Airlines,2021,$0 million,$20 million
+Avelo Airlines,2022,$0 million,$20 million
+Avelo Airlines,2023,$0 million,$20 million
+Avelo Airlines,2024,$10 million,$20 million
+Breeze Airways,2021,$0 million,$20 million
+Breeze Airways,2022,$0 million,$20 million
+Breeze Airways,2023,$0 million,$20 million
+Breeze Airways,2024,$10 million,$20 million
+Silver Airways,2021,$0 million,$10 million
+Silver Airways,2022,$0 million,$10 million
+Silver Airways,2023,$0 million,$10 million
+Silver Airways,2024,$10 million,$10 million
+Contour Airlines,2021,$0 million,$10 million
+Contour Airlines,2022,$0 million,$10 million
+Contour Airlines,2023,$0 million,$10 million
+Contour Airlines,2024,$10 million,$10 million
+Elite Airways,2021,$0 million,$5 million
+Elite Airways,2022,$0 million,$5 million
+Elite Airways,2023,$0 million,$5 million
+Elite Airways,2024,$5 million,$5 million
+Eastern Airlines,2021,$0 million,$5 million
+Eastern Airlines,2022,$0 million,$5 million
+Eastern Airlines,2023,$0 million,$5 million
+Eastern Airlines,2024,$5 million,$5 million
+GlobalX Airlines,2021,$0 million,$5 million
+GlobalX Airlines,2022,$0 million,$5 million
+GlobalX Airlines,2023,$0 million,$5 million
+GlobalX Airlines,2024,$5 million,$5 million
+Ravn Alaska,2021,$0 million,$5 million
+Ravn Alaska,2022,$0 million,$5 million
+Ravn Alaska,2023,$0 million,$5 million
+Ravn Alaska,2024,$5 million,$5 million
+Western Global Airlines,2021,$0 million,$5 million
+Western Global Airlines,2022,$0 million,$5 million
+Western Global Airlines,2023,$0 million,$5 million
+Western Global Airlines,2024,$5 million,$5 million
+JPMorgan Chase,2021,$10.5B,$1.5B
+JPMorgan Chase,2022,$11.2B,$1.8B
+JPMorgan Chase,2023,$12.0B,$2.0B
+JPMorgan Chase,2024,$13.0B,$2.5B
+Bank of America,2021,$8.0B,$1.2B
+Bank of America,2022,$8.5B,$1.3B
+Bank of America,2023,$9.0B,$1.5B
+Bank of America,2024,$9.5B,$1.7B
+Citigroup,2021,$6.5B,$1.0B
+Citigroup,2022,$6.8B,$1.1B
+Citigroup,2023,$7.0B,$1.2B
+Citigroup,2024,$7.2B,$1.3B
+Wells Fargo,2021,$5.5B,$0.9B
+Wells Fargo,2022,$5.8B,$1.0B
+Wells Fargo,2023,$6.0B,$1.1B
+Wells Fargo,2024,$6.2B,$1.2B
+Goldman Sachs,2021,$4.0B,$0.6B
+Goldman Sachs,2022,$4.2B,$0.7B
+Goldman Sachs,2023,$4.5B,$0.8B
+Goldman Sachs,2024,$4.8B,$0.9B
+Morgan Stanley,2021,$3.5B,$0.5B
+Morgan Stanley,2022,$3.7B,$0.6B
+Morgan Stanley,2023,$4.0B,$0.7B
+Morgan Stanley,2024,$4.2B,$0.8B
+U.S. Bancorp,2021,$2.5B,$0.4B
+U.S. Bancorp,2022,$2.6B,$0.4B
+U.S. Bancorp,2023,$2.7B,$0.5B
+U.S. Bancorp,2024,$2.8B,$0.5B
+PNC Financial,2021,$2.0B,$0.3B
+PNC Financial,2022,$2.1B,$0.3B
+PNC Financial,2023,$2.2B,$0.4B
+PNC Financial,2024,$2.3B,$0.4B
+Truist Financial,2021,$1.8B,$0.3B
+Truist Financial,2022,$1.9B,$0.3B
+Truist Financial,2023,$2.0B,$0.3B
+Truist Financial,2024,$2.1B,$0.4B
+Capital One,2021,$1.5B,$0.2B
+Capital One,2022,$1.6B,$0.3B
+Capital One,2023,$1.7B,$0.3B
+Capital One,2024,$1.8B,$0.3B
+Bank of NY Mellon,2021,$1.2B,$0.2B
+Bank of NY Mellon,2022,$1.3B,$0.2B
+Bank of NY Mellon,2023,$1.4B,$0.2B
+Bank of NY Mellon,2024,$1.5B,$0.3B
+State Street,2021,$1.0B,$0.2B
+State Street,2022,$1.1B,$0.2B
+State Street,2023,$1.2B,$0.2B
+State Street,2024,$1.3B,$0.2B
+Citizens Financial,2021,$900M,$100M
+Citizens Financial,2022,$1.0B,$100M
+Citizens Financial,2023,$1.1B,$200M
+Citizens Financial,2024,$1.2B,$200M
+Fifth Third Bank,2021,$800M,$100M
+Fifth Third Bank,2022,$900M,$100M
+Fifth Third Bank,2023,$1.0B,$200M
+Fifth Third Bank,2024,$1.1B,$200M
+KeyBank,2021,$700M,$100M
+KeyBank,2022,$800M,$100M
+KeyBank,2023,$900M,$100M
+KeyBank,2024,$1.0B,$200M
+Regions Financial,2021,$600M,$100M
+Regions Financial,2022,$700M,$100M
+Regions Financial,2023,$800M,$100M
+Regions Financial,2024,$900M,$100M
+Huntington Bancshares,2021,$500M,$100M
+Huntington Bancshares,2022,$600M,$100M
+Huntington Bancshares,2023,$700M,$100M
+Huntington Bancshares,2024,$800M,$100M
+M&T Bank,2021,$400M,$100M
+M&T Bank,2022,$500M,$100M
+M&T Bank,2023,$600M,$100M
+M&T Bank,2024,$700M,$100M
+Zions Bancorporation,2021,$300M,$50M
+Zions Bancorporation,2022,$400M,$50M
+Zions Bancorporation,2023,$500M,$50M
+Zions Bancorporation,2024,$600M,$50M
+Comerica,2021,$200M,$50M
+Comerica,2022,$300M,$50M
+Comerica,2023,$400M,$50M
+Comerica,2024,$500M,$50M
+Fifth Third Bank,2021,$800M,$188M
+Fifth Third Bank,2022,$840M,$198M
+Fifth Third Bank,2023,$880M,$207M
+Fifth Third Bank,2024,$920M,$216M
+M&T Bank,2021,$700M,$165M
+M&T Bank,2022,$735M,$173M
+M&T Bank,2023,$770M,$181M
+M&T Bank,2024,$805M,$189M
+UBS,2021,$650M,$153M
+UBS,2022,$682M,$161M
+UBS,2023,$715M,$168M
+UBS,2024,$747M,$176M
+Huntington Bancshares,2021,$600M,$141M
+Huntington Bancshares,2022,$630M,$148M
+Huntington Bancshares,2023,$660M,$155M
+Huntington Bancshares,2024,$690M,$162M
+Ally Financial,2021,$550M,$129M
+Ally Financial,2022,$578M,$136M
+Ally Financial,2023,$605M,$142M
+Ally Financial,2024,$632M,$149M
+Barclays,2021,$500M,$118M
+Barclays,2022,$525M,$124M
+Barclays,2023,$550M,$129M
+Barclays,2024,$575M,$135M
+KeyCorp,2021,$480M,$113M
+KeyCorp,2022,$504M,$119M
+KeyCorp,2023,$528M,$124M
+KeyCorp,2024,$552M,$130M
+Ameriprise,2021,$460M,$108M
+Ameriprise,2022,$483M,$114M
+Ameriprise,2023,$506M,$119M
+Ameriprise,2024,$529M,$124M
+Santander Bank,2021,$440M,$104M
+Santander Bank,2022,$462M,$109M
+Santander Bank,2023,$484M,$114M
+Santander Bank,2024,$506M,$119M
+RBC Bank,2021,$420M,$99M
+RBC Bank,2022,$441M,$104M
+RBC Bank,2023,$462M,$109M
+RBC Bank,2024,$483M,$114M
+Regions Financial Corporation,2021,$400M,$94M
+Regions Financial Corporation,2022,$420M,$99M
+Regions Financial Corporation,2023,$440M,$104M
+Regions Financial Corporation,2024,$460M,$108M
+Northern Trust,2021,$380M,$89M
+Northern Trust,2022,$399M,$94M
+Northern Trust,2023,$418M,$98M
+Northern Trust,2024,$437M,$103M
+Discover Financial,2021,$360M,$85M
+Discover Financial,2022,$378M,$89M
+Discover Financial,2023,$396M,$93M
+Discover Financial,2024,$414M,$97M
+Synchrony Financial,2021,$340M,$80M
+Synchrony Financial,2022,$357M,$84M
+Synchrony Financial,2023,$374M,$88M
+Synchrony Financial,2024,$391M,$92M
+Deutsche Bank,2021,$320M,$75M
+Deutsche Bank,2022,$336M,$79M
+Deutsche Bank,2023,$352M,$83M
+Deutsche Bank,2024,$368M,$87M
+Flagstar Financial,2021,$300M,$71M
+Flagstar Financial,2022,$315M,$74M
+Flagstar Financial,2023,$330M,$78M
+Flagstar Financial,2024,$345M,$81M
+Mizuho Financial Group,2021,$280M,$66M
+Mizuho Financial Group,2022,$294M,$69M
+Mizuho Financial Group,2023,$308M,$72M
+Mizuho Financial Group,2024,$322M,$76M
+Raymond James Financial,2021,$260M,$61M
+Raymond James Financial,2022,$273M,$64M
+Raymond James Financial,2023,$286M,$67M
+Raymond James Financial,2024,$299M,$70M
+First Horizon National Corporation,2021,$240M,$56M
+First Horizon National Corporation,2022,$252M,$59M
+First Horizon National Corporation,2023,$264M,$62M
+First Horizon National Corporation,2024,$276M,$65M
+Western Alliance Bancorporation,2021,$220M,$52M
+Western Alliance Bancorporation,2022,$231M,$54M
+Western Alliance Bancorporation,2023,$242M,$57M
+Western Alliance Bancorporation,2024,$253M,$60M
+Old National Bank,2021,$500M,$117M
+Old National Bank,2022,$525M,$123M
+Old National Bank,2023,$550M,$129M
+Old National Bank,2024,$575M,$135M
+Columbia Bank,2021,$494M,$116M
+Columbia Bank,2022,$519M,$122M
+Columbia Bank,2023,$543M,$127M
+Columbia Bank,2024,$568M,$133M
+"Cullen/Frost Bankers, Inc.",2021,$488M,$114M
+"Cullen/Frost Bankers, Inc.",2022,$512M,$120M
+"Cullen/Frost Bankers, Inc.",2023,$537M,$126M
+"Cullen/Frost Bankers, Inc.",2024,$561M,$132M
+Pinnacle Financial Partners,2021,$482M,$113M
+Pinnacle Financial Partners,2022,$506M,$119M
+Pinnacle Financial Partners,2023,$530M,$124M
+Pinnacle Financial Partners,2024,$554M,$130M
+BOK Financial Corporation,2021,$476M,$112M
+BOK Financial Corporation,2022,$500M,$117M
+BOK Financial Corporation,2023,$524M,$123M
+BOK Financial Corporation,2024,$547M,$128M
+FNB Corporation,2021,$470M,$110M
+FNB Corporation,2022,$494M,$116M
+FNB Corporation,2023,$517M,$121M
+FNB Corporation,2024,$540M,$127M
+UMB Financial Corporation,2021,$464M,$109M
+UMB Financial Corporation,2022,$487M,$114M
+UMB Financial Corporation,2023,$510M,$120M
+UMB Financial Corporation,2024,$534M,$125M
+South State Bank,2021,$458M,$107M
+South State Bank,2022,$481M,$113M
+South State Bank,2023,$504M,$118M
+South State Bank,2024,$527M,$124M
+Associated Banc-Corp,2021,$452M,$106M
+Associated Banc-Corp,2022,$475M,$111M
+Associated Banc-Corp,2023,$497M,$117M
+Associated Banc-Corp,2024,$520M,$122M
+Prosperity Bancshares,2021,$446M,$105M
+Prosperity Bancshares,2022,$468M,$110M
+Prosperity Bancshares,2023,$491M,$115M
+Prosperity Bancshares,2024,$513M,$120M
+Atlantic Union Bank,2021,$440M,$103M
+Atlantic Union Bank,2022,$462M,$108M
+Atlantic Union Bank,2023,$484M,$114M
+Atlantic Union Bank,2024,$506M,$119M
+EverBank,2021,$434M,$102M
+EverBank,2022,$456M,$107M
+EverBank,2023,$477M,$112M
+EverBank,2024,$499M,$117M
+MidFirst Bank,2021,$428M,$100M
+MidFirst Bank,2022,$449M,$105M
+MidFirst Bank,2023,$471M,$110M
+MidFirst Bank,2024,$492M,$115M
+Sumitomo Mitsui Banking Corp.,2021,$422M,$99M
+Sumitomo Mitsui Banking Corp.,2022,$443M,$104M
+Sumitomo Mitsui Banking Corp.,2023,$464M,$109M
+Sumitomo Mitsui Banking Corp.,2024,$485M,$114M
+Stifel,2021,$416M,$98M
+Stifel,2022,$437M,$102M
+Stifel,2023,$458M,$107M
+Stifel,2024,$478M,$112M
+BankUnited,2021,$410M,$96M
+BankUnited,2022,$430M,$101M
+BankUnited,2023,$451M,$106M
+BankUnited,2024,$471M,$111M
+Hancock Whitney,2021,$404M,$95M
+Hancock Whitney,2022,$424M,$100M
+Hancock Whitney,2023,$444M,$104M
+Hancock Whitney,2024,$465M,$109M
+SoFi,2021,$398M,$93M
+SoFi,2022,$418M,$98M
+SoFi,2023,$438M,$103M
+SoFi,2024,$458M,$107M
+Banc of California,2021,$392M,$92M
+Banc of California,2022,$412M,$97M
+Banc of California,2023,$431M,$101M
+Banc of California,2024,$451M,$106M
+Fulton Financial Corporation,2021,$386M,$91M
+Fulton Financial Corporation,2022,$405M,$95M
+Fulton Financial Corporation,2023,$425M,$100M
+Fulton Financial Corporation,2024,$444M,$104M
+First National of Nebraska,2021,$380M,$89M
+First National of Nebraska,2022,$399M,$94M
+First National of Nebraska,2023,$418M,$98M
+First National of Nebraska,2024,$437M,$103M
+Texas Capital Bank,2021,$374M,$88M
+Texas Capital Bank,2022,$393M,$92M
+Texas Capital Bank,2023,$411M,$97M
+Texas Capital Bank,2024,$430M,$101M
+Commerce Bancshares,2021,$368M,$86M
+Commerce Bancshares,2022,$386M,$91M
+Commerce Bancshares,2023,$405M,$95M
+Commerce Bancshares,2024,$423M,$99M
+United Bank (West Virginia),2021,$362M,$85M
+United Bank (West Virginia),2022,$380M,$89M
+United Bank (West Virginia),2023,$398M,$93M
+United Bank (West Virginia),2024,$416M,$98M
+First Interstate BancSystem,2021,$356M,$84M
+First Interstate BancSystem,2022,$374M,$88M
+First Interstate BancSystem,2023,$392M,$92M
+First Interstate BancSystem,2024,$409M,$96M
+Glacier Bancorp,2021,$350M,$82M
+Glacier Bancorp,2022,$368M,$86M
+Glacier Bancorp,2023,$385M,$90M
+Glacier Bancorp,2024,$402M,$94M
+WaFd Bank,2021,$344M,$81M
+WaFd Bank,2022,$361M,$85M
+WaFd Bank,2023,$378M,$89M
+WaFd Bank,2024,$396M,$93M
+FirstBank Holding Co,2021,$338M,$79M
+FirstBank Holding Co,2022,$355M,$83M
+FirstBank Holding Co,2023,$372M,$87M
+FirstBank Holding Co,2024,$389M,$91M
+United Community Bank,2021,$332M,$78M
+United Community Bank,2022,$349M,$82M
+United Community Bank,2023,$365M,$86M
+United Community Bank,2024,$382M,$90M
+Simmons Bank,2021,$326M,$76M
+Simmons Bank,2022,$342M,$80M
+Simmons Bank,2023,$359M,$84M
+Simmons Bank,2024,$375M,$88M
+Arvest Bank,2021,$320M,$75M
+Arvest Bank,2022,$336M,$79M
+Arvest Bank,2023,$352M,$83M
+Arvest Bank,2024,$368M,$86M
+NBT Bank,2021,$314M,$74M
+NBT Bank,2022,$330M,$77M
+NBT Bank,2023,$345M,$81M
+NBT Bank,2024,$361M,$85M
+Bank OZK,2021,$308M,$72M
+Bank OZK,2022,$323M,$76M
+Bank OZK,2023,$339M,$79M
+Bank OZK,2024,$354M,$83M
+Community Bank System,2021,$302M,$71M
+Community Bank System,2022,$317M,$74M
+Community Bank System,2023,$332M,$78M
+Community Bank System,2024,$347M,$81M
+Ameris Bancorp,2021,$296M,$69M
+Ameris Bancorp,2022,$311M,$73M
+Ameris Bancorp,2023,$326M,$76M
+Ameris Bancorp,2024,$340M,$80M
+Investors Bank,2021,$290M,$68M
+Investors Bank,2022,$304M,$71M
+Investors Bank,2023,$319M,$75M
+Investors Bank,2024,$334M,$78M
+TowneBank,2021,$284M,$67M
+TowneBank,2022,$298M,$70M
+TowneBank,2023,$312M,$73M
+TowneBank,2024,$327M,$77M
+Bank of Hawaii,2021,$278M,$65M
+Bank of Hawaii,2022,$292M,$68M
+Bank of Hawaii,2023,$306M,$72M
+Bank of Hawaii,2024,$320M,$75M
+Valley National Bank,2021,$272M,$64M
+Valley National Bank,2022,$286M,$67M
+Valley National Bank,2023,$299M,$70M
+Valley National Bank,2024,$313M,$73M
+Independent Bank Group,2021,$266M,$62M
+Independent Bank Group,2022,$279M,$66M
+Independent Bank Group,2023,$293M,$69M
+Independent Bank Group,2024,$306M,$72M
+Cathay Bank,2021,$260M,$61M
+Cathay Bank,2022,$273M,$64M
+Cathay Bank,2023,$286M,$67M
+Cathay Bank,2024,$299M,$70M
+First Commonwealth Bank,2021,$254M,$60M
+First Commonwealth Bank,2022,$267M,$63M
+First Commonwealth Bank,2023,$279M,$66M
+First Commonwealth Bank,2024,$292M,$69M
+First Merchants Corporation,2021,$248M,$58M
+First Merchants Corporation,2022,$260M,$61M
+First Merchants Corporation,2023,$273M,$64M
+First Merchants Corporation,2024,$285M,$67M
+Home BancShares,2021,$242M,$57M
+Home BancShares,2022,$254M,$60M
+Home BancShares,2023,$266M,$62M
+Home BancShares,2024,$278M,$65M
+WesBanco,2021,$236M,$55M
+WesBanco,2022,$248M,$58M
+WesBanco,2023,$260M,$61M
+WesBanco,2024,$271M,$64M
+Trustmark National Bank,2021,$230M,$54M
+Trustmark National Bank,2022,$242M,$57M
+Trustmark National Bank,2023,$253M,$59M
+Trustmark National Bank,2024,$264M,$62M
+Bank of Marin,2021,$224M,$53M
+Bank of Marin,2022,$235M,$55M
+Bank of Marin,2023,$246M,$58M
+Bank of Marin,2024,$258M,$60M
+Tompkins Financial,2021,$218M,$51M
+Tompkins Financial,2022,$229M,$54M
+Tompkins Financial,2023,$240M,$56M
+Tompkins Financial,2024,$251M,$59M
+Lakeland Bank,2021,$212M,$50M
+Lakeland Bank,2022,$223M,$52M
+Lakeland Bank,2023,$233M,$55M
+Lakeland Bank,2024,$244M,$57M
+Cadence Bank,2021,$206M,$48M
+Cadence Bank,2022,$216M,$51M
+Cadence Bank,2023,$227M,$53M
+Cadence Bank,2024,$237M,$56M
+Great Western Bank,2021,$218M,$51M
+Great Western Bank,2022,$229M,$54M
+Great Western Bank,2023,$240M,$56M
+Great Western Bank,2024,$251M,$59M
+Banner Bank,2021,$212M,$50M
+Banner Bank,2022,$223M,$52M
+Banner Bank,2023,$233M,$55M
+Banner Bank,2024,$244M,$57M
+PacWest Bancorp,2021,$206M,$48M
+PacWest Bancorp,2022,$216M,$51M
+PacWest Bancorp,2023,$227M,$53M
+PacWest Bancorp,2024,$237M,$56M
+Rolex,2021,$1.5B,$352M
+Rolex,2022,$1.6B,$369M
+Rolex,2023,$1.7B,$387M
+Rolex,2024,$1.7B,$405M
+Patek Philippe,2021,$1.2B,$281M
+Patek Philippe,2022,$1.3B,$296M
+Patek Philippe,2023,$1.3B,$310M
+Patek Philippe,2024,$1.4B,$324M
+Audemars Piguet,2021,$1.0B,$235M
+Audemars Piguet,2022,$1.1B,$246M
+Audemars Piguet,2023,$1.1B,$258M
+Audemars Piguet,2024,$1.1B,$270M
+Vacheron Constantin,2021,$900M,$211M
+Vacheron Constantin,2022,$945M,$222M
+Vacheron Constantin,2023,$990M,$232M
+Vacheron Constantin,2024,$1.0B,$243M
+Omega,2021,$800M,$188M
+Omega,2022,$840M,$197M
+Omega,2023,$880M,$206M
+Omega,2024,$920M,$216M
+Cartier,2021,$750M,$176M
+Cartier,2022,$788M,$185M
+Cartier,2023,$825M,$194M
+Cartier,2024,$862M,$202M
+Jaeger‑LeCoultre,2021,$700M,$164M
+Jaeger‑LeCoultre,2022,$735M,$172M
+Jaeger‑LeCoultre,2023,$770M,$181M
+Jaeger‑LeCoultre,2024,$805M,$189M
+Hublot,2021,$600M,$141M
+Hublot,2022,$630M,$148M
+Hublot,2023,$660M,$155M
+Hublot,2024,$690M,$162M
+Richard Mille,2021,$550M,$129M
+Richard Mille,2022,$578M,$135M
+Richard Mille,2023,$605M,$142M
+Richard Mille,2024,$632M,$148M
+Panerai,2021,$500M,$117M
+Panerai,2022,$525M,$123M
+Panerai,2023,$550M,$129M
+Panerai,2024,$575M,$135M
+Breitling,2021,$450M,$106M
+Breitling,2022,$472M,$111M
+Breitling,2023,$495M,$116M
+Breitling,2024,$518M,$121M
+Blancpain,2021,$400M,$94M
+Blancpain,2022,$420M,$99M
+Blancpain,2023,$440M,$103M
+Blancpain,2024,$460M,$108M
+Piaget,2021,$350M,$82M
+Piaget,2022,$368M,$86M
+Piaget,2023,$385M,$90M
+Piaget,2024,$402M,$94M
+Girard‑Perregaux,2021,$300M,$70M
+Girard‑Perregaux,2022,$315M,$74M
+Girard‑Perregaux,2023,$330M,$77M
+Girard‑Perregaux,2024,$345M,$81M
+Zenith,2021,$250M,$59M
+Zenith,2022,$262M,$62M
+Zenith,2023,$275M,$65M
+Zenith,2024,$288M,$67M
+Tudor,2021,$220M,$52M
+Tudor,2022,$231M,$54M
+Tudor,2023,$242M,$57M
+Tudor,2024,$253M,$59M
+Chanel (watches),2021,$200M,$47M
+Chanel (watches),2022,$210M,$49M
+Chanel (watches),2023,$220M,$52M
+Chanel (watches),2024,$230M,$54M
+Breguet,2021,$180M,$42M
+Breguet,2022,$189M,$44M
+Breguet,2023,$198M,$46M
+Breguet,2024,$207M,$49M
+Ulysse Nardin,2021,$160M,$38M
+Ulysse Nardin,2022,$168M,$39M
+Ulysse Nardin,2023,$176M,$41M
+Ulysse Nardin,2024,$184M,$43M
+Roger Dubuis,2021,$140M,$33M
+Roger Dubuis,2022,$147M,$34M
+Roger Dubuis,2023,$154M,$36M
+Roger Dubuis,2024,$161M,$38M
+Arnold & Son,2021,$130M,$30M
+Arnold & Son,2022,$136M,$32M
+Arnold & Son,2023,$143M,$34M
+Arnold & Son,2024,$150M,$35M
+Parmigiani Fleurier,2021,$125M,$29M
+Parmigiani Fleurier,2022,$131M,$31M
+Parmigiani Fleurier,2023,$138M,$32M
+Parmigiani Fleurier,2024,$144M,$34M
+HYT,2021,$120M,$28M
+HYT,2022,$126M,$30M
+HYT,2023,$132M,$31M
+HYT,2024,$138M,$32M
+Greubel Forsey,2021,$115M,$27M
+Greubel Forsey,2022,$121M,$28M
+Greubel Forsey,2023,$127M,$30M
+Greubel Forsey,2024,$132M,$31M
+H. Moser & Cie,2021,$110M,$26M
+H. Moser & Cie,2022,$116M,$27M
+H. Moser & Cie,2023,$121M,$28M
+H. Moser & Cie,2024,$126M,$30M
+Laurent Ferrier,2021,$105M,$25M
+Laurent Ferrier,2022,$110M,$26M
+Laurent Ferrier,2023,$116M,$27M
+Laurent Ferrier,2024,$121M,$28M
+Christophe Claret,2021,$100M,$23M
+Christophe Claret,2022,$105M,$25M
+Christophe Claret,2023,$110M,$26M
+Christophe Claret,2024,$115M,$27M
+De Bethune,2021,$95M,$22M
+De Bethune,2022,$100M,$23M
+De Bethune,2023,$105M,$25M
+De Bethune,2024,$109M,$26M
+F.P. Journe,2021,$90M,$21M
+F.P. Journe,2022,$94M,$22M
+F.P. Journe,2023,$99M,$23M
+F.P. Journe,2024,$103M,$24M
+MB&F,2021,$85M,$20M
+MB&F,2022,$89M,$21M
+MB&F,2023,$94M,$22M
+MB&F,2024,$98M,$23M
+Lang & Heyne,2021,$80M,$19M
+Lang & Heyne,2022,$84M,$20M
+Lang & Heyne,2023,$88M,$21M
+Lang & Heyne,2024,$92M,$22M
+Urwerk,2021,$75M,$18M
+Urwerk,2022,$79M,$18M
+Urwerk,2023,$82M,$19M
+Urwerk,2024,$86M,$20M
+Romain Gauthier,2021,$70M,$16M
+Romain Gauthier,2022,$74M,$17M
+Romain Gauthier,2023,$77M,$18M
+Romain Gauthier,2024,$80M,$19M
+Jacob & Co.,2021,$65M,$15M
+Jacob & Co.,2022,$68M,$16M
+Jacob & Co.,2023,$72M,$17M
+Jacob & Co.,2024,$75M,$18M
+Gerald Genta,2021,$60M,$14M
+Gerald Genta,2022,$63M,$15M
+Gerald Genta,2023,$66M,$15M
+Gerald Genta,2024,$69M,$16M
+Louis Moinet,2021,$55M,$13M
+Louis Moinet,2022,$58M,$14M
+Louis Moinet,2023,$61M,$14M
+Louis Moinet,2024,$63M,$15M
+Ming,2021,$50M,$12M
+Ming,2022,$52M,$12M
+Ming,2023,$55M,$13M
+Ming,2024,$57M,$13M
+Angelus,2021,$45M,$11M
+Angelus,2022,$47M,$11M
+Angelus,2023,$50M,$12M
+Angelus,2024,$52M,$12M
+Czapek & Cie,2021,$40M,$9M
+Czapek & Cie,2022,$42M,$10M
+Czapek & Cie,2023,$44M,$10M
+Czapek & Cie,2024,$46M,$11M
+Kari Voutilainen,2021,$35M,$8M
+Kari Voutilainen,2022,$37M,$9M
+Kari Voutilainen,2023,$38M,$9M
+Kari Voutilainen,2024,$40M,$9M
+Garmin,2024,$99M,$24M
+Garmin,2023,$26M,$6M
+Garmin,2022,$45M,$11M
+Garmin,2021,$52M,$13M
+Xiaomi,2024,$625M,$184M
+Xiaomi,2023,$590M,$174M
+Xiaomi,2022,$560M,$165M
+Xiaomi,2021,$530M,$156M
+Whirlpool,2024,$10M,$0M
+Whirlpool,2023,$77M,$18M
+Whirlpool,2022,$265M,$65M
+Whirlpool,2021,$518M,$127M
+Canon,2021,$0M,$60M
+Canon,2022,$0M,$80M
+Canon,2023,$0M,$80M
+Canon,2024,$0M,$80M
+Nikon,2021,$0M,$10M
+Nikon,2022,$0M,$10M
+Nikon,2023,$0M,$10M
+Nikon,2024,$0M,$10M
+Fujifilm,2021,$0M,$100M
+Fujifilm,2022,$0M,$120M
+Fujifilm,2023,$0M,$110M
+Fujifilm,2024,$0M,$100M
+Panasonic,2021,$0M,$50M
+Panasonic,2022,$0M,$50M
+Panasonic,2023,$0M,$500M
+Panasonic,2024,$0M,$500M
+GoPro,2021,$0M,$281M
+GoPro,2022,~$5.6M,$0M
+GoPro,2023,$0M,$0M
+GoPro,2024,$0M,$0M
