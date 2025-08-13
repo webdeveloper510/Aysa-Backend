@@ -12,8 +12,8 @@ urlpatterns = [
     path('ceo-worker-semantic-search' ,CEOWorkerSemanticSearchView.as_view()),
 
     # GET ALL product margin data 
-    path("get-profit-margin-data", GetProfitMarginData.as_view())
-]
+    path("get-profit-margin-data", GetProfitMarginData.as_view()),
+    path("get-tax-data", TaxAvenueView.as_view())]
 
 
 
