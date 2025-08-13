@@ -64,6 +64,46 @@ class ProductSemanticSearchView(APIView):
     top_n = 80
     similarity = 0.75
 
+    def drop_unnecessary_cols(self,df, extra_cols=None):
+        drop_cols = ["brand_similarity", "brand", "text", "full_text_similarity"]
+        if extra_cols:
+            drop_cols.extend(extra_cols)
+        return df.drop(columns=drop_cols, errors="ignore")
+
+    # function to change profit margin in dataframe
+    def convert_profit_margin(self,df):
+        df["Profit Margin"] = (
+            df["Profit Margin"].astype(str)
+            .str.replace("%", "")
+            .str.replace(",", ".")
+            .astype(float)
+        )
+        return df
+
+    # function to get highest mmargin of unique brand
+    def get_highest_margin_per_brand(self,df):
+        result = []
+        for _, group in df.groupby("Brand"):
+            highest_margin = group.loc[group["Profit Margin"].idxmax()]
+            result.append(highest_margin)
+        return pd.DataFrame(result).reset_index(drop=True)
+
+    # Function to compare rows 
+    def filter_compare_rows(self,df, matched):
+        compare_rows = []
+        for row_dict in df.to_dict(orient="records"):
+            Brand = str(row_dict.get("Brand", "")).lower().strip()
+            Year = int(row_dict.get("Production Year"))
+            ProductCategory = str(row_dict.get("Category", "")).lower().strip()
+            ProductType = str(row_dict.get("Type", "")).lower().strip()
+
+            if (matched["Product_type"] in ProductType
+                    and matched["BrandName"] != Brand
+                    and ProductCategory == matched["product_category"]
+                    and Year == matched["matched_year"]):
+                compare_rows.append(row_dict)
+        return pd.DataFrame(compare_rows)
+
     # function to get product search
     def ProductSearch(self ,user_query, full_embedding_df_path , model):
         try:
@@ -106,14 +146,13 @@ class ProductSemanticSearchView(APIView):
             print(error_message)
             return None
    
+   # Main function 
     def post(self, request, format=None):
         try:
-
             user_query = request.data.get("query")
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
-            # Split user query
             split_query = user_query.split(" ")
 
             # Define paths
@@ -126,80 +165,71 @@ class ProductSemanticSearchView(APIView):
             # Get embeddings and original data
             embedding_df, original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
 
-            # Handle empty result
             if embedding_df.empty:
                 return ProductResponse("failed", [])
 
-            # Get most similar row
+            # Most similar row
             matched_row = embedding_df.loc[embedding_df["full_text_similarity"].idxmax()]
             matched_row_data = matched_row.to_dict()
 
-            # Extract variables
             BrandName = str(matched_row_data.get("Brand", "")).lower().strip()
-
-            # Normalize product type and Type column
-            Product_type = str(matched_row_data.get("Type" , "")).lower().strip()
-
+            Product_type = str(matched_row_data.get("Type", "")).lower().strip()
             product_category = str(matched_row_data.get("Category", "")).lower().strip()
-
             matched_year = int(matched_row_data.get("Production Year"))
 
             print({
-                "BrandName ": BrandName,
-                "Product_type ": Product_type,
-                "product_category ": product_category,
-                "matched_year ": matched_year,
+                "BrandName": BrandName,
+                "Product_type": Product_type,
+                "product_category": product_category,
+                "matched_year": matched_year,
             })
 
-            # Drop columns
-            original_df = original_df.drop(columns=['Type_encoded', "full_text_embedding", "brand_embedding"], errors='ignore')
+            if len(split_query) > 1:
+                # Drop unnecessary columns from original_df
+                original_df = original_df.drop(
+                    columns=['Type_encoded', "full_text_embedding", "brand_embedding"],
+                    errors='ignore'
+                )
 
-            # convert dataframe into json
-            DataList = original_df.to_dict(orient="records")
+                filtered_df = self.filter_compare_rows(original_df, {
+                    "Product_type": Product_type,
+                    "BrandName": BrandName,
+                    "product_category": product_category,
+                    "matched_year": matched_year
+                })
 
-            compare_rows =[]
+                if not filtered_df.empty:
+                    filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
+                    filtered_df = self.get_highest_margin_per_brand(filtered_df)
+                    print("filtered_df", filtered_df)
 
-            for row_dict in DataList:
-                Brand = str(row_dict.get("Brand", "")).lower().strip()
-                Year = int(row_dict.get("Production Year"))
-                ProductCategory = str(row_dict.get("Category", "")).lower().strip()
-                ProductType = str(row_dict.get("Type", "")).lower().strip()
-                
-                if Product_type in ProductType and BrandName != Brand and ProductCategory == product_category and Year== matched_year:
-                    compare_rows.append(row_dict)
-            
-            filtered_df = pd.DataFrame(compare_rows)
-            if not filtered_df.empty:
-                filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
+                matched_df = pd.DataFrame([matched_row])
+                merge_df = pd.concat([matched_df, filtered_df]).reset_index(drop=True)
+                merge_df = self.drop_unnecessary_cols(merge_df, extra_cols=["brand", "text"])
+                if len(merge_df) > 3:
+                    merge_df = merge_df.iloc[0:3]
 
-                FilteredList =[]
-                for brand , group in filtered_df.groupby("Brand"):
-                    highest_margin = group.loc[group["Profit Margin"].idxmax()]
-                    #lowest_margin = group.loc[group["Profit Margin"].idxmin()]
+                return ProductResponse("success", merge_df.to_dict(orient="records"))
 
-                    # extend in compare rows
-                    FilteredList.extend([highest_margin])
+            else:
+                print("Only ask about single brand")
+                if BrandName:
+                    filtered_df = embedding_df.loc[
+                        embedding_df["Brand"].astype(str).str.lower().str.strip() == BrandName
+                    ]
 
-                # Create DataFrame from results
-                filtered_df = pd.DataFrame(FilteredList).reset_index(drop=True)
-                print("filtered_df ", filtered_df)
+                    filtered_df = self.convert_profit_margin(filtered_df)
+                    filtered_df = filtered_df.sort_values(
+                        ['Production Year', 'Profit Margin'], ascending=[False, False]
+                    )
+                    filtered_df = filtered_df.drop_duplicates(subset=["Production Year"], keep="first")
+                    print(filtered_df)
 
-            # convert Series columbn to dataframe
-            matched_df = pd.DataFrame([matched_row])
+                    filtered_df = self.drop_unnecessary_cols(filtered_df)
+                    if len(filtered_df) > 4:
+                        filtered_df = filtered_df.iloc[0:4]
 
-            # Merge dataframe 
-            merge_df = pd.concat([matched_df ,filtered_df]).reset_index(drop=True)
-
-            # Drop unnecessary columns
-            merge_df = merge_df.drop(columns=["brand_similarity","brand" , "text" , "full_text_similarity", "text"])
-
-            if len(merge_df)>3:
-                merge_df = merge_df.iloc[0:3]
-
-            json_output = merge_df.to_dict(orient="records")
-
-            return ProductResponse("success", json_output)
-
+                    return ProductResponse("success", filtered_df.to_dict(orient="records"))
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -209,9 +239,9 @@ class ProductSemanticSearchView(APIView):
             return Response({
                 "message": error_message,
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "matched_data": [],
-                "compare_data": []
+                "data": [],
             })
+
 
 
 # API For get all profit margin data
