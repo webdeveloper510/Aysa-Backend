@@ -13,15 +13,15 @@ import pandas as pd
 import torch
 
 # import Project files
-from .model_pipeline import UserInference , DataTrainPipeline
 from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND, ProductResponse
 from .models import *
 from .utils import *
 from .product_structure import *
 from .tax_structure import *
+from .ceo_worker import *
 from sentence_transformers import SentenceTransformer , util
 
-
+""" ###############################          Profit Margin Data    ##################################"""
 # API FOR PRODUCT DATA TRAIN 
 class ProductTrainPipeline(APIView):
     def get(self,format =None):
@@ -64,10 +64,8 @@ class ProductSemanticSearchView(APIView):
     top_n = 80
     similarity = 0.75
 
-    def drop_unnecessary_cols(self,df, extra_cols=None):
-        drop_cols = ["brand_similarity", "brand", "text", "full_text_similarity"]
-        if extra_cols:
-            drop_cols.extend(extra_cols)
+    def drop_unnecessary_cols(self,df):
+        drop_cols = ["brand_similarity", "brand", "text", "full_text_similarity", "brand_embedding"]
         return df.drop(columns=drop_cols, errors="ignore")
 
     # function to change profit margin in dataframe
@@ -76,6 +74,7 @@ class ProductSemanticSearchView(APIView):
             df["Profit Margin"].astype(str)
             .str.replace("%", "")
             .str.replace(",", ".")
+            .str.replace("$", ".")
             .astype(float)
         )
         return df
@@ -133,7 +132,7 @@ class ProductSemanticSearchView(APIView):
             df["brand_similarity"] = Brand_similarities
 
             embedding_df = (
-                df.drop(columns=['Type_encoded', "full_text_embedding" , "brand_embedding"])
+                df.drop(columns=['Type_encoded', "full_text_embedding"])
                 .sort_values('full_text_similarity', ascending=False)
                 .head(self.top_n)
             )
@@ -184,53 +183,65 @@ class ProductSemanticSearchView(APIView):
                 "matched_year": matched_year,
             })
 
-            if len(split_query) > 1:
-                # Drop unnecessary columns from original_df
-                original_df = original_df.drop(
-                    columns=['Type_encoded', "full_text_embedding", "brand_embedding"],
-                    errors='ignore'
-                )
+            # Handle if user ask only about brand
 
-                filtered_df = self.filter_compare_rows(original_df, {
-                    "Product_type": Product_type,
-                    "BrandName": BrandName,
-                    "product_category": product_category,
-                    "matched_year": matched_year
-                })
-
-                if not filtered_df.empty:
-                    filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
-                    filtered_df = self.get_highest_margin_per_brand(filtered_df)
-                    print("filtered_df", filtered_df)
-
-                matched_df = pd.DataFrame([matched_row])
-                merge_df = pd.concat([matched_df, filtered_df]).reset_index(drop=True)
-                merge_df = self.drop_unnecessary_cols(merge_df, extra_cols=["brand", "text"])
-                if len(merge_df) > 3:
-                    merge_df = merge_df.iloc[0:3]
-
-                return ProductResponse("success", merge_df.to_dict(orient="records"))
-
-            else:
+            if len(split_query) == 1:
                 print("Only ask about single brand")
-                if BrandName:
-                    filtered_df = embedding_df.loc[
-                        embedding_df["Brand"].astype(str).str.lower().str.strip() == BrandName
-                    ]
+                filtered_df = embedding_df.loc[embedding_df["brand_similarity"] > 0.65]
 
+
+                # Check if user input exists in Brand column
+                if not filtered_df.empty:
+                    
+                    # convert profit margin into string
                     filtered_df = self.convert_profit_margin(filtered_df)
+
                     filtered_df = filtered_df.sort_values(
                         ['Production Year', 'Profit Margin'], ascending=[False, False]
                     )
+                    filtered_df = filtered_df.drop(columns =["brand_embedding"], axis=1)
+
+                    print(filtered_df[["Brand", "Product Name", "Type", "Production Year", 'Profit Margin']])
                     filtered_df = filtered_df.drop_duplicates(subset=["Production Year"], keep="first")
-                    print(filtered_df)
 
                     filtered_df = self.drop_unnecessary_cols(filtered_df)
-                    if len(filtered_df) > 4:
-                        filtered_df = filtered_df.iloc[0:4]
+
+                    # Show latest + 4 previous years only
+                    if len(filtered_df) > 5:
+                        filtered_df = filtered_df.iloc[0:5]
 
                     return ProductResponse("success", filtered_df.to_dict(orient="records"))
+                
+            print("Hit for compare products ....")
+            # Drop unnecessary columns from original_df
+            original_df = original_df.drop(
+                columns=['Type_encoded', "full_text_embedding", "brand_embedding"],
+                errors='ignore'
+            )
 
+            filtered_df = self.filter_compare_rows(original_df, {
+                "Product_type": Product_type,
+                "BrandName": BrandName,
+                "product_category": product_category,
+                "matched_year": matched_year
+            })
+
+
+            if not filtered_df.empty:
+                filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
+                filtered_df = self.get_highest_margin_per_brand(filtered_df)
+
+            matched_df = pd.DataFrame([matched_row])
+
+            merge_df = pd.concat([matched_df, filtered_df]).reset_index(drop=True)
+            merge_df = self.drop_unnecessary_cols(merge_df)
+
+            if len(merge_df) > 3:
+                merge_df = merge_df.iloc[0:3]
+
+            return ProductResponse("success", merge_df.to_dict(orient="records"))
+
+             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
@@ -275,6 +286,10 @@ class GetProfitMarginData(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
                 "message": error_message
             })
+
+
+""" ###############################          Tax Avenue Data    ##################################"""
+
 
 # API FOR Tax  DATA TRAIN 
 class TaxDataTrainPipeline(APIView):
@@ -335,7 +350,6 @@ class TaxSemanticSearchView(APIView):
             # Reaf full model and save mode
             df = pd.read_pickle(tax_embedding_df_path)
          
-            
             # make a copy of original dataframe
             original_df = df.copy()
 
@@ -371,6 +385,9 @@ class TaxSemanticSearchView(APIView):
             
             # Drop unncessary columns
             filtered_df = filtered_df.drop(columns=["text", "tax_text_embedding"]).reset_index(drop=True)
+
+            if len(filtered_df) > 4:
+                filtered_df = filtered_df.iloc[0:4]
 
             sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
 
@@ -421,42 +438,31 @@ class TaxAvenueView(APIView):
                 "message": error_message
             })
 
+
+""" ###############################          CEO Worker Frontline Data    ##################################"""
+
 # API FOR  CEO WORKER DATA TRAIN 
 class CEOWorkerTrainPipeline(APIView):
     def get(self, format =None):
         try:
             # Vector Database dir path
-            vector_db_dir = os.path.join(os.getcwd() , "VectorDBS", "Ceo_Worker")
-            os.makedirs(vector_db_dir , exist_ok=True)
+            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "CEO-Worker")
+            os.makedirs(Emedding_dir_path , exist_ok=True)
 
             #CSV file name
-            File_path = os.path.join(os.getcwd() , "Data", 'ceo_vs_worker_pay.csv')
-
+            File_path = os.path.join(os.getcwd() , "Data", 'Worker_Pay_Gap.csv')
             if not os.path.exists(File_path):
                 return DATA_NOT_FOUND(f"File Not Found with Name : {File_path}")
 
-            # function to train model
-            class_obj = DataTrainPipeline(File_path)
-
-            # STEP 1 : DATA INGESTION
-            documents = class_obj.DataIngestion(File_path)
-            if not documents:
-                return BAD_RESPONSE("Failed to ingest data")
-
-            # STEP 2: DATA CHUNKING
-            chunks = class_obj.DataChunking(documents)
-            if not chunks:
-                return BAD_RESPONSE("Failed to chunk data.")
+            # Transformer model 
+            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
+            os.makedirs(TransferModelDir , exist_ok=True)
             
-
-            # STEP 3: VECTORIZATION AND SAVE AT LOCAL
-            result_message = class_obj.TextEmbeddingAndVectorDb(vector_db_dir,chunks)
-            if result_message is None:
-                return BAD_RESPONSE("Failed to Vectorization data")
-
-
+            # Call function to train model with all rows
+            CeoworkerModelResponse = CeoWorkerMainFunc(File_path, Emedding_dir_path, TransferModelDir)
+            
             return Response({
-                "message": result_message,
+                "message": CeoworkerModelResponse,
             }, status=status.HTTP_200_OK)
         
 
@@ -470,27 +476,77 @@ class CEOWorkerTrainPipeline(APIView):
 
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    top_n = 80
+    similarity = 0.75
 
     def post(self , request , format=None):
         try:
             
-            user_input = request.data.get("query")
-            if not user_input:
+            user_query = request.data.get("query")
+            if not user_query:
                 return BAD_RESPONSE("user query is required , Please provide with key name : 'query' ")
+
+            split_query = user_query.split(" ")
+
+            # Define paths
+            ceo_worker_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_worker_embedding.pkl")
+            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
             
+            # Load model
+            model = SentenceTransformer(transfer_model_path)
 
-            user_query =SpellCorrector(user_input)
+            # Reaf full model and save mode
+            df = pd.read_pickle(ceo_worker_embedding_df_path)
+
+            # make a copy of original dataframe
+            original_df = df.copy()
+
+            # convert_user_query in embedding 
+            query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
+
+            # Convert all full Text  embeddings to tensor
+            ceo_worker_embeddings = [torch.tensor(e).to(self.device) for e in df['frontline_text_embedding']]
+            frontline_embedding_tensor = torch.stack(ceo_worker_embeddings)
+
+            # Cosine similarity on full Text
+            fullText_similarities = util.cos_sim(query_embedding, frontline_embedding_tensor)[0].cpu().numpy()
+            df['ceo_worker_similarity'] = fullText_similarities
+
+            embedding_df = (
+                df.drop(columns=["frontline_text_embedding" , "text"])
+                .sort_values('ceo_worker_similarity', ascending=False)
+                .head(self.top_n)
+            )
+
+             # Most similar row
+            matched_row = embedding_df.loc[embedding_df["ceo_worker_similarity"].idxmax()]
+            matched_row_data = matched_row.to_dict()
+
+            # Get company name from matched row dict
+            CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
+            CEOName = str(matched_row_data.get("CEO Name", "")).lower().strip()
             
-            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Ceo_Worker", "faiss_index")
+            filtered_df = original_df.loc[
+                (original_df["Company Name"].astype(str).str.lower().str.strip() ==CompanyName)&
+                (original_df["CEO Name"].astype(str).str.lower().str.strip() ==CEOName)
+                ]
 
-            # Function to inference model
-            inference_obj = UserInference(VectoDB_Path, CEO_WORKER_DATA_KEYS)
+            if filtered_df.empty:
+                return ProductResponse("failed", [])
+            
+            # Drop unncessary columns
+            filtered_df = filtered_df.drop(columns=["text", "frontline_text_embedding"]).reset_index(drop=True)
 
-            retriever = inference_obj.LoadVectorDB()
+            if len(filtered_df)>4:
+                filtered_df = filtered_df.iloc[0:4]
 
-            result_dict = inference_obj.ModelInference(retriever, user_query)
+            sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
 
-            return Success_RESPONSE(user_query , result_dict)
+            if sorted_df.empty:
+                return ProductResponse("failed", [])
+            
+            return ProductResponse("success", sorted_df.to_dict(orient="records"))
 
 
         except Exception as e:
