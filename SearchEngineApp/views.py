@@ -187,12 +187,21 @@ class ProductSemanticSearchView(APIView):
 
             if len(split_query) == 1:
                 print("Only ask about single brand")
-                filtered_df = embedding_df.loc[embedding_df["brand_similarity"] > 0.65]
 
+                cleaned_split_query = str(split_query[0]).strip()
 
-                # Check if user input exists in Brand column
+                # Handle condition 
+                if cleaned_split_query in ['apple', 'iphone']:
+                    cleaned_split_query="apple"
+
+                # Handle condition 
+                if cleaned_split_query in ['samsung', 'galaxy']:
+                    cleaned_split_query="samsung"
+
+                # Filtered df based on the data 
+                filtered_df = embedding_df.loc[embedding_df["Brand"].str.lower().str.strip() ==cleaned_split_query]
+
                 if not filtered_df.empty:
-                    
                     # convert profit margin into string
                     filtered_df = self.convert_profit_margin(filtered_df)
 
