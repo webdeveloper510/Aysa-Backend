@@ -56,3 +56,10 @@ def select_most_similar_by_brand_year(df):
     return compare_df
         
 
+def filter_plus_rows(df, cleaned_product_type):
+    # Return a boolean Series, not a filtered DataFrame
+    return df["Type_clean"].str.contains(cleaned_product_type, case=False, na=False)
+
+    
+
+

@@ -116,44 +116,73 @@ class ProductSemanticSearchView(APIView):
             # Split user query
             split_query = user_query.split(" ")
 
-            # Define paths of all rows embedding model
+            # Define paths
             full_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
-
-            # Make a path of senetence tranfer model
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
+
+            # Load model
             model = SentenceTransformer(transfer_model_path)
 
-            # call function to get highest similar data
-            embedding_df , original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
-            
-            # Hamdle
+            # Get embeddings and original data
+            embedding_df, original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
+
+            # Handle empty result
             if embedding_df.empty:
                 return ProductResponse("failed", [])
 
-            # Get most highest similar row
+            # Get most similar row
             matched_row = embedding_df.loc[embedding_df["full_text_similarity"].idxmax()]
-
-            # convert into dictionary
             matched_row_data = matched_row.to_dict()
 
-            #Get variables
-            BrandName = matched_row_data.get("Brand")
-            Product_type=matched_row_data.get("Type")
-            product_category = matched_row_data.get("Category")
-            matched_year = matched_row_data.get("Production Year")
+            # Extract variables
+            BrandName = str(matched_row_data.get("Brand", "")).lower().strip()
 
-            #Filtere dataframe based on the query
-            filtered_df = original_df.loc[
-                (original_df["Brand"] != BrandName) & 
-                (original_df["Type"].str.contains(Product_type, case=False, na=False))&
-                (original_df["Production Year"] ==matched_year) & 
-                (original_df["Category"]==product_category)]
+            # Normalize product type and Type column
+            Product_type = str(matched_row_data.get("Type" , "")).lower().strip()
+
+            product_category = str(matched_row_data.get("Category", "")).lower().strip()
+
+            matched_year = int(matched_row_data.get("Production Year"))
+
+            print({
+                "BrandName ": BrandName,
+                "Product_type ": Product_type,
+                "product_category ": product_category,
+                "matched_year ": matched_year,
+            })
+
+            # Drop columns
+            original_df = original_df.drop(columns=['Type_encoded', "full_text_embedding", "brand_embedding"], errors='ignore')
+
+            # convert dataframe into json
+            DataList = original_df.to_dict(orient="records")
+
+            compare_rows =[]
+
+            for row_dict in DataList:
+                Brand = str(row_dict.get("Brand", "")).lower().strip()
+                Year = int(row_dict.get("Production Year"))
+                ProductCategory = str(row_dict.get("Category", "")).lower().strip()
+                ProductType = str(row_dict.get("Type", "")).lower().strip()
+                
+                if Product_type in ProductType and BrandName != Brand and ProductCategory == product_category and Year== matched_year:
+                    compare_rows.append(row_dict)
             
-
-            filtered_df= filtered_df.drop(columns=['Type_encoded', "full_text_embedding" , "brand_embedding"])
+            filtered_df = pd.DataFrame(compare_rows)
             if not filtered_df.empty:
                 filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
 
+                FilteredList =[]
+                for brand , group in filtered_df.groupby("Brand"):
+                    highest_margin = group.loc[group["Profit Margin"].idxmax()]
+                    #lowest_margin = group.loc[group["Profit Margin"].idxmin()]
+
+                    # extend in compare rows
+                    FilteredList.extend([highest_margin])
+
+                # Create DataFrame from results
+                filtered_df = pd.DataFrame(FilteredList).reset_index(drop=True)
+                print("filtered_df ", filtered_df)
 
             # convert Series columbn to dataframe
             matched_df = pd.DataFrame([matched_row])
