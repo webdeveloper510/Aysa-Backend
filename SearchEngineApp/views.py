@@ -18,7 +18,7 @@ from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND, ProductR
 from .models import *
 from .utils import *
 from .product_structure import *
-from .tax_paid import *
+from .tax_structure import *
 from sentence_transformers import SentenceTransformer , util
 
 
@@ -243,7 +243,6 @@ class ProductSemanticSearchView(APIView):
             })
 
 
-
 # API For get all profit margin data
 class GetProfitMarginData(APIView):
     def get(self,request,format=None):
@@ -285,10 +284,6 @@ class TaxDataTrainPipeline(APIView):
             Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "Tax")
             os.makedirs(Emedding_dir_path , exist_ok=True)
 
-            # Vector Database dir path
-            ModelDirPath = os.path.join(os.getcwd() ,"Model", "Tax")
-            os.makedirs(ModelDirPath , exist_ok=True)
-
             #CSV file name
             input_csv_file_path = os.path.join(os.getcwd() , "Data", 'Tax_Avoidance.csv')
             if not os.path.exists(input_csv_file_path):
@@ -299,10 +294,8 @@ class TaxDataTrainPipeline(APIView):
             os.makedirs(TransferModelDir , exist_ok=True)
             
             # Call function to train model with all rows
-            TaxModelResponse = Tax_main(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
+            TaxModelResponse = TaxMainFunc(input_csv_file_path, Emedding_dir_path, TransferModelDir)
             
-            # train model only brand ,Product type data 
-            # model_response = BrandProductMain(input_csv_file_path, Emedding_dir_path, ModelDirPath, TransferModelDir)
 
             return Response({
                 "message": TaxModelResponse,
@@ -316,37 +309,85 @@ class TaxDataTrainPipeline(APIView):
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
                 "message": error_message
             })
+
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    top_n = 80
+    similarity = 0.75
 
     def post(self , request , format=None):
         try:
             
-            user_input = request.data.get("query")
-            if not user_input:
-                return BAD_RESPONSE("user input is required , Please provide with key name : 'query'")
+            user_query = request.data.get("query")
+            if not user_query:
+                return BAD_RESPONSE("user query is required , Please provide with key name : 'query'")
             
-            user_query =SpellCorrector(user_input)
+            split_query = user_query.split(" ")
+
+            # Define paths
+            tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
+            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
             
-            VectoDB_Path = os.path.join(os.getcwd() , "VectorDBS", "Tax_DB", "faiss_index")
+            # Load model
+            model = SentenceTransformer(transfer_model_path)
 
-            # Call Product Inference Model
-            # Function to inference model
-            inference_obj = UserInference(VectoDB_Path , TAX_DATA_KEYS)
+            # Reaf full model and save mode
+            df = pd.read_pickle(tax_embedding_df_path)
+         
+            
+            # make a copy of original dataframe
+            original_df = df.copy()
 
-            # STEP 1 
-            retriever = inference_obj.LoadVectorDB()
+            # convert_user_query in embedding 
+            query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
 
-            result_dict = inference_obj.ModelInference(retriever, user_query)
+            # Convert all full Text  embeddings to tensor
+            tax_embeddings = [torch.tensor(e).to(self.device) for e in df['tax_text_embedding']]
+            tax_embedding_tensor = torch.stack(tax_embeddings)
 
-            return Success_RESPONSE(user_query , result_dict)
+            # Cosine similarity on full Text
+            fullText_similarities = util.cos_sim(query_embedding, tax_embedding_tensor)[0].cpu().numpy()
+            df['tax_similarity'] = fullText_similarities
 
+
+            embedding_df = (
+                df.drop(columns=["tax_text_embedding" , "text"])
+                .sort_values('tax_similarity', ascending=False)
+                .head(self.top_n)
+            )
+
+            # Most similar row
+            matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
+            matched_row_data = matched_row.to_dict()
+
+            # Get company name from matched row dict
+            CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
+            
+            filtered_df = original_df.loc[original_df["Company Name"].astype(str).str.lower().str.strip() ==CompanyName]
+
+            if filtered_df.empty:
+                return ProductResponse("failed", [])
+            
+            # Drop unncessary columns
+            filtered_df = filtered_df.drop(columns=["text", "tax_text_embedding"]).reset_index(drop=True)
+
+            sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
+
+            if sorted_df.empty:
+                return ProductResponse("failed", [])
+            
+            return ProductResponse("success", sorted_df.to_dict(orient="records"))
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
-            return []
+            return Response({
+                "message": error_message,
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "data": [],
+            })
 
 # API FOR  CEO WORKER DATA TRAIN 
 class CEOWorkerTrainPipeline(APIView):
