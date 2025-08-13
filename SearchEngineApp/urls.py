@@ -13,7 +13,10 @@ urlpatterns = [
 
     # GET ALL product margin data 
     path("get-profit-margin-data", GetProfitMarginData.as_view()),
-    path("get-tax-data", TaxAvenueView.as_view())]
+    path("get-tax-data", TaxAvenueView.as_view()),
+    path("get-ceo-worker-data", CeoWorkerView.as_view())
+    
+    ]
 
 
 
