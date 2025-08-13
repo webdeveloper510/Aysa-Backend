@@ -186,22 +186,22 @@ class ProductSemanticSearchView(APIView):
             # Handle if user ask only about brand
 
             if len(split_query) == 1:
+
                 print("Only ask about single brand")
+                cleaned_split_query = str(split_query[0]).lower().strip()
 
-                cleaned_split_query = str(split_query[0]).strip()
+                if cleaned_split_query in ["apple", "iphone"]:
+                    cleaned_split_query ="apple"
+                
+                if cleaned_split_query in ["samsung", "galaxy"]:
+                    cleaned_split_query ="samsung"
 
-                # Handle condition 
-                if cleaned_split_query in ['apple', 'iphone']:
-                    cleaned_split_query="apple"
 
-                # Handle condition 
-                if cleaned_split_query in ['samsung', 'galaxy']:
-                    cleaned_split_query="samsung"
+                filtered_df = embedding_df.loc[embedding_df["Brand"].str.lower().str.strip() == cleaned_split_query]
 
-                # Filtered df based on the data 
-                filtered_df = embedding_df.loc[embedding_df["Brand"].str.lower().str.strip() ==cleaned_split_query]
-
+                # Check if user input exists in Brand column
                 if not filtered_df.empty:
+
                     # convert profit margin into string
                     filtered_df = self.convert_profit_margin(filtered_df)
 
@@ -383,12 +383,29 @@ class TaxSemanticSearchView(APIView):
             # Most similar row
             matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
             matched_row_data = matched_row.to_dict()
+            print("matched row data ", matched_row_data)
+
+
 
             # Get company name from matched row dict
             CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
-            
-            filtered_df = original_df.loc[original_df["Company Name"].astype(str).str.lower().str.strip() ==CompanyName]
+            Year = matched_row_data.get("Year")
 
+            # Take Empty dataframe
+            filtered_df= pd.DataFrame()
+
+           # Check if year exists in user query
+            if str(Year) in user_query:
+                filtered_df = original_df.loc[
+                    (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName)
+                    & (original_df["Year"].astype(int) == int(Year))
+                ]
+            else:
+                filtered_df = original_df.loc[
+                    original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName
+                ]
+
+            # Handle if filetred dataframe is empty 
             if filtered_df.empty:
                 return ProductResponse("failed", [])
             
@@ -535,12 +552,24 @@ class CEOWorkerSemanticSearchView(APIView):
             # Get company name from matched row dict
             CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
             CEOName = str(matched_row_data.get("CEO Name", "")).lower().strip()
-            
-            filtered_df = original_df.loc[
-                (original_df["Company Name"].astype(str).str.lower().str.strip() ==CompanyName)&
-                (original_df["CEO Name"].astype(str).str.lower().str.strip() ==CEOName)
+            Year = matched_row_data.get("Year")
+
+
+            filtered_df = pd.DataFrame()
+            # Check if year exists in user query
+            if str(Year) in user_query:
+                filtered_df = original_df.loc[
+                    (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName) &
+                    (original_df["CEO Name"].astype(str).str.lower().str.strip() == CEOName) &
+                    (original_df["Year"].astype(int) == int(Year))
+                ]
+            else:
+                filtered_df = original_df.loc[
+                    (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName) &
+                    (original_df["CEO Name"].astype(str).str.lower().str.strip() == CEOName)
                 ]
 
+            # Handle if dataframe is empty
             if filtered_df.empty:
                 return ProductResponse("failed", [])
             
