@@ -14,3 +14,4 @@ tabulate
 cryptography
 django-cors-headers
 textblob
+openpyxl

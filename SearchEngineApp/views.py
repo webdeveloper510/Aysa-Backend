@@ -87,29 +87,16 @@ class ProductSemanticSearchView(APIView):
             result.append(highest_margin)
         return pd.DataFrame(result).reset_index(drop=True)
 
-    # Function to compare rows 
-    def filter_compare_rows(self,df, matched):
-        compare_rows = []
-        for row_dict in df.to_dict(orient="records"):
-            Brand = str(row_dict.get("Brand", "")).lower().strip()
-            Year = int(row_dict.get("Production Year"))
-            ProductCategory = str(row_dict.get("Category", "")).lower().strip()
-            ProductType = str(row_dict.get("Type", "")).lower().strip()
-
-            if (matched["Product_type"] in ProductType
-                    and matched["BrandName"] != Brand
-                    and ProductCategory == matched["product_category"]
-                    and Year == matched["matched_year"]):
-                compare_rows.append(row_dict)
-        return pd.DataFrame(compare_rows)
-
     # function to get product search
     def ProductSearch(self ,user_query, full_embedding_df_path , model):
         try:
  
             # Reaf full model and save mode
             df = pd.read_pickle(full_embedding_df_path)
-           
+
+            #print("Read original df is printing read from pickle file ....")
+            #print(df.iloc[15:40])
+            #print()
             original_df = df.copy()
 
             # convert_user_query in embedding 
@@ -216,8 +203,8 @@ class ProductSemanticSearchView(APIView):
                     filtered_df = self.drop_unnecessary_cols(filtered_df)
 
                     # Show latest + 4 previous years only
-                    if len(filtered_df) > 5:
-                        filtered_df = filtered_df.iloc[0:5]
+                    if len(filtered_df) > 3:
+                        filtered_df = filtered_df.iloc[0:3]
 
                     return ProductResponse("success", filtered_df.to_dict(orient="records"))
                 
@@ -228,23 +215,33 @@ class ProductSemanticSearchView(APIView):
                 errors='ignore'
             )
 
-            filtered_df = self.filter_compare_rows(original_df, {
-                "Product_type": Product_type,
-                "BrandName": BrandName,
-                "product_category": product_category,
-                "matched_year": matched_year
-            })
+            # compare rows based on the "Brand , Production Year , Category , Type"
+            compare_rows = []
+            for row_dict in original_df.to_dict(orient="records"):
+                Brand = str(row_dict.get("Brand", "")).lower().strip()
+                Year = int(row_dict.get("Production Year"))
+                ProductCategory = str(row_dict.get("Category", "")).lower().strip()
+                ProductType = str(row_dict.get("Type", "")).lower().strip()
 
+                if BrandName  != Brand and Product_type in ProductType and product_category == ProductCategory and matched_year ==Year:
+                    compare_rows.append(row_dict)
 
+            # Make a dataframe 
+            filtered_df = pd.DataFrame(compare_rows)
+
+            # get highest and minimum profit margin
             if not filtered_df.empty:
                 filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
                 filtered_df = self.get_highest_margin_per_brand(filtered_df)
 
+            # Convert series into dataframe
             matched_df = pd.DataFrame([matched_row])
 
+            # Merge Both Dataframe
             merge_df = pd.concat([matched_df, filtered_df]).reset_index(drop=True)
             merge_df = self.drop_unnecessary_cols(merge_df)
 
+            # only return 3 product if it has more than from 3
             if len(merge_df) > 3:
                 merge_df = merge_df.iloc[0:3]
 

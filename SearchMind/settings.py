@@ -95,7 +95,6 @@ REST_FRAMEWORK = {
 
 WSGI_APPLICATION = 'SearchMind.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 

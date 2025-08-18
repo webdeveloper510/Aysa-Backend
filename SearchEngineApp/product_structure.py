@@ -47,6 +47,12 @@ class ProductModelStructure:
             # remove space from the columns name
             df.columns = df.columns.str.strip()
 
+            # DROP Uncessary column 
+            df = df.drop("Profit Made", axis=1)
+
+            print("csv read dataframe ....")
+            print(df)
+
             # Filter out Brand Categories values 
             # get mask rows where all columns values is NAN and Brand have value
             mask = df.drop(columns=["Brand"]).isna().all(axis=1)
