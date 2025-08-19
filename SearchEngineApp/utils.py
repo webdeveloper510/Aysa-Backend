@@ -39,17 +39,3 @@ def preprocess_text(text):
 
 
 
-
-def normalize_type(row):
-    if row["Category"] == "Vehicles":
-        return vehicals_map.get(row["Type"], row["Type"])
-    elif row["Category"] == "Smart TV":
-        return smart_tv_map.get(row["Type"], row["Type"])
-    elif row["Category"] == "Sneakers":
-        return sneaker_map.get(row["Type"], row["Type"])
-    elif row["Category"] == "Luxury Clothing":
-        return laxury_clothing_brands_map.get(row["Type"], row["Type"])
-    elif row["Category"] == "Watches":
-        return watch_map.get(row["Type"], row["Type"])
-    else:
-        return row["Type"]
