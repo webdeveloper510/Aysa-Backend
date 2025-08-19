@@ -65,7 +65,7 @@ class ProductSemanticSearchView(APIView):
     similarity = 0.75
 
     def drop_unnecessary_cols(self,df):
-        drop_cols = ["brand_similarity", "brand", "text", "full_text_similarity", "brand_embedding"]
+        drop_cols = ["Type","brand_similarity", "brand", "text", "full_text_similarity", "brand_embedding"]
         return df.drop(columns=drop_cols, errors="ignore")
 
     # function to change profit margin in dataframe
@@ -278,6 +278,9 @@ class ProductSemanticSearchView(APIView):
             # Merge Both Dataframe
             merge_df = pd.concat([matched_df, filtered_df]).reset_index(drop=True)
             merge_df = self.drop_unnecessary_cols(merge_df)
+            
+            # Rename column
+            merge_df = merge_df.rename(columns={'Type Mapped': 'Type'})
 
             if len(merge_df) > 3:
                 merge_df = merge_df.iloc[0:3]
