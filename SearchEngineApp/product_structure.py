@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer , util
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import KMeans
 from .utils import preprocess_text
+from .category_map import product_type_mapping
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
@@ -43,25 +44,20 @@ class ProductModelStructure:
         print("Step 1: Reading CSV file ....")
         try:
             df = pd.read_csv(self.csv_path)
-
             # remove space from the columns name
             df.columns = df.columns.str.strip()
 
+            # Drop Unneccsary columns
+            if "Unnamed: 8" in df.columns:
+                df = df.drop("Unnamed: 8", axis=1)
+
+            # remove extra spaces 
+            df["Type"] = df["Type"].str.strip()
+
+            df["Type Mapped"] = df["Type"].map(product_type_mapping).fillna(df["Type"])
+
             # DROP Uncessary column 
             df = df.drop("Profit Made", axis=1)
-
-            print("csv read dataframe ....")
-            print(df)
-
-            # Filter out Brand Categories values 
-            # get mask rows where all columns values is NAN and Brand have value
-            mask = df.drop(columns=["Brand"]).isna().all(axis=1)
-
-            # Create New column and with value nan
-            df["Category"] = np.where(mask, df["Brand"], np.nan)
-            
-            # Fill with category name 
-            df["Category"] = df["Category"].ffill()
 
             # remove nan values
             df.dropna(inplace=True)
@@ -86,7 +82,6 @@ class ProductModelStructure:
 
             # make a copy of dataframe
             df = df.copy()
-
             # Add two column with different columns groups
             df["text"] = (df["Brand"] +" " + df["Product Name"] + " " +df["Type"])
             df["brand"] = df["Brand"]
@@ -102,28 +97,8 @@ class ProductModelStructure:
             print(error_message)
             return []
 
-    def Label_Encoding(self, df):
-        print("Step 3: Generating Label according to type of each category .....")
-        try:
-            df = df.copy()
-            df['Type_encoded'] = None  # create column
-
-            le = LabelEncoder()
-
-            for category, group in df.groupby("Category"):
-                encoded = le.fit_transform(group['Type'])
-                df.loc[group.index, 'Type_encoded'] = encoded
-
-            return df
-
-        except Exception as e:
-            exc_type , exc_obj , exc_tb = sys.exc_info()
-            error_message = f"Failed tp lebeling model, error occur {str(e)} in line no : {exc_tb.tb_lineno}"
-            print(error_message)
-            return []
-
     def apply_kmeans(self, df, embedding_dir_path):
-        print(f"Step 4: Text Embedding is starting ........")
+        print(f"Step 3: Text Embedding is starting ........")
         try:
 
             # make a model path 
@@ -168,11 +143,7 @@ def AllProductDetailMain(file_path, embedding_dir_path , TransferModelDir):
         if isinstance(cleaned_df, list): 
             return None
         
-        encoded_df = product_structure.Label_Encoding(cleaned_df)
-        if isinstance(cleaned_df, list): 
-            return None
-
-        response = product_structure.apply_kmeans(encoded_df, embedding_dir_path)
+        response = product_structure.apply_kmeans(cleaned_df, embedding_dir_path)
 
         return response     
 

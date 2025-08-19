@@ -1,5 +1,6 @@
 from textblob import TextBlob
 import re
+from .category_map import *
 
 PRODUCT_DATA_KEYS = [
     'Brand', 'Product Name', 'Type', 'Production Year',
@@ -37,3 +38,18 @@ def preprocess_text(text):
     return text
 
 
+
+
+def normalize_type(row):
+    if row["Category"] == "Vehicles":
+        return vehicals_map.get(row["Type"], row["Type"])
+    elif row["Category"] == "Smart TV":
+        return smart_tv_map.get(row["Type"], row["Type"])
+    elif row["Category"] == "Sneakers":
+        return sneaker_map.get(row["Type"], row["Type"])
+    elif row["Category"] == "Luxury Clothing":
+        return laxury_clothing_brands_map.get(row["Type"], row["Type"])
+    elif row["Category"] == "Watches":
+        return watch_map.get(row["Type"], row["Type"])
+    else:
+        return row["Type"]

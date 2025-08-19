@@ -28,6 +28,8 @@ VectorDBS
 # Ignore Jupyter file
 SearchEngineApp/work.ipynb
 
-
 # Ignore Transfer model 
 transfer_model
+
+# Ignore category file
+SearchEngineApp/category_map.py
