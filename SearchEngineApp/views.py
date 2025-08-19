@@ -132,7 +132,7 @@ class ProductSemanticSearchView(APIView):
 
             # remove unnessary columns from the Embeddingf df
             embedding_df = (
-                df.drop(columns=["full_text_embedding", "brand_embedding"])
+                df.drop(columns=["full_text_embedding", "brand_embedding", 'brand_similarity'])
                 .sort_values('full_text_similarity', ascending=False)
                 .head(self.top_n)
             )
@@ -166,7 +166,7 @@ class ProductSemanticSearchView(APIView):
 
             # Get embeddings and original data
             embedding_df, original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
-         
+            
             # Handle if embedding df is empty 
             if embedding_df.empty:
                 return ProductResponse("failed", [])
@@ -191,8 +191,6 @@ class ProductSemanticSearchView(APIView):
             if len(split_query) == 1:
                 print("Only ask about single brand")
                 cleaned_split_query = str(split_query[0]).lower().strip()
-                print("cleaned_split_query ", cleaned_split_query)
-
 
                 filtered_df = embedding_df.loc[embedding_df["Brand"].str.lower().str.strip() == cleaned_split_query]
 
@@ -225,23 +223,27 @@ class ProductSemanticSearchView(APIView):
                     #  Drop unnecessary cols ONLY at the end, not before trimming
                     filtered_df = self.drop_unnecessary_cols(filtered_df)
 
-                    print("final rows:", len(filtered_df))
                     return ProductResponse("success", filtered_df.to_dict(orient="records"))
 
                 
             print("Hit for compare products ....")
-            # compare rows based on the "Brand , Production Year , Category , Type"
+            #compare rows based on the "Brand , Production Year , Category , Type"
 
+  
             # filter data based on the Brand Name , Type and Production Year  from the embedding dataframe
             filtered_df = embedding_df.loc[
                 (embedding_df["Brand"].str.lower().str.strip() != BrandName) &
                 (embedding_df["Type Mapped"].str.lower().str.strip() == Product_type) &
                 (embedding_df["Production Year"].astype(int) == matched_year) 
                 ].copy()
+            
+            print("Embedding filtered dataframe 1 ")
+            print(filtered_df)
+            print()
 
             # if embdding dataframe does not contain values then 
             # Filter out data from original dataframe 
-            if filtered_df.empty:
+            if filtered_df.empty or len(filtered_df) <3:
                 filtered_df = original_df.loc[
                     (original_df["Brand"].str.lower().str.strip() != BrandName) &
                     (original_df["Type Mapped"].str.lower().str.strip() == Product_type) &
@@ -249,6 +251,9 @@ class ProductSemanticSearchView(APIView):
                 
                 ].copy()
 
+            print("original dataframe  filtered dataframe 2 ")
+            print(filtered_df)
+            print()
 
             # get highest and minimum profit margin
             if not filtered_df.empty:
@@ -264,7 +269,9 @@ class ProductSemanticSearchView(APIView):
 
                 filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
 
-     
+            # Add percentage sign after the value
+            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(int).apply(lambda x: f"{x}%" if pd.notnull(x) else "")
+
             # Convert series into dataframe
             matched_df = pd.DataFrame([matched_row])
 
@@ -277,6 +284,7 @@ class ProductSemanticSearchView(APIView):
 
             return ProductResponse("success", merge_df.to_dict(orient="records"))
 
+             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
