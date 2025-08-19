@@ -270,7 +270,7 @@ class ProductSemanticSearchView(APIView):
                 filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
 
             # Add percentage sign after the value
-            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(int).apply(lambda x: f"{x}%" if pd.notnull(x) else "")
+            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).apply(lambda x: f"{x}%" if pd.notnull(x) else "")
 
             # Convert series into dataframe
             matched_df = pd.DataFrame([matched_row])
