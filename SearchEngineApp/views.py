@@ -166,6 +166,11 @@ class ProductSemanticSearchView(APIView):
 
             # Get embeddings and original data
             embedding_df, original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
+
+            # Normalize Profit margin column value in same format
+            embedding_df["Profit Margin"] = embedding_df["Profit Margin"].apply(format_profit_margin)
+            original_df["Profit Margin"] = original_df["Profit Margin"].apply(format_profit_margin)
+
             
             # Handle if embedding df is empty 
             if embedding_df.empty:
@@ -270,7 +275,9 @@ class ProductSemanticSearchView(APIView):
                 filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
 
             # Add percentage sign after the value
-            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).apply(lambda x: f"{x}%" if pd.notnull(x) else "")
+            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].apply(
+                lambda x: f"{x:.2f}%" if pd.notnull(x) else ""
+            )
 
             # Convert series into dataframe
             matched_df = pd.DataFrame([matched_row])

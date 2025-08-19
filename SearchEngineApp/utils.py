@@ -38,4 +38,39 @@ def preprocess_text(text):
     return text
 
 
+def format_profit_margin(x):
+    import pandas as pd
+    
+    if pd.isnull(x):
+        return ""
+    
+    s = str(x).strip()
+    
+    # If already has $ → format as currency
+    if "$" in s:
+        # Remove commas, $, then format again
+        try:
+            val = float(s.replace("$", "").replace(",", ""))
+            return f"${val:,.2f}"
+        except:
+            return s
+    
+    # If has % → normalize to 2 decimals
+    if "%" in s:
+        try:
+            val = float(s.replace("%", ""))
+            return f"{val:.2f}%"
+        except:
+            return s
+    
+    # If pure number → decide if % or $
+    try:
+        val = float(s)
+        # If it's > 1000 → assume it's money
+        if val > 1000:
+            return f"${val:,.2f}"
+        else:
+            return f"{val:.2f}%"
+    except:
+        return s
 
