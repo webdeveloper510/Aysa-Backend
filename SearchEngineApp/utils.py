@@ -1,6 +1,6 @@
 from textblob import TextBlob
 import re
-from .category_map import *
+
 
 PRODUCT_DATA_KEYS = [
     'Brand', 'Product Name', 'Type', 'Production Year',
