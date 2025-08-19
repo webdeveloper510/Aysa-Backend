@@ -248,7 +248,7 @@ class ProductSemanticSearchView(APIView):
 
             # if embdding dataframe does not contain values then 
             # Filter out data from original dataframe 
-            if filtered_df.empty or len(filtered_df) <3:
+            if filtered_df.empty or len(filtered_df) <2:
                 filtered_df = original_df.loc[
                     (original_df["Brand"].str.lower().str.strip() != BrandName) &
                     (original_df["Type Mapped"].str.lower().str.strip() == Product_type) &
@@ -309,7 +309,7 @@ class ProductSemanticSearchView(APIView):
 
 # API For get all profit margin data
 class GetProfitMarginData(APIView):# #
-    def get(self,request,format=None):
+    def get(self,format=None):
         try:
             #CSV file name
             input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
@@ -318,10 +318,14 @@ class GetProfitMarginData(APIView):# #
             
             # Read csv 
             df = pd.read_csv(input_csv_file_path)
+            
+            # Drop Unneccsary columns
+            if "Unnamed: 8" in df.columns:
+                df = df.drop("Unnamed: 8", axis=1)
 
-            # Clean NaN and infinity values
-            if not df.empty:
-                df.dropna(inplace=True)
+            # Replace NaN/inf values with None so JSON can handle them
+            df = df.replace([np.inf, -np.inf], np.nan)   # convert inf to NaN
+            df = df.where(pd.notnull(df), None)          # convert NaN to None
             
             # Return Response
             return Response({
