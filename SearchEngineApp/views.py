@@ -400,9 +400,12 @@ class TaxSemanticSearchView(APIView):
                 return BAD_RESPONSE("user query is required , Please provide with key name : 'query'")
             
             # Call function to get year status from  the user query ...
-            Filter_year_from_user_query= get_year(user_query)
+            Filter_year_from_user_query= get_year(str(user_query))
+            print("Filter_year_from_user_query ", Filter_year_from_user_query)
             YEAR_STATUS = True if  Filter_year_from_user_query != 'None' else False
 
+            print("user query ", user_query)
+            print("YEAR_STATUS ", YEAR_STATUS)
             # Define paths
             tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')

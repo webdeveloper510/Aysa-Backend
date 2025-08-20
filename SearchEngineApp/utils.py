@@ -77,15 +77,6 @@ def format_profit_margin(x):
 
 
 # Function to get Year from text 
-def get_year(text : str) -> str:
-    Year ="None"
-
-    import spacy
-    nlp = spacy.load("en_core_web_sm")
-
-    doc = nlp(text)
-
-    for ent in doc.ents:
-        if ent.label_ == "DATE":
-            Year =str(ent.text)
-    return Year
+def get_year(text: str) -> str:
+    match = re.search(r"\b(19|20)\d{2}\b", text)  # matches years 1900–2099
+    return match.group(0) if match else "None"
