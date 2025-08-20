@@ -74,3 +74,18 @@ def format_profit_margin(x):
     except:
         return s
 
+
+
+# Function to get Year from text 
+def get_year(text : str) -> str:
+    Year ="None"
+
+    import spacy
+    nlp = spacy.load("en_core_web_sm")
+
+    doc = nlp(text)
+
+    for ent in doc.ents:
+        if ent.label_ == "DATE":
+            Year =str(ent.text)
+    return Year

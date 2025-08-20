@@ -176,14 +176,17 @@ class ProductSemanticSearchView(APIView):
             if embedding_df.empty:
                 return ProductResponse("failed", [])
 
-            # Most similar row
+            # Get Most Similar row from the dataframe and Convert into dictionary.
             matched_row = embedding_df.loc[embedding_df["full_text_similarity"].idxmax()]
             matched_row_data = matched_row.to_dict()
 
             # get values from the matched dataframe
-            BrandName = str(matched_row_data.get("Brand", "")).lower().strip()
-            Product_type = str(matched_row_data.get("Type Mapped", "")).lower().strip()
-            matched_year = int(matched_row_data.get("Production Year"))
+            Row_data_parameter = lambda x : (str(x["Brand"]).lower().strip(), str(x["Type Mapped"]).lower().strip() , int(x["Production Year"]))
+            Result = Row_data_parameter(matched_row_data)
+
+            BrandName = Result[0]           # Matched Brand Name
+            Product_type = Result[1]        # Matched Product Type
+            matched_year = Result[2]        # Matched year
 
             print({
                 "BrandName": BrandName,
@@ -318,7 +321,7 @@ class GetProfitMarginData(APIView):# #
             
             # Read csv 
             df = pd.read_csv(input_csv_file_path)
-            
+
             # Drop Unneccsary columns
             if "Unnamed: 8" in df.columns:
                 df = df.drop("Unnamed: 8", axis=1)
@@ -333,8 +336,6 @@ class GetProfitMarginData(APIView):# #
                 "status": status.HTTP_200_OK if not df.empty  else 404, 
                 "data": df.to_dict(orient="records") if not df.empty else []
             })
-            
-
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -390,12 +391,14 @@ class TaxSemanticSearchView(APIView):
 
     def post(self , request , format=None):
         try:
-            
+            # Get User query from POST Request
             user_query = request.data.get("query")
             if not user_query:
                 return BAD_RESPONSE("user query is required , Please provide with key name : 'query'")
             
-            split_query = user_query.split(" ")
+            # Call function to get year status from  the user query ...
+            Filter_year_from_user_query= get_year(user_query)
+            YEAR_STATUS = True if  Filter_year_from_user_query != 'None' else False
 
             # Define paths
             tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
@@ -442,8 +445,9 @@ class TaxSemanticSearchView(APIView):
             # Take Empty dataframe
             filtered_df= pd.DataFrame()
 
+            
            # Check if year exists in user query
-            if str(Year) in user_query:
+            if YEAR_STATUS:
                 filtered_df = original_df.loc[
                     (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName)
                     & (original_df["Year"].astype(int) == int(Year))
@@ -557,11 +561,14 @@ class CEOWorkerSemanticSearchView(APIView):
     def post(self , request , format=None):
         try:
             
+            # GET USER QUERY FROM POST REQUEST 
             user_query = request.data.get("query")
             if not user_query:
                 return BAD_RESPONSE("user query is required , Please provide with key name : 'query' ")
 
-            split_query = user_query.split(" ")
+            # Call function to get year status from  the user query ...
+            Filter_year_from_user_query= get_year(user_query)
+            YEAR_STATUS = True if  Filter_year_from_user_query != 'None' else False
 
             # Define paths
             ceo_worker_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_worker_embedding.pkl")
@@ -605,7 +612,7 @@ class CEOWorkerSemanticSearchView(APIView):
 
             filtered_df = pd.DataFrame()
             # Check if year exists in user query
-            if str(Year) in user_query:
+            if YEAR_STATUS:
                 filtered_df = original_df.loc[
                     (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName) &
                     (original_df["CEO Name"].astype(str).str.lower().str.strip() == CEOName) &
