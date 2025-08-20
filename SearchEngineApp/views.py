@@ -146,7 +146,11 @@ class ProductSemanticSearchView(APIView):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed tp get full and sub embed dataframe [ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
-            return None
+            return Response({
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "message": error_message,
+            })
+
    
    # Main function 
     def post(self, request, format=None):
@@ -306,7 +310,6 @@ class ProductSemanticSearchView(APIView):
             return Response({
                 "message": error_message,
                 "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "data": [],
             })
 
 
@@ -479,9 +482,8 @@ class TaxSemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return Response({
-                "message": error_message,
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "data": [],
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                "message": error_message
             })
 
 # API For get all Tax Avenue data
@@ -540,9 +542,9 @@ class CEOWorkerTrainPipeline(APIView):
             CeoworkerModelResponse = CeoWorkerMainFunc(File_path, Emedding_dir_path, TransferModelDir)
             
             return Response({
+                "status": status.HTTP_200_OK,
                 "message": CeoworkerModelResponse,
-            }, status=status.HTTP_200_OK)
-        
+            })
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -646,7 +648,10 @@ class CEOWorkerSemanticSearchView(APIView):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
-            return []
+            return Response({
+                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                "message": error_message
+            })
 
 
 # API For get CEO Worker data
