@@ -8,7 +8,6 @@ from sentence_transformers import SentenceTransformer , util
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import KMeans
 from .utils import preprocess_text
-from .category_map import product_type_mapping
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
@@ -38,7 +37,6 @@ class ProductModelStructure:
             model = SentenceTransformer(model_path)
 
         return model
-
 
     def read_csv(self):
         print("Step 1: Reading CSV file ....")

@@ -18,8 +18,3 @@ urlpatterns = [
     
     ]
 
-
-
-
-
-

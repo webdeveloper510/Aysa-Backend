@@ -13,11 +13,12 @@ import pandas as pd
 import torch
 
 # import Project files
-from .response import BAD_RESPONSE , Success_RESPONSE , DATA_NOT_FOUND, ProductResponse
+from .response import *
 from .models import *
 from .utils import *
 from .product_structure import *
 from .tax_structure import *
+from .profit_margin_predict import *
 from .ceo_worker import *
 from sentence_transformers import SentenceTransformer , util
 
@@ -53,105 +54,11 @@ class ProductTrainPipeline(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
+            return Internal_server_response(error_message)
 
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    top_n = 80
-    similarity = 0.75
 
-    def drop_unnecessary_cols(self,df):
-        drop_cols = ["Type","brand_similarity", "brand", "text", "full_text_similarity", "brand_embedding"]
-        return df.drop(columns=drop_cols, errors="ignore")
-
-    # function to change profit margin in dataframe
-    def convert_profit_margin(self,df):
-        # Remove all characters except digits and dot
-        df["Profit Margin"] = (
-            df["Profit Margin"]
-            .astype(str)
-            .str.replace(r"[^0-9.-]", "", regex=True)  # keep digits, minus, dot
-            .replace("", "0")  # if empty string, set to 0
-            .astype(float)
-        )
-        return df
-
-
-    # function to get highest mmargin of unique brand
-    def get_highest_margin_per_brand(self,df):
-        result = []
-        for _, group in df.groupby("Brand"):
-            highest_margin = group.loc[group["Profit Margin"].idxmax()]
-            result.append(highest_margin)
-        return pd.DataFrame(result).reset_index(drop=True)
-    
-    @staticmethod
-    def compare_products(df ,BrandName,Product_type ,matched_year):
-        compare_rows =[]
-        for row_dict in df.to_dict(orient="records"):
-            Brand = str(row_dict.get("Brand", "")).lower().strip()
-            Year = int(row_dict.get("Production Year"))
-            ProductType = str(row_dict.get("Type Mapped", "")).lower().strip()
-
-            # Compare Rows according to data 
-            if BrandName  != Brand and Product_type == ProductType and matched_year ==Year:
-                compare_rows.append(row_dict)
-        return compare_rows
-
-    # function to get product search
-    def ProductSearch(self ,user_query, full_embedding_df_path , model):
-        try:
- 
-            # Reaf full model and save mode
-            df = pd.read_pickle(full_embedding_df_path)
-
-            original_df = df.copy()
-
-            # convert_user_query in embedding 
-            query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
-
-            # Convert all full Text  embeddings to tensor
-            full_embeddings = [torch.tensor(e).to(self.device) for e in df['full_text_embedding']]
-            full_text_embedding_tensor = torch.stack(full_embeddings)
-
-            # Convert all sub Text  embeddings to tensor
-            Brand_embeddings = [torch.tensor(e).to(self.device) for e in df['brand_embedding']]
-            brand_embedding_tensor = torch.stack(Brand_embeddings)
-
-            # Cosine similarity on full Text
-            fullText_similarities = util.cos_sim(query_embedding, full_text_embedding_tensor)[0].cpu().numpy()
-            df['full_text_similarity'] = fullText_similarities
-
-            # Cosine similarity on Sub Text
-            Brand_similarities = util.cos_sim(query_embedding, brand_embedding_tensor)[0].cpu().numpy()
-            df["brand_similarity"] = Brand_similarities
-
-            # remove unnessary columns from the Embeddingf df
-            embedding_df = (
-                df.drop(columns=["full_text_embedding", "brand_embedding", 'brand_similarity'])
-                .sort_values('full_text_similarity', ascending=False)
-                .head(self.top_n)
-            )
-
-            # remove unneccsary columns from original dataframe
-            original_df = original_df.drop(columns=["full_text_embedding", "brand_embedding"], errors="ignore")
-
-            return embedding_df , original_df
-        
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"Failed tp get full and sub embed dataframe [ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
-            print(error_message)
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "message": error_message,
-            })
-
-   
    # Main function 
     def post(self, request, format=None):
         try:
@@ -159,158 +66,82 @@ class ProductSemanticSearchView(APIView):
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
-            split_query = user_query.split(" ")
 
             # Define paths
-            full_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
+            pickle_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
 
             # Load model
             model = SentenceTransformer(transfer_model_path)
+            pickle_df = pd.read_pickle(pickle_df_path)
 
-            # Get embeddings and original data
-            embedding_df, original_df = self.ProductSearch(user_query, full_embedding_df_path, model)
+            Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
 
-            # Normalize Profit margin column value in same format
-            embedding_df["Profit Margin"] = embedding_df["Profit Margin"].apply(format_profit_margin)
-            original_df["Profit Margin"] = original_df["Profit Margin"].apply(format_profit_margin)
+            # Function -1
+            Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
 
+            # Function -2
+            paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df)     # Get matched row parameter dict
+
+            # create a dataframe from matched row data dict
+            searched_df = pd.DataFrame([matched_row_data_dict])
+
+            # if searched dataframe is empty  return empty json 
+            if searched_df.empty:
+                return ProductResponse("failed",[])
+
+            # Remove unneccary columns from searched dataframe
+            searched_df = searched_df.drop(columns=["Category", "Gender", "text", 'similarity_score'], errors="ignore", axis=1)
+
+            matched_row_json = searched_df.to_dict(orient="records")
             
-            # Handle if embedding df is empty 
-            if embedding_df.empty:
-                return ProductResponse("failed", [])
+            # Function -3
+            Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict) 
 
-            # Get Most Similar row from the dataframe and Convert into dictionary.
-            matched_row = embedding_df.loc[embedding_df["full_text_similarity"].idxmax()]
-            matched_row_data = matched_row.to_dict()
+            # Return Response if only matched row dataframe is true
+            if Product_Category_df.empty:
+                return ProductResponse("success",matched_row_json)
 
-            # get values from the matched dataframe
-            Row_data_parameter = lambda x : (str(x["Brand"]).lower().strip(), str(x["Type Mapped"]).lower().strip() , int(x["Production Year"]))
-            Result = Row_data_parameter(matched_row_data)
+            # Function -4
+            Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
 
-            BrandName = Result[0]           # Matched Brand Name
-            Product_type = Result[1]        # Matched Product Type
-            matched_year = Result[2]        # Matched year
+            # Return Response if only matched row dataframe is true
+            if Product_Yearly_df.empty:
+                return ProductResponse("success",matched_row_json)
 
-            print({
-                "BrandName": BrandName,
-                "Product_type": Product_type,
-                "matched_year": matched_year,
-    
-            })
+            # Function -5
+            Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
 
-            # Handle if user ask only about brand
-            if len(split_query) == 1:
-                print("Only ask about single brand")
-                cleaned_split_query = str(split_query[0]).lower().strip()
+            if Product_Gender_df.empty:
+                return ProductResponse("success",matched_row_json)
 
-                filtered_df = embedding_df.loc[embedding_df["Brand"].str.lower().str.strip() == cleaned_split_query]
+            # Function -6
+            brand_product_type_list ,only_brandName_list = Profit_Obj.Filter_rows_list(paramter_dict , Product_Gender_df) 
 
-                # Check if user input exists in Brand column
-                if not filtered_df.empty:
-                    # convert profit margin if needed
-                    filtered_df = self.convert_profit_margin(filtered_df)
+            # Function -7 
+            filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list, only_brandName_list)
 
-                    # sort by year (latest first) and margin (highest first)
-                    filtered_df = filtered_df.sort_values(
-                        ['Production Year', 'Profit Margin'], ascending=[False, False]
-                    )
-
-                    # drop embedding col if present
-                    if "brand_embedding" in filtered_df.columns:
-                        filtered_df = filtered_df.drop(columns=["brand_embedding"], axis=1)
-
-                    print("filtered df")
-                    print(filtered_df)
-
-                    # Case 1: only one year → keep top 3 rows from that year
-                    if filtered_df['Production Year'].astype(int).nunique() == 1:
-                        filtered_df = filtered_df.drop_duplicates(subset=["Type Mapped"], keep="first")
-                        filtered_df = filtered_df.head(3)
-                    else:
-                        # Case 2: multiple years → keep top 1 per year (latest 3 years)
-                        filtered_df = filtered_df.drop_duplicates(subset=["Production Year"], keep="first")
-                        filtered_df = filtered_df.head(3)
-
-                    #  Drop unnecessary cols ONLY at the end, not before trimming
-                    filtered_df = self.drop_unnecessary_cols(filtered_df)
-
-                    return ProductResponse("success", filtered_df.to_dict(orient="records"))
-
-                
-            print("Hit for compare products ....")
-            #compare rows based on the "Brand , Production Year , Category , Type"
-
-  
-            # filter data based on the Brand Name , Type and Production Year  from the embedding dataframe
-            filtered_df = embedding_df.loc[
-                (embedding_df["Brand"].str.lower().str.strip() != BrandName) &
-                (embedding_df["Type Mapped"].str.lower().str.strip() == Product_type) &
-                (embedding_df["Production Year"].astype(int) == matched_year) 
-                ].copy()
+            # Handle if filtered datframe return empty list
+            if isinstance(filtered_df , list):
+                return ProductResponse('success', matched_row_json)
             
-            print("Embedding filtered dataframe 1 ")
-            print(filtered_df)
-            print()
+            # Merge bot dataframe
+            merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
+                                              
+            merge_df = merge_df.drop(columns=["Category" ,"Gender", "text", "similarity_score", "text_embedding"],  errors="ignore")      # remove unneccessary dataframe
 
-            # if embdding dataframe does not contain values then 
-            # Filter out data from original dataframe 
-            if filtered_df.empty or len(filtered_df) <2:
-                filtered_df = original_df.loc[
-                    (original_df["Brand"].str.lower().str.strip() != BrandName) &
-                    (original_df["Type Mapped"].str.lower().str.strip() == Product_type) &
-                    (original_df["Production Year"].astype(int) == matched_year) 
-                
-                ].copy()
-
-            print("original dataframe  filtered dataframe 2 ")
-            print(filtered_df)
-            print()
-
-            # get highest and minimum profit margin
-            if not filtered_df.empty:
-                filtered_df = self.convert_profit_margin(filtered_df)
-                # Get row with highest margin
-                highest = filtered_df.loc[filtered_df["Profit Margin"].idxmax()]
-
-                # Get row with lowest margin
-                lowest = filtered_df.loc[filtered_df["Profit Margin"].idxmin()]
-
-                # Combine into a single dataframe
-                filtered_df = pd.DataFrame([highest, lowest])
-
-                filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
-
-            # Add percentage sign after the value
-            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].apply(
-                lambda x: f"{x:.2f}%" if pd.notnull(x) else ""
-            )
-
-            # Convert series into dataframe
-            matched_df = pd.DataFrame([matched_row])
-
-            # Merge Both Dataframe
-            merge_df = pd.concat([matched_df, filtered_df]).reset_index(drop=True)
-            merge_df = self.drop_unnecessary_cols(merge_df)
-            
-            # Rename column
-            merge_df = merge_df.rename(columns={'Type Mapped': 'Type'})
-
+            # Only return three product in API
             if len(merge_df) > 3:
                 merge_df = merge_df.iloc[0:3]
 
-            return ProductResponse("success", merge_df.to_dict(orient="records"))
+            return ProductResponse('success', merge_df.to_dict(orient="records"))
 
-             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
+            return Internal_server_response(error_message)
 
-            return Response({
-                "message": error_message,
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
-            })
 
 
 # API For get all profit margin data
@@ -343,11 +174,8 @@ class GetProfitMarginData(APIView):# #
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
-
+            print(error_message)
+            return Internal_server_response(error_message)
 
 """ ###############################          Tax Avenue Data    ##################################"""
 
@@ -371,7 +199,6 @@ class TaxDataTrainPipeline(APIView):
             
             # Call function to train model with all rows
             TaxModelResponse = TaxMainFunc(input_csv_file_path, Emedding_dir_path, TransferModelDir)
-            
 
             return Response({
                 "message": TaxModelResponse,
@@ -381,10 +208,9 @@ class TaxDataTrainPipeline(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
+            print(error_message)
+            return Internal_server_response(error_message)
+          
 
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
@@ -443,7 +269,6 @@ class TaxSemanticSearchView(APIView):
             print("matched row data ", matched_row_data)
 
 
-
             # Get company name from matched row dict
             CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
             Year = matched_row_data.get("Year")
@@ -484,10 +309,7 @@ class TaxSemanticSearchView(APIView):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
+            return Internal_server_response(error_message)
 
 # API For get all Tax Avenue data
 class TaxAvenueView(APIView):
@@ -516,11 +338,8 @@ class TaxAvenueView(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
-
+            print(error_message)
+            return Internal_server_response(error_message)
 
 """ ###############################          CEO Worker Frontline Data    ##################################"""
 
@@ -552,10 +371,8 @@ class CEOWorkerTrainPipeline(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
+            print(error_message)
+            return Internal_server_response(error_message)
 
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
@@ -651,10 +468,7 @@ class CEOWorkerSemanticSearchView(APIView):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
+            return Internal_server_response(error_message)
 
 
 # API For get CEO Worker data
@@ -684,7 +498,5 @@ class CeoWorkerView(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Response({
-                "status": status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                "message": error_message
-            })
+            print(error_message)
+            return Internal_server_response(error_message)

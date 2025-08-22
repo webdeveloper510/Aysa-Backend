@@ -14,12 +14,15 @@ def Success_RESPONSE(query, result_dict):
         "status": status.HTTP_200_OK
     })
 
-
-
 def ProductResponse(message , final_data):
-
     return Response({
         "message": message ,
         "status": status.HTTP_200_OK if message =='success' else 404,
         "data": final_data
+    })
+
+def Internal_server_response(message: str):
+    return Response({
+        "message": message ,
+        "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
     })
