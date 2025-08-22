@@ -125,6 +125,9 @@ class ProductSemanticSearchView(APIView):
             if isinstance(filtered_df , list):
                 return ProductResponse('success', matched_row_json)
             
+            # Add percentage sign
+            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
+
             # Merge bot dataframe
             merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
                                               
@@ -169,7 +172,7 @@ class GetProfitMarginData(APIView):# #
             
             # Rename  column Name
             df= df.rename({"Product Type": "Type"}, axis=1)
-            
+
             # Return Response
             return Response({
                 "message": "success" if not df.empty else "failed",
