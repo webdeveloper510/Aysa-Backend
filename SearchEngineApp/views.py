@@ -155,6 +155,9 @@ class GetProfitMarginData(APIView):# #
             
             # Read csv 
             df = pd.read_csv(input_csv_file_path)
+            
+            # Remove Extra spaces from the column Name
+            df.columns = df.columns.str.strip()
 
             # Drop Unneccsary columns
             if "Unnamed: 8" in df.columns:
@@ -163,6 +166,9 @@ class GetProfitMarginData(APIView):# #
             # Replace NaN/inf values with None so JSON can handle them
             df = df.replace([np.inf, -np.inf], np.nan)   # convert inf to NaN
             df = df.where(pd.notnull(df), None)          # convert NaN to None
+            
+            # Rename  column Name
+            df= df.rename({"Product Type": "Type"}, axis=1)
             
             # Return Response
             return Response({
