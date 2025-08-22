@@ -66,7 +66,6 @@ class ProductSemanticSearchView(APIView):
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
 
-
             # Define paths
             pickle_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
@@ -77,8 +76,22 @@ class ProductSemanticSearchView(APIView):
 
             Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
 
+            # Handle when user has asked about only brand name
+            split_query = user_query.split()
+            
+            # Implement logic when user asked about only product
+            if len(split_query) == 1:
+                print('Single brand query is hitting .....')
+                filtered_df = Profit_Obj.BrandDF(user_query , pickle_df)
+                if not filtered_df.empty:
+                    return ProductResponse('success',filtered_df.to_dict(orient="records") )
+
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
+            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.40]    # Filter out dataframe if similarity score greater than 40
+            
+            if Embedding_df.empty:
+                return ProductResponse("failed", [])
 
             # Function -2
             paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df)     # Get matched row parameter dict
@@ -92,8 +105,7 @@ class ProductSemanticSearchView(APIView):
 
             # Remove unneccary columns from searched dataframe
             searched_df = searched_df.drop(columns=["Category", "Gender", "text", 'similarity_score'], errors="ignore", axis=1)
-
-            matched_row_json = searched_df.to_dict(orient="records")
+            matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
             
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict) 
@@ -116,10 +128,10 @@ class ProductSemanticSearchView(APIView):
                 return ProductResponse("success",matched_row_json)
 
             # Function -6
-            brand_product_type_list ,only_brandName_list = Profit_Obj.Filter_rows_list(paramter_dict , Product_Gender_df) 
+            brand_product_type_list= Profit_Obj.Filter_rows_list(paramter_dict , Product_Gender_df) 
 
             # Function -7 
-            filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list, only_brandName_list)
+            filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list)
 
             # Handle if filtered datframe return empty list
             if isinstance(filtered_df , list):

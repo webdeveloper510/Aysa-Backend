@@ -48,6 +48,23 @@ class ProfitMarginPreidction:
         )
         return df
     
+    
+    # This function is return dataframe if user asked about only Brand Name
+    def BrandDF(self, user_query: str , pickle_df: pd.DataFrame) -> pd.DataFrame:
+        pickle_df.loc[:, "Brand"] = pickle_df["Brand"].astype(str).str.lower().str.strip()
+        user_query = str(user_query.lower().strip())
+
+        filtered_df = pd.DataFrame()
+        if user_query in pickle_df["Brand"].values:  
+            filtered_df = pickle_df.loc[(pickle_df["Brand"]==user_query)]
+            filtered_df = filtered_df.sort_values('Production Year', ascending=False)  
+            filtered_df = filtered_df.drop_duplicates(subset=["Production Year"], keep="first")       # Keep only first row of every brand
+
+            if len(filtered_df) > 3:
+                filtered_df = filtered_df.iloc[0:3]
+
+            filtered_df = filtered_df.drop(columns=["Category" ,"Gender", "text", "text_embedding"],  errors="ignore")      # remove unneccessary dataframe
+        return filtered_df
     # function to apply embedding 
     def apply_embedding(self):
 
@@ -132,7 +149,6 @@ class ProfitMarginPreidction:
     def Filter_rows_list(self, response_dict : dict, genderly_df: pd.DataFrame) -> pd.DataFrame:
 
         brand_product_type =[]
-        only_brandName_list =[]
 
         # Get values from paramter/ response dict
         matched_brand_name = response_dict.get("matched_brand") 
@@ -150,33 +166,16 @@ class ProfitMarginPreidction:
                     or 
                 (matched_brand_name != filtered_brand_name and filtered_product_type in matched_product_type)
                 ):
-
                 brand_product_type.append(row_data)
-
-            elif matched_brand_name != filtered_brand_name:
-                only_brandName_list.append(row_data)
-
-
-        return brand_product_type , only_brandName_list
+        
+        return brand_product_type
     
     # This function is just filtering dataframe 
     # Based on the brand product type list
     # And only brand name list
-    def Filtered_Dataframe(self,brand_product_type_list: list, only_brandName_list: list) -> pd.DataFrame:
-
-        data_dict ={}
+    def Filtered_Dataframe(self,brand_product_type_list: list) -> pd.DataFrame:
  
-        brand_type_df = pd.DataFrame(brand_product_type_list)
-        only_brand_df = pd.DataFrame(only_brandName_list)
-
-        # Take Empty dataframe
-        filtered_df = pd.DataFrame()
-
-        # filter out dataframe based on the empty and non empty dataframe
-        if not brand_type_df.empty:
-            filtered_df = pd.concat([brand_type_df, only_brand_df]).reset_index(drop=True)
-        else :
-            filtered_df = only_brand_df
+        filtered_df = pd.DataFrame(brand_product_type_list)
         
         # Return Empty list when filtered df is empty 
         if filtered_df.empty:
@@ -213,7 +212,7 @@ class ProfitMarginPreidction:
 
         elif len(agg_df) ==1 : 
             print('agg df elif condition is running ')
-                # Only one brand exists, get max profit margin row
+            # Only one brand exists, get max profit margin row
             max_profit = agg_df['max'].iloc[0]
             max_brand = agg_df['Brand'].iloc[0]
 
