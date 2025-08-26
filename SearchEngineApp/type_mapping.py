@@ -1,0 +1,180 @@
+smartphone_variant_map = {
+    # --- Base / Entry-level ---
+    # Apple iPhone
+    "4": "base",
+    "4s": "base",
+    "5": "base",
+    "6": "base",
+    "6 SE": "base",
+    "7": "base",
+    "8": "base",
+    "11": "base",
+    "12": "base",
+    "13": "base",
+    "14": "base",
+    "15": "base",
+    "16": "base",
+    
+    # Samsung Galaxy Base / A / M Series
+    "A02": "base",
+    "A12": "base",
+    "A22": "base",
+    "A32": "base",
+    "A42": "base",
+    "A52": "base",
+    "A55": "base",
+    "A73": "base",
+    "A11": "base",
+    "A21": "base",
+    "A31": "base",
+    "A35": "base",
+    "A41": "base",
+    "A51": "base",
+    "A71": "base",
+    "A81": "base",
+    "M01 S": "base",
+    "M02": "base",
+    "M11": "base",
+    "M12": "base",
+    "M21": "base",
+    "M22": "base",
+    "M31": "base",
+    "M31 S": "base",
+    "M32": "base",
+    "M41": "base",
+    "M52": "base",
+    "J3": "base",
+    "J4 Plus": "base",
+    "J5": "base",
+    "J6 Plus": "base",
+    "J7": "base",
+    "J9": "base",
+    "F02s": "base",
+    "F13": "base",
+    "F42": "base",
+    "F63": "base",
+    "A7": "base",
+    "A8": "base",
+    "A8 Plus": "base",
+    "A9": "base",
+    "A10": "base",
+    "S": "base",
+    "256GB ROM": "base",
+    
+    # Google Pixel Base
+    "6": "base",
+    "8": "base",
+    "9": "base",
+    "5": "base",
+    "4": "base",
+    "3a": "base",
+    
+    # --- Mid-range / Popular ---
+    # Apple iPhone Mid
+    "Plus": "mid-range",
+    "SE": "mid-range",
+    "X": "mid-range",
+    
+    # Samsung Mid
+    "S Plus": "mid-range",
+    "Core": "mid-range",
+    "FE": "mid-range",
+    "Quantum": "mid-range",
+    "Galaxy": "mid-range",
+    "Fold 4": "mid-range",
+    "Flip 4": "mid-range",
+    "A14 SG": "mid-range",
+    "3a Xl": "mid-range",
+    "4 XL": "mid-range",
+    "5a 5G": "mid-range",
+    "A6 Plus": "mid-range",
+    "512GB ROM": "mid-range",
+    "6a": "mid-range",
+    "7a": "mid-range",
+    "8a": "mid-range",
+    "4a sg": "mid-range",
+    "4a": "mid-range",
+    "Note 11": "mid-range",
+    
+    # Google Pixel Mid
+    "6a": "mid-range",
+    "7a": "mid-range",
+    "4a": "mid-range",
+    
+    # --- Pro / High-end ---
+    # Apple iPhone Pro
+    "Pro": "pro",
+    "Pro Max": "pro",
+    
+    # Samsung Pro
+    "Fold": "pro",
+    "Pro Fold": "pro",
+    "Ultra": "pro",
+    "S10": "pro",
+    "S10 Plus": "pro",
+    "S10 S": "pro",
+    "S11": "pro",
+    "S21": "pro",
+    "S23Plus": "pro",
+    "S9 Plus": "pro",
+    "9 Pro": "pro",
+    "9 Pro XL": "pro",
+    "8 Pro": "pro",
+    "7 Pro": "pro",
+    "6 Pro": "pro",
+    "Z Fold 3": "pro",
+    "Z Fold 7": "pro",
+    "Z Flip": "pro",
+    "Z Flip 7": "pro",
+    "1TB ROM": "pro",
+    "Note 10": "pro",
+    "Note 10 Plus": "pro",
+    "Note 10 G": "pro",
+    "Note 20 Ultra": "pro",
+    "Note 21": "pro",
+    
+    # Google Pixel Pro
+    "8 Pro": "pro",
+    "9 Pro": "pro",
+    "9 Pro XL": "pro",
+    "Fold": "pro",
+    "Pro Fold": "pro"
+}
+
+
+
+smartv_variant_map = {
+    # --- Inches-based / Screen size ---
+    '40-inches': 'base',
+    '42-inches': 'base',
+    '43-inches': 'base',
+    '48-inches': 'base',
+    '49-inches': 'base',
+    '50-inches': 'base',
+    '55-inches': 'mid-range',
+    '58-inches': 'mid-range',
+    '65-inches': 'mid-range',
+    '75-inches': 'mid-range',
+    '77-inches': 'mid-range',
+    '82-inches': 'pro',
+    '83-inches': 'pro',
+    '85-inches': 'pro',
+
+    # --- Series-based / Generation ---
+    'G1': 'base', 'C1': 'base', 'B1': 'base', 'M1': 'base',
+    'G2': 'base', 'C2': 'base', 'B2': 'base', 'M2': 'base',
+    'G3': 'base', 'C3': 'base', 'B3': 'base', 'M3': 'base',
+    'G4': 'mid-range', 'C4': 'mid-range', 'B4': 'mid-range', 'M4': 'mid-range',
+    'G5': 'mid-range', 'C5': 'mid-range', 'B5': 'mid-range', 'M5': 'mid-range',
+    
+    # --- Special / High-end series ---
+    'GX': 'pro', 'CX': 'pro', 'BX': 'pro', 'MX': 'pro',
+
+    # --- Numbered Series ---
+    '70 Series': 'base',
+    '75 Series': 'base',
+    '80 Series': 'base',
+    '85 Series': 'mid-range',
+    '90 Series': 'mid-range',
+    '99 Series': 'pro',
+}

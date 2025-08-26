@@ -59,11 +59,13 @@ class ProfitMarginPreidction:
             filtered_df = pickle_df.loc[(pickle_df["Brand"]==user_query)]
             filtered_df = filtered_df.sort_values('Production Year', ascending=False)  
             filtered_df = filtered_df.drop_duplicates(subset=["Production Year"], keep="first")       # Keep only first row of every brand
+            print("filtered_df : \n", filtered_df)
 
             if len(filtered_df) > 3:
                 filtered_df = filtered_df.iloc[0:3]
 
             filtered_df = filtered_df.drop(columns=["Category" ,"Gender", "text", "text_embedding"],  errors="ignore")      # remove unneccessary dataframe
+
         return filtered_df
     # function to apply embedding 
     def apply_embedding(self):
@@ -95,6 +97,7 @@ class ProfitMarginPreidction:
         matched_category = str(matched_row.get("Category")).lower().strip()
         matched_year = int(matched_row.get("Production Year"))
         matched_product_type = str(matched_row.get("Product Type")).lower().strip()
+        matched_variant_map = str(matched_row.get("Type Mapped")).lower().strip()
         matched_gender = str(matched_row.get("Gender")).lower().strip()
 
         # Make a response dict
@@ -104,7 +107,9 @@ class ProfitMarginPreidction:
                             "matched_year" :  matched_year,
                             "matched_product_type" :  matched_product_type,
                             "matched_gender" :  matched_gender,
+                            "matched_variant_map": matched_variant_map
                         }
+        
         return response_dict , matched_row_data
 
     # function to return filter out dataframe based on the category value
@@ -153,19 +158,26 @@ class ProfitMarginPreidction:
         # Get values from paramter/ response dict
         matched_brand_name = response_dict.get("matched_brand") 
         matched_product_type= response_dict.get("matched_product_type") 
+        matched_variant_map = response_dict.get("matched_variant_map")
+        matched_category = response_dict.get("matched_category")
+
+        print({
+            "matched_brand_name" : matched_brand_name,
+            "matched_product_type" : matched_product_type,
+            "matched_variant_map" : matched_variant_map,
+            "matched_category" : matched_category,
+        })
+        
 
         # Iterate through the dataframe
         for idx , row_data in genderly_df.iterrows():
             filtered_brand_name = str(row_data.get("Brand")).lower().strip()
             filtered_product_type = str(row_data.get("Product Type")).lower().strip()
+            filtered_variant_map = str(row_data.get("Type Mapped")).lower().strip()
             
             # Skip same brand
-            if ((matched_brand_name != filtered_brand_name and matched_product_type == filtered_product_type)
-                    or
-                (matched_brand_name != filtered_brand_name and matched_product_type in filtered_product_type)
-                    or 
-                (matched_brand_name != filtered_brand_name and filtered_product_type in matched_product_type)
-                ):
+            if matched_brand_name != filtered_brand_name and matched_variant_map == filtered_variant_map:
+
                 brand_product_type.append(row_data)
         
         return brand_product_type
@@ -176,6 +188,7 @@ class ProfitMarginPreidction:
     def Filtered_Dataframe(self,brand_product_type_list: list) -> pd.DataFrame:
  
         filtered_df = pd.DataFrame(brand_product_type_list)
+        print("filtered_df : \n", filtered_df[["Brand", "Product Name", "Product Type", "Gender", "Category", "Type Mapped"]])
         
         # Return Empty list when filtered df is empty 
         if filtered_df.empty:
@@ -189,25 +202,34 @@ class ProfitMarginPreidction:
 
         # if there is multiple brand exist in dataframe
         if len(agg_df) >1 :
-
-            # Remove extra spaces from the brand column value
+            # Remove e  xtra spaces from the brand column value
             agg_df["Brand"] = agg_df["Brand"].str.strip()
 
-            # Get max and min profit value of specific brand
-            max_profit =    agg_df['max'].max()
-            min_profit =    agg_df['min'].min()
+            # Sort agg_df by max descending for max profit, min ascending for min profit
+            agg_df_max_sorted = agg_df.sort_values('max', ascending=False)
+            agg_df_min_sorted = agg_df.sort_values('min', ascending=True)
+
+            # Pick the brand with highest profit
+            max_brand = agg_df_max_sorted.iloc[0]['Brand']
+            max_profit = agg_df_max_sorted.iloc[0]['max']
+
+            # Pick the brand with lowest profit, but ensure it's different
+            min_brand_row = agg_df_min_sorted[agg_df_min_sorted['Brand'] != max_brand].iloc[0]
+            min_brand = min_brand_row['Brand']
+            min_profit = min_brand_row['min']
+
+
+            # Get rows from filtered_df
+            highest_row = filtered_df[(filtered_df['Brand'].str.strip() == max_brand) & 
+                                    (filtered_df['Profit Margin'].astype(float) == max_profit)]
             
-            # Get the Brand(s) corresponding to max and min
-            max_brands = agg_df[agg_df['max'] == max_profit]['Brand'].tolist()
-            min_brands = agg_df[agg_df['min'] == min_profit]['Brand'].tolist()
+            lowest_row = filtered_df[(filtered_df['Brand'].str.strip() == min_brand) & 
+                                    (filtered_df['Profit Margin'].astype(float) == min_profit)]
 
-            #Get rows from filtered_df where Profit Margin equals max/min and Brand matches
-            highest_row = filtered_df[(filtered_df['Brand'].str.strip().isin(max_brands)) & (filtered_df['Profit Margin'].astype(float) == max_profit)]
-            lowest_rows = filtered_df[(filtered_df['Brand'].str.strip().isin(min_brands)) & (filtered_df['Profit Margin'].astype(float) == min_profit)]
-
-            filtered_df = pd.concat([highest_row, lowest_rows], ignore_index=True)                  # Concate dataframe with highest and lowest margin rows
-            filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)                 # Sort dataframe based on the profit margin descending value
-            filtered_df = filtered_df.drop_duplicates(subset=["Profit Margin"], keep="first")       # Keep only first row of every brand
+            # Combine and sort
+            filtered_df = pd.concat([highest_row, lowest_row], ignore_index=True)
+            filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
+            filtered_df = filtered_df.drop_duplicates(subset=["Profit Margin"], keep="first")
 
 
         elif len(agg_df) ==1 : 

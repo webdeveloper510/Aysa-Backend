@@ -104,7 +104,7 @@ class ProductSemanticSearchView(APIView):
                 return ProductResponse("failed",[])
 
             # Remove unneccary columns from searched dataframe
-            searched_df = searched_df.drop(columns=["Category", "Gender", "text", 'similarity_score'], errors="ignore", axis=1)
+            searched_df = searched_df.drop(columns=["Type Mapped", "Gender", "text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
             matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
             
             # Function -3
@@ -116,13 +116,15 @@ class ProductSemanticSearchView(APIView):
 
             # Function -4
             Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-
+            print("Product_Yearly_df : \n ", Product_Yearly_df)
+            print()
             # Return Response if only matched row dataframe is true
             if Product_Yearly_df.empty:
                 return ProductResponse("success",matched_row_json)
 
             # Function -5
             Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
+            print("Product_Gender_df : \n ", Product_Gender_df)
 
             if Product_Gender_df.empty:
                 return ProductResponse("success",matched_row_json)
@@ -139,11 +141,12 @@ class ProductSemanticSearchView(APIView):
             
             # Add percentage sign
             filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
+            filtered_df = filtered_df.drop(columns=["Gender", "text", "similarity_score", "text_embedding", "brand_embedding", "brand", "Type Mapped"],  errors="ignore")      # remove unneccessary dataframe
+
 
             # Merge bot dataframe
             merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
                                               
-            merge_df = merge_df.drop(columns=["Category" ,"Gender", "text", "similarity_score", "text_embedding"],  errors="ignore")      # remove unneccessary dataframe
 
             # Only return three product in API
             if len(merge_df) > 3:
@@ -521,3 +524,6 @@ class CeoWorkerView(APIView):
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
             print(error_message)
             return Internal_server_response(error_message)
+        
+
+"""                 #######################          CSV RELATED API's              ###########################################               """

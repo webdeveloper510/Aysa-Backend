@@ -8,11 +8,26 @@ from sentence_transformers import SentenceTransformer , util
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import KMeans
 from .utils import preprocess_text
+from .type_mapping import *
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
 
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
+
+gender_map = {
+"Women": "Women",
+"Female": "Women",
+"Men": "Men",
+"male": "Men",
+"Unisex": "Unisex",
+"Unixes": "Unisex",
+"Kids": "Kids",
+"Boys": "Kids",
+"Girls": "Kids",
+"Baby": "Kids",
+"Babies": "Kids",
+}
 
 
 class ProductModelStructure:
@@ -48,14 +63,25 @@ class ProductModelStructure:
             # Drop Unneccsary columns
             if "Unnamed: 8" in df.columns:
                 df = df.drop("Unnamed: 8", axis=1)
+            
 
-            # remove extra spaces 
-            df["Type"] = df["Type"].str.strip()
+            # Make correction of gender column 
+            df['Gender'] = df['Gender'].fillna('Unisex') # Fill nan values with Unisex which is used for both
+            df['Gender'] = df['Gender'].astype(str).str.strip().map(gender_map) # Map gender columns with gender map dictionary 
 
-            df["Type Mapped"] = df["Type"].map(product_type_mapping).fillna(df["Type"])
+            # remove only rows which have no product Name
+            df = df.dropna(subset=['Product Name']) 
+            df.drop_duplicates(inplace=True) # Remove duplicacy from dataframe
 
-            # DROP Uncessary column 
-            df = df.drop("Profit Made", axis=1)
+            # Remove extra spaces from the smartphone
+            df["Product Type"] = df["Product Type"].str.strip()
+
+            # Map typed 
+            # Combine two dictionaries
+            combined_map = {**smartphone_variant_map, **smartv_variant_map}
+            df["Type Mapped"] = df["Product Type"].map(combined_map).fillna(df["Product Type"])
+
+            filtered_df = df.loc[df["Category"] =="Smart TV"]
 
             # remove nan values
             df.dropna(inplace=True)
@@ -81,7 +107,7 @@ class ProductModelStructure:
             # make a copy of dataframe
             df = df.copy()
             # Add two column with different columns groups
-            df["text"] = (df["Brand"] +" " + df["Product Name"] + " " +df["Type"])
+            df["text"] = (df["Brand"] +" " + df["Product Name"] + " " +df["Product Type"])
             df["brand"] = df["Brand"]
 
             # Apply preprocess columns on both column
@@ -108,7 +134,7 @@ class ProductModelStructure:
             embeddings_full_text = model.encode(df['text'].tolist(), show_progress_bar=True)
             embeddings_sub_text = model.encode(df['brand'].tolist(), show_progress_bar=True)
 
-            df["full_text_embedding"] = list(embeddings_full_text)
+            df["text_embedding"] = list(embeddings_full_text)
             df["brand_embedding"] = list(embeddings_sub_text)
 
             # save embedding df
