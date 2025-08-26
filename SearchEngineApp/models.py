@@ -26,3 +26,11 @@ class CEOWokrerModel(models.Model):
     ceo_name = models.CharField(max_length=500 , blank=True , null=True)
     ceo_total_compensation = models.CharField(max_length = 500 ,blank=True, null=True)
     worker_salary = models.CharField(max_length = 500 ,blank=True, null=True)
+
+
+
+class Visitor_Track_Count(models.Model):
+    visit_day = models.DateField()
+    visitor_track_count = models.IntegerField(default=0)
+    
+    

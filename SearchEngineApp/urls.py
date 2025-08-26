@@ -14,7 +14,10 @@ urlpatterns = [
     # GET ALL product margin data 
     path("get-profit-margin-data", GetProfitMarginData.as_view()),
     path("get-tax-data", TaxAvenueView.as_view()),
-    path("get-ceo-worker-data", CeoWorkerView.as_view())
+    path("get-ceo-worker-data", CeoWorkerView.as_view()),
+
+    # URL OF TRACL VISITOR
+    path("count-value/", TrackVisitorCountView.as_view())
     
     ]
 

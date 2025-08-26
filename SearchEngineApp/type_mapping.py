@@ -2,6 +2,7 @@ smartphone_variant_map = {
     # --- Base / Entry-level ---
     # Apple iPhone
     "4": "base",
+    
     "4s": "base",
     "5": "base",
     "6": "base",
@@ -141,8 +142,6 @@ smartphone_variant_map = {
     "Pro Fold": "pro"
 }
 
-
-
 smartv_variant_map = {
     # --- Inches-based / Screen size ---
     '40-inches': 'base',
@@ -177,4 +176,149 @@ smartv_variant_map = {
     '85 Series': 'mid-range',
     '90 Series': 'mid-range',
     '99 Series': 'pro',
+}
+
+makeup_variant_map = {
+    'Lipstick': 'Lipstick',
+    'Lip Stain': 'Lipstick',
+    'Lip Liner': 'Lipstick',
+    'Lip': 'Lipstick',
+    'Lip Glow': 'Lipstick',
+    'Lip Crayon': 'Lipstick',
+    'Lip Pencil': 'Lipstick',
+    'Lip Gloss': 'Lipstick',
+
+    'Foundation': 'Foundation',
+    'Powder': 'Foundation',
+    'Skin Primer': 'Foundation',
+    'Concealer': 'Foundation',
+
+    'Blush': 'Face',
+    'Highlighter': 'Face',
+    'Bronzer': 'Face',
+    'Bronzing': 'Face',
+    'Glow Stick': 'Face',
+    'Cheek Balm': 'Face',
+
+    'Eyeshadow': 'Eye',
+    'Eye': 'Eye',
+    'Mascara': 'Eye',
+    'Brow Pencil': 'Eye',
+    'Brow Gel': 'Eye',
+    'Eyeliner': 'Eye',
+    'Sculpting Wax': 'Eye',
+
+    'Stick': 'Makeup',   # too generic → better leave broad
+    'Makeup Set': 'Makeup Set',
+    'Nail Colour': 'Nail Colour',
+}
+
+
+skincare_variant_map = {
+    'Cream' : 'Skincare',
+    'Moisture' : 'Skincare',
+    'Skincare' : 'Skincare',
+    'Moisturizer' : 'Skincare',
+    'Triple Serum' : 'Skincare',
+    'Correcting Serum' : 'Skincare',
+    'Truth Serum': 'Skincare',
+    'Drench'     : 'Skincare'
+}
+
+bodycare_variant_map={
+    "Lotion": "Bodycare",
+    "Wash": "Bodycare",
+    "Mist": "Bodycare",
+    "Oil": "Bodycare",
+    "Bodycare": "Bodycare",
+    "Gel": "Bodycare",
+    "Serum": "Bodycare",
+    "Powder": "Bodycare",
+    "Butter": "Bodycare",
+}
+
+car_variant_map = {
+    #  SUVs
+    'SUV': 'Cars',
+    'Compact SUV': 'Cars',
+    'Midsize SUV': 'Cars',
+    'Full-Size SUV': 'Cars',
+    'Subcompact SUV': 'Cars',
+    'Luxury 4×4 SUV': 'Cars',
+    'Full-Size Luxury SUV': 'Cars',
+    'Mid-Size Luxury Crossover SUV': 'Cars',
+    'Compact Luxury Crossover SUV': 'Cars',
+    'Subcompact Luxury Crossover SUV': 'Cars',
+    'Subcompact Luxury Crossover': 'Cars',
+    'Full-Size Luxury Crossover SUV': 'Cars',
+    'Luxury SUV': "Cars",
+
+    #  Pickup Trucks
+    'Pickup Truck': 'Cars',
+    'Compact Truck': 'Cars',
+    'Midsize Pickup Truck': 'Cars',
+    'Full-Size Pickup Truck': 'Cars',
+
+    # Sedans & Hatchbacks
+    'Sedan': 'Cars',
+    'Midsize Sedan': 'Cars',
+    'Executive Sedan': 'Cars',
+    'Compact Executive Car': 'Cars',
+    'Full-Size Luxury Sedan': 'Cars',
+    'Electric Executive Sedan': 'Cars',
+    "Luxury Full-Size Sedan":  'Cars',
+
+    'Compact Sedan/Hatchback': 'Cars',
+    'Hot Hatch': 'Cars',
+    'Hybrid Hatchback': 'Cars',
+    'Compact Sedan': 'Cars',
+
+    #  Sports / Performance
+    'Sports Car': 'Cars',
+    'Sports Car (Hybrid)': 'Cars',
+    'Sports Coupe (Hybrid)': 'Cars',
+    'High-Performance Coupe': 'Cars',
+    'High-Performance Sedan': 'Cars',
+    'High-Performance Estate': 'Cars',
+    'Hypercar': 'Cars',
+    'Grand Tourer': 'Cars',
+    'Coupe': 'Cars',
+    'Coupé': 'Cars',
+    'Targa': 'Cars',
+    'Cabriolet': 'Cars',
+    'Convertible': 'Cars',
+
+    #  Electric / Hybrid
+    'Electric Pickup Truck': 'Cars',
+    'Electric SUV': 'Cars',
+    'Electric Subcompact SUV': 'Cars',
+    'Electric Compact SUV': 'Cars',
+    'Electric Midsize SUV': 'Cars',
+    'Electric Full-Size SUV': 'Cars',
+    'Electric Full-Size Pickup': 'Cars',
+    'Electric Compact Crossover': 'Cars',
+    'Electric Mid-Size Luxury SUV': 'Cars',
+    'Electric Full-Size Luxury SUV': 'Cars',
+    'Electric Full-Size Luxury Sedan': 'Cars',
+    'Electric Luxury Sedan': 'Cars',
+    'Electric Luxury Sports Sedan': 'Cars',
+    'Electric Subcompact Luxury Crossover': 'Cars',
+    'Electric Compact Luxury Crossover': 'Cars',
+    'Electric Compact Luxury Crossover SUV': 'Cars',
+    'Electric Mid-Size Luxury Crossover SUV': 'Cars',
+    'Electric Coupé': 'Cars',
+    'Electric Sedan': 'Cars',
+
+    #  Tesla-specific Models
+    'Tesla S': 'Cars',
+    'Tesla 3': 'Cars',
+    'Tesla X': 'Cars',
+    'Tesla Y': 'Cars',
+    'Single-Motor': 'Cars',
+    'Dual-Motor': 'Cars',
+    'Tri-Motor': 'Cars',
+
+    #  Miscellaneous
+    'Mini Bagvan': 'Cars',
+    'Midsize Crossover': 'Cars',
 }

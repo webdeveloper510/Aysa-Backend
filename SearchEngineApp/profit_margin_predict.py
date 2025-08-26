@@ -151,36 +151,59 @@ class ProfitMarginPreidction:
     # This function Returning Two lists
     # One is compare list which is filter rows based on the Brand value and Product Type Value
     # Second is brand list which is filter rows based on the only Brand Value
-    def Filter_rows_list(self, response_dict : dict, genderly_df: pd.DataFrame) -> pd.DataFrame:
+    def Filter_rows_list(self, response_dict: dict, genderly_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Filter rows from genderly_df based on matched_brand, matched_product_type, and matched_variant_map.
+        Ensures that returned rows have a different brand from the matched_brand but similar product type or variant.
+        """
 
-        brand_product_type =[]
-
-        # Get values from paramter/ response dict
-        matched_brand_name = response_dict.get("matched_brand") 
-        matched_product_type= response_dict.get("matched_product_type") 
-        matched_variant_map = response_dict.get("matched_variant_map")
-        matched_category = response_dict.get("matched_category")
+        # Extract response parameters
+        matched_brand_name = str(response_dict.get("matched_brand", "")).lower().strip()
+        matched_product_type = str(response_dict.get("matched_product_type", "")).lower().strip()
+        matched_variant_map = str(response_dict.get("matched_variant_map", "")).lower().strip()
+        matched_category = response_dict.get("matched_category", "")
 
         print({
-            "matched_brand_name" : matched_brand_name,
-            "matched_product_type" : matched_product_type,
-            "matched_variant_map" : matched_variant_map,
-            "matched_category" : matched_category,
+            "matched_brand_name": matched_brand_name,
+            "matched_product_type": matched_product_type,
+            "matched_variant_map": matched_variant_map,
+            "matched_category": matched_category,
         })
-        
 
-        # Iterate through the dataframe
-        for idx , row_data in genderly_df.iterrows():
-            filtered_brand_name = str(row_data.get("Brand")).lower().strip()
-            filtered_product_type = str(row_data.get("Product Type")).lower().strip()
-            filtered_variant_map = str(row_data.get("Type Mapped")).lower().strip()
-            
-            # Skip same brand
-            if matched_brand_name != filtered_brand_name and matched_variant_map == filtered_variant_map:
+        filtered_rows = []
 
-                brand_product_type.append(row_data)
+        # First pass: filter by product type but different brand
+        for idx, row in genderly_df.iterrows():
+            row_brand = str(row.get("Brand", "")).lower().strip()
+            row_product_type = str(row.get("Product Type", "")).lower().strip()
+            row_variant_map = str(row.get("Type Mapped", "")).lower().strip()
+
+            if row_brand != matched_brand_name and (
+                row_product_type == matched_product_type or
+                matched_product_type in row_product_type or
+                row_product_type in matched_product_type
+            ):
+                filtered_rows.append(row)
+                
+        print("filtered_rows : \n ", filtered_rows)
+        print()
         
-        return brand_product_type
+        # If less than 2 unique brands, second pass: check by variant
+        compare_df = pd.DataFrame(filtered_rows)
+        if compare_df.empty or compare_df["Brand"].nunique() < 2:
+            print(" - Searching for second brand ........")
+            for idx, row in genderly_df.iterrows():
+                row_brand = str(row.get("Brand", "")).lower().strip()
+                row_variant_map = str(row.get("Type Mapped", "")).lower().strip()
+
+                if row_brand != matched_brand_name and row_variant_map == matched_variant_map:
+                    # Append only if not already in filtered_rows
+                    if not any(row.equals(r) for r in filtered_rows):
+                        filtered_rows.append(row)
+
+        # Return as DataFrame
+        return filtered_rows
+
     
     # This function is just filtering dataframe 
     # Based on the brand product type list
@@ -188,7 +211,6 @@ class ProfitMarginPreidction:
     def Filtered_Dataframe(self,brand_product_type_list: list) -> pd.DataFrame:
  
         filtered_df = pd.DataFrame(brand_product_type_list)
-        print("filtered_df : \n", filtered_df[["Brand", "Product Name", "Product Type", "Gender", "Category", "Type Mapped"]])
         
         # Return Empty list when filtered df is empty 
         if filtered_df.empty:

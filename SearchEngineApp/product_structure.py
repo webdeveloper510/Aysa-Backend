@@ -78,10 +78,12 @@ class ProductModelStructure:
 
             # Map typed 
             # Combine two dictionaries
-            combined_map = {**smartphone_variant_map, **smartv_variant_map}
-            df["Type Mapped"] = df["Product Type"].map(combined_map).fillna(df["Product Type"])
+            combined_map = {**makeup_variant_map, **skincare_variant_map, **bodycare_variant_map, **car_variant_map}
+            df["Type Mapped"] = df["Product Type"].map(combined_map).fillna(df["Category"])
+            df.to_csv("sample.csv", index=False)
 
-            filtered_df = df.loc[df["Category"] =="Smart TV"]
+            filtered_df = df.loc[df["Category"] =="Cars"]
+            print("filtered_df : \n ",filtered_df["Product Type"].unique().tolist())
 
             # remove nan values
             df.dropna(inplace=True)

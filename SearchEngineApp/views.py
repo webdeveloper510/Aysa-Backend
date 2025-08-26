@@ -4,6 +4,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from datetime import datetime , timedelta
+
 
 # Import python packages
 import os 
@@ -88,7 +90,9 @@ class ProductSemanticSearchView(APIView):
 
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.40]    # Filter out dataframe if similarity score greater than 40
+            print("Embedding_df : \n ", Embedding_df)
+            print()
+            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.35]    # Filter out dataframe if similarity score greater than 40
             
             if Embedding_df.empty:
                 return ProductResponse("failed", [])
@@ -104,11 +108,16 @@ class ProductSemanticSearchView(APIView):
                 return ProductResponse("failed",[])
 
             # Remove unneccary columns from searched dataframe
-            searched_df = searched_df.drop(columns=["Type Mapped", "Gender", "text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
+            searched_df = searched_df.drop(columns=["Gender", "text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
             matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
             
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict) 
+
+      
+
+            print("Product_Category_df : \n", Product_Category_df.columns.tolist())
+            print()
 
             # Return Response if only matched row dataframe is true
             if Product_Category_df.empty:
@@ -134,18 +143,22 @@ class ProductSemanticSearchView(APIView):
 
             # Function -7 
             filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list)
-
+    
             # Handle if filtered datframe return empty list
             if isinstance(filtered_df , list):
                 return ProductResponse('success', matched_row_json)
             
             # Add percentage sign
             filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
-            filtered_df = filtered_df.drop(columns=["Gender", "text", "similarity_score", "text_embedding", "brand_embedding", "brand", "Type Mapped"],  errors="ignore")      # remove unneccessary dataframe
+            
 
+            # Drop Unneccessary columns if it filtered_df is dataframe
+            if isinstance(filtered_df , pd.DataFrame) and not filtered_df.empty:
+                filtered_df = filtered_df.drop(columns=["text", "Gender","similarity_score", "text_embedding", "brand_embedding", "brand"],  errors="ignore")      # remove unneccessary dataframe
 
             # Merge bot dataframe
             merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
+
                                               
 
             # Only return three product in API
@@ -527,3 +540,30 @@ class CeoWorkerView(APIView):
         
 
 """                 #######################          CSV RELATED API's              ###########################################               """
+class TrackVisitorCountView(APIView):
+
+    def get(self, request):
+        try:
+            track_count_status = request.GET.get("visit_value", "false").lower() == "true"
+            current_date = datetime.now().date()
+
+            # get or create record for today
+            visit_model_obj, created = Visitor_Track_Count.objects.get_or_create(
+                visit_day=current_date,
+                defaults={"visitor_track_count": 0}
+            )
+
+            if track_count_status:
+                visit_model_obj.visitor_track_count += 1
+                visit_model_obj.save()
+
+            return Response({
+                "message": "success",
+                "status": status.HTTP_200_OK,
+                "visitor_count_value": visit_model_obj.visitor_track_count
+            })
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to get track count value, error: {str(e)} in line {exc_tb.tb_lineno}"
+            return Internal_server_response(error_message)
