@@ -1,6 +1,7 @@
 # Ignore Environment file
 env
 .env
+myenv
 
 #ignore cache
 SearchEngineApp/__pycache__
@@ -30,6 +31,11 @@ SearchEngineApp/work.ipynb
 
 # Ignore Transfer model 
 transfer_model
+
+# Ignore Sample csv model 
+sample.csv
+Aysa-Backend/sample.csv
+huggingface_cache/
 
 # Ignore category file
 #SearchEngineApp/category_map.py
