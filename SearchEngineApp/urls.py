@@ -16,7 +16,7 @@ urlpatterns = [
     path("get-tax-data", TaxAvenueView.as_view()),
     path("get-ceo-worker-data", CeoWorkerView.as_view()),
 
-    # URL OF TRACL VISITOR
+    # URL OF TRACK VISITOR
     path("count-value/", TrackVisitorCountView.as_view())
     
     ]
