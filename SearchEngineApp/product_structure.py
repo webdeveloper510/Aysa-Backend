@@ -82,10 +82,10 @@ class ProductModelStructure:
             df["Type Mapped"] = df["Product Type"].map(combined_map).fillna(df["Category"])
 
             # create csv
-            df.to_csv("sample.csv", index=False)
+            #df.to_csv("sample.csv", index=False)
 
-            filtered_df = df.loc[df["Category"] =="Socks"]
-            print("filtered_df : \n ",filtered_df["Product Type"].unique().tolist())
+            #filtered_df = df.loc[df["Category"] =="Sunglasses"]
+            #print("filtered_df : \n ",filtered_df["Product Type"].unique().tolist())
 
             # remove nan values
             df.dropna(inplace=True)

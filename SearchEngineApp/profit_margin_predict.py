@@ -268,7 +268,6 @@ class ProfitMarginPreidction:
 
         elif len(agg_df) ==1 : 
             print('agg df elif condition is running ')
-
             # Only one brand exists, get max profit margin row
             brand_name = str(agg_df['Brand'].iloc[0]).strip()
             profit_margin = float(agg_df['min'].iloc[0])

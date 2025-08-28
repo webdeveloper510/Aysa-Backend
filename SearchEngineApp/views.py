@@ -60,7 +60,6 @@ class ProductTrainPipeline(APIView):
 
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
-
    # Main function 
     def post(self, request, format=None):
         try:
@@ -156,8 +155,6 @@ class ProductSemanticSearchView(APIView):
 
             # Merge bot dataframe
             merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
-
-                                              
 
             # Only return three product in API
             if len(merge_df) > 3:
