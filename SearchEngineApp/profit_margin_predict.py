@@ -14,7 +14,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 top_n = 80
 similarity = 0.75
 
-
 class ProfitMarginPreidction:
 
     def __init__(self, pickle_df , model, user_query):
@@ -136,17 +135,28 @@ class ProfitMarginPreidction:
         return yearly_df
     
     # function to return filter out dataframe based on the matched GENDER value
-    def Get_gender_based_df(self,response_dict : dict , yearly_df: pd.DataFrame) -> pd.DataFrame:
+    def Get_gender_based_df(self, response_dict: dict, yearly_df: pd.DataFrame) -> pd.DataFrame:
+        # Make Gender column lowercase and strip extra spaces
+        yearly_df.loc[:,"Gender"] = yearly_df["Gender"].str.strip().str.lower()
 
-        # Make lower case and remove extra space
-        yearly_df.loc[:, "Gender"] = yearly_df["Gender"].astype(str).str.lower().str.strip()
-
-        # Get Gender value from Matched Row dict
+        # Get matched_gender from response_dict
         matched_gender = response_dict.get("matched_gender")
+        print("Matched gender:", matched_gender)
+
+        if matched_gender:
+            matched_gender = matched_gender.lower()
+            if matched_gender in ["men", "women"]:
+                # Replace "unisex" with matched gender
+                yearly_df.loc[: ,"Gender"] = yearly_df["Gender"].replace("unisex", matched_gender)
+            elif matched_gender == "unisex":
+                # Replace "men" and "women" with "unisex"
+                yearly_df.loc[:,"Gender"] = yearly_df["Gender"].replace({"men": "unisex", "women": "unisex"})
+
+            # Filter dataframe based on matched gender
+            return yearly_df[yearly_df["Gender"] == matched_gender]
         
-        # filter df
-        classify_gender_df = yearly_df.loc[yearly_df["Gender"] == matched_gender]
-        return classify_gender_df
+        return pd.DataFrame()  # Return an empty dataframe if no matched_gender
+
     
     # This function Returning Two lists
     # One is compare list which is filter rows based on the Brand value and Product Type Value
@@ -185,9 +195,6 @@ class ProfitMarginPreidction:
             ):
                 filtered_rows.append(row)
                 
-        print("filtered_rows : \n ", filtered_rows)
-        print()
-        
         # If less than 2 unique brands, second pass: check by variant
         compare_df = pd.DataFrame(filtered_rows)
         if compare_df.empty or compare_df["Brand"].nunique() < 2:
@@ -200,6 +207,7 @@ class ProfitMarginPreidction:
                     # Append only if not already in filtered_rows
                     if not any(row.equals(r) for r in filtered_rows):
                         filtered_rows.append(row)
+        print("filtered rows : \n", filtered_rows)
 
         # Return as DataFrame
         return filtered_rows
@@ -222,6 +230,8 @@ class ProfitMarginPreidction:
         # Get min amd max value of specific brand
         agg_df = filtered_df.groupby("Brand")["Profit Margin"].agg(["min", "max"]).reset_index()
 
+        print("agg_df : \n ", agg_df)
+        print()
         # if there is multiple brand exist in dataframe
         if len(agg_df) >1 :
             # Remove e  xtra spaces from the brand column value
@@ -240,29 +250,31 @@ class ProfitMarginPreidction:
             min_brand = min_brand_row['Brand']
             min_profit = min_brand_row['min']
 
-
-            # Get rows from filtered_df
+            # # Get rows from filtered_df
             highest_row = filtered_df[(filtered_df['Brand'].str.strip() == max_brand) & 
                                     (filtered_df['Profit Margin'].astype(float) == max_profit)]
             
             lowest_row = filtered_df[(filtered_df['Brand'].str.strip() == min_brand) & 
                                     (filtered_df['Profit Margin'].astype(float) == min_profit)]
 
-            # Combine and sort
+            # # Combine and sort
             filtered_df = pd.concat([highest_row, lowest_row], ignore_index=True)
             filtered_df = filtered_df.sort_values('Profit Margin', ascending=False)
-            filtered_df = filtered_df.drop_duplicates(subset=["Profit Margin"], keep="first")
+
+            # Handle if  profit margins of both brands is same
+            if max_profit !=  min_profit:
+                filtered_df = filtered_df.drop_duplicates(subset=["Profit Margin"], keep="first")
 
 
         elif len(agg_df) ==1 : 
             print('agg df elif condition is running ')
+
             # Only one brand exists, get max profit margin row
-            max_profit = agg_df['max'].iloc[0]
-            max_brand = agg_df['Brand'].iloc[0]
+            brand_name = str(agg_df['Brand'].iloc[0]).strip()
+            profit_margin = float(agg_df['min'].iloc[0])
 
-            filtered_df = filtered_df[(filtered_df['Brand'].str.strip() == max_brand) & 
-                                        (filtered_df['Profit Margin'].astype(float) == max_profit)]
+            filtered_df = filtered_df[(filtered_df['Brand'].str.strip() == brand_name) & 
+                                    (filtered_df['Profit Margin'].astype(float) == profit_margin)]
 
-        
         return filtered_df
 

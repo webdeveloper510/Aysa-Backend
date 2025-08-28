@@ -322,3 +322,56 @@ car_variant_map = {
     'Mini Bagvan': 'Cars',
     'Midsize Crossover': 'Cars',
 }
+
+
+scent_varient_map = {
+
+    'Fragrance':'Perfume',
+    'Toilette':'Perfume',
+    'Parfum':'Perfume',
+    'Perfume':'Perfume',
+    'Eau de Toilette':'Perfume',
+    'Eau de Parfum':'Perfume',
+    'Cologne':'Perfume'
+}
+
+womens_outfit_varient_map = {
+    'Midi Skirt': "Skirt",
+    'Outfit': "Dress",
+    'Blouse': "Tops",
+    'Skirt': "Skirt",
+    'Evening Dress': "Dress",
+    'Wrap Dress': "Dress",
+    'Mini Dress': "Dress",
+    'Culottes': "Pants",
+    'Pleated': "Skirt",
+    'Jumpsuit': "Dress",
+    'Suit': "Dress",
+    'Coat Set': "Dress",
+    'Coat Dress': "Dress",
+    'Blouse & Skirt': "Dress",
+    'Elegance Dress': "Dress",
+    'Dress': "Dress",
+    'Drape Dress': "Dress",
+    'Suit Dress': "Dress",
+    'Pants': "Pants",
+    'Maxi Dress': "Dress",
+    'Midi Dress': "Dress",
+    'Ruflle Dress': "Dress",
+    'Linen Dress': "Dress",
+    'Belted Dress': "Dress",
+    'Outfits': "Dress",
+    'Chic Blouse': "Tops",
+    'Top': "Tops",
+    'Shirt': "Tops",
+    'Cardigan Sweater': "Sweater",
+    #'Blazer': "Sweater",
+    'Coat': "Sweater",
+    'Jeans': "Pants",     
+    'T-Shirt': "Tops",
+    'Sweater': "Sweater",
+    'Turtleneck': "Sweater",
+    'Tunic': "Tops",
+    'Hoodie': "Sweater",
+    'Jacket': "Sweater",
+}

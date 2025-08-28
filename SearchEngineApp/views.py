@@ -90,7 +90,7 @@ class ProductSemanticSearchView(APIView):
 
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            print("Embedding_df : \n ", Embedding_df)
+            print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[0:50])
             print()
             Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.35]    # Filter out dataframe if similarity score greater than 40
             
@@ -112,11 +112,9 @@ class ProductSemanticSearchView(APIView):
             matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
             
             # Function -3
-            Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict) 
+            Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
 
-      
-
-            print("Product_Category_df : \n", Product_Category_df.columns.tolist())
+            print("Product_Category_df : \n", Product_Category_df)
             print()
 
             # Return Response if only matched row dataframe is true
@@ -125,7 +123,7 @@ class ProductSemanticSearchView(APIView):
 
             # Function -4
             Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-            print("Product_Yearly_df : \n ", Product_Yearly_df)
+            print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
             print()
             # Return Response if only matched row dataframe is true
             if Product_Yearly_df.empty:
@@ -133,7 +131,7 @@ class ProductSemanticSearchView(APIView):
 
             # Function -5
             Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
-            print("Product_Gender_df : \n ", Product_Gender_df)
+            print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
 
             if Product_Gender_df.empty:
                 return ProductResponse("success",matched_row_json)
