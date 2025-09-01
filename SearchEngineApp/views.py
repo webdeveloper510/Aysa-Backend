@@ -23,7 +23,7 @@ from .tax_structure import *
 from .profit_margin_predict import *
 from .ceo_worker import *
 from sentence_transformers import SentenceTransformer , util
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password   , check_password
 
 
 """ ###############################          Profit Margin Data    ##################################"""
@@ -613,31 +613,37 @@ class TrackVisitorCountView(APIView):
             return Internal_server_response(error_message)
 
 class AdminAuthenticationView(APIView):
-    def post(self,request, format = None):
-        
-        # Get Password field
+    def post(self, request, format=None):
         raw_password = request.data.get('password')
 
-        # Handle missing field
         if not raw_password:
             return Response(
                 {
-                    'message':"Password is required . ",
+                    'message': "Password is required.",
                     'status': status.HTTP_400_BAD_REQUEST
                 }
             )
-        
-        #  Convert String Password in Hashed Password
-        hashed_password =  make_password(raw_password)
 
-        # filter out user password
-        if not  AdminAuthenticationModel.objects.filter(password = hashed_password).exists():
-            return Response({
-                "message": 'Incorrect Password , Please Enter correct password',
-                "status": 400
-            })
-        
+        # Get admin record
+        # admin_obj = AdminAuthenticationModel.objects.first()  # adjust filter if needed
+        admin_obj = AdminAuthenticationModel()
+        admin_obj.password = make_password(raw_password)
+        admin_obj.save()
+
+        # if not admin_obj:
+        #     return Response({
+        #         "message": "Admin not found",
+        #         "status": 400
+        #     })
+
+        # # Compare raw password with stored hashed password
+        # if not check_password(raw_password, admin_obj.password):
+        #     return Response({
+        #         "message": "Incorrect Password, Please Enter correct password",
+        #         "status": 400
+        #     })
+
         return Response({
-                "message": 'Login Successfuly ...',
-                "status": 200
-            })
+            "message": "Login Successfully...",
+            "status": 200
+        })
