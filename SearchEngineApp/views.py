@@ -625,23 +625,21 @@ class AdminAuthenticationView(APIView):
             )
 
         # Get admin record
-        # admin_obj = AdminAuthenticationModel.objects.first()  # adjust filter if needed
-        admin_obj = AdminAuthenticationModel()
-        admin_obj.password = make_password(raw_password)
-        admin_obj.save()
+        admin_obj = AdminAuthenticationModel.objects.first()  # adjust filter if needed
+  
 
-        # if not admin_obj:
-        #     return Response({
-        #         "message": "Admin not found",
-        #         "status": 400
-        #     })
+        if not admin_obj:
+            return Response({
+                "message": "Admin not found",
+                "status": 400
+            })
 
-        # # Compare raw password with stored hashed password
-        # if not check_password(raw_password, admin_obj.password):
-        #     return Response({
-        #         "message": "Incorrect Password, Please Enter correct password",
-        #         "status": 400
-        #     })
+        # Compare raw password with stored hashed password
+        if not check_password(raw_password, admin_obj.password):
+            return Response({
+                "message": "Incorrect Password, Please Enter correct password",
+                "status": 400
+            })
 
         return Response({
             "message": "Login Successfully...",
