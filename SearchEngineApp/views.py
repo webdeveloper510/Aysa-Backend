@@ -6,7 +6,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from datetime import datetime , timedelta
 
-
 # Import python packages
 import os 
 import jwt
@@ -61,6 +60,7 @@ class ProductTrainPipeline(APIView):
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
             return Internal_server_response(error_message)
 
+
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
    # Main function 
@@ -78,9 +78,7 @@ class ProductSemanticSearchView(APIView):
                 })
             
             user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
-
+          
             # Define paths
             pickle_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
@@ -228,6 +226,7 @@ class GetProfitMarginData(APIView):# #
             print(error_message)
             return Internal_server_response(error_message)
 
+
 """ ###############################          Tax Avenue Data    ##################################"""
 
 
@@ -272,11 +271,22 @@ class TaxSemanticSearchView(APIView):
     def post(self , request , format=None):
         try:
             # Get User query from POST Request
+            required_fields= ['query','tab_type']
+            
+            # Get payload data 
+            payload = request.data
+
+            # Handle missing data 
+            missing_fields = [field for field in required_fields if payload.get(field) is None  or not payload.get(field)]
+            if missing_fields:
+                return Response({
+                    'message':f"{', '.join(missing_fields)}: key is required .",
+                    'status':status.HTTP_400_BAD_REQUEST
+                })
+            
+            # Take Payload query value in parameter
             user_query = request.data.get("query")
 
-            if not user_query:
-                return BAD_RESPONSE("user query is required , Please provide with key name : 'query'")
-            
             # Call function to get year status from  the user query ...
             Filter_year_from_user_query= get_year(str(user_query))
             YEAR_STATUS = True if  Filter_year_from_user_query != 'None' else False
@@ -315,8 +325,6 @@ class TaxSemanticSearchView(APIView):
             # Most similar row
             matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
             matched_row_data = matched_row.to_dict()
-            print("matched row data ", matched_row_data)
-
 
             # Get company name from matched row dict
             CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
@@ -344,10 +352,22 @@ class TaxSemanticSearchView(APIView):
             # Drop unncessary columns
             filtered_df = filtered_df.drop(columns=["text", "tax_text_embedding"]).reset_index(drop=True)
 
+          
             if len(filtered_df) > 4:
                 filtered_df = filtered_df.iloc[0:4]
 
             sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
+
+            first_row = sorted_df.iloc[0]
+            first_row_dict = first_row.to_dict()
+
+
+            soreted_filetered_product_name = first_row_dict.get("Company Name") + str(first_row_dict.get("Year"))
+                       
+            PRODUCT_NAME = user_query if  YEAR_STATUS else soreted_filetered_product_name
+
+            # Call function to update track count of Tax data:
+            ProductSearch_Object_create_func(PRODUCT_NAME , payload.get("tab_type"))
 
             if sorted_df.empty:
                 return ProductResponse("failed", [])
@@ -357,7 +377,6 @@ class TaxSemanticSearchView(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
-            print(error_message)
             return Internal_server_response(error_message)
 
 # API For get all Tax Avenue data
@@ -433,9 +452,21 @@ class CEOWorkerSemanticSearchView(APIView):
         try:
             
             # GET USER QUERY FROM POST REQUEST 
+            required_fields= ['query','tab_type']
+            
+            # Get payload data 
+            payload = request.data
+
+            # Handle missing data 
+            missing_fields = [field for field in required_fields if payload.get(field) is None  or not payload.get(field)]
+            if missing_fields:
+                return Response({
+                    'message':f"{', '.join(missing_fields)}: key is required .",
+                    'status':status.HTTP_400_BAD_REQUEST
+                })
+            
+            # Take Payload query value in parameter
             user_query = request.data.get("query")
-            if not user_query:
-                return BAD_RESPONSE("user query is required , Please provide with key name : 'query' ")
 
             # Call function to get year status from  the user query ...
             Filter_year_from_user_query= get_year(user_query)
@@ -507,6 +538,17 @@ class CEOWorkerSemanticSearchView(APIView):
 
             sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
 
+            first_row = sorted_df.iloc[0]
+            first_row_dict = first_row.to_dict()
+
+
+            soreted_filetered_product_name = first_row_dict.get("Company Name") +" " + str(first_row_dict.get("Year"))
+                       
+            PRODUCT_NAME = user_query if  YEAR_STATUS else soreted_filetered_product_name
+
+            # Call function to update track count of Tax data:
+            ProductSearch_Object_create_func(PRODUCT_NAME , payload.get("tab_type"))
+
             if sorted_df.empty:
                 return ProductResponse("failed", [])
             
@@ -516,7 +558,6 @@ class CEOWorkerSemanticSearchView(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
-            print(error_message)
             return Internal_server_response(error_message)
 
 
