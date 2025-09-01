@@ -1,5 +1,8 @@
 from textblob import TextBlob
 import re
+from .models import *
+from datetime import datetime , timedelta
+import sys
 
 
 PRODUCT_DATA_KEYS = [
@@ -80,3 +83,27 @@ def format_profit_margin(x):
 def get_year(text: str) -> str:
     match = re.search(r"\b(19|20)\d{2}\b", text)  # matches years 1900–2099
     return match.group(0) if match else "None"
+
+
+# function to update track count of Product
+def ProductSearch_Object_create_func(product_name : str , tab_type : str):
+    try:
+        # get or create record for today
+        visit_model_obj, created = ProductSearchTrack.objects.get_or_create(
+            
+            #visit_day = current_date,
+            product_name=product_name,
+            tab_type = tab_type,
+            defaults={
+                'search_count':  0,
+                }
+        )
+
+        visit_model_obj.search_count += 1
+        visit_model_obj.save()
+        return "success"
+
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        error_message = f"[ERROR] Failed to get track count value, error: {str(e)} in line {exc_tb.tb_lineno}"
+        return error_message

@@ -17,7 +17,7 @@ urlpatterns = [
     path("get-ceo-worker-data", CeoWorkerView.as_view()),
 
     # URL OF TRACK VISITOR
-    path("count-value", TrackVisitorCountView.as_view()),
+    path("count-value/", GetProductVisitorCount.as_view()),
     path("admin-login", AdminAuthenticationView.as_view())
     
     ]

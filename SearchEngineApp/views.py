@@ -9,6 +9,7 @@ from datetime import datetime , timedelta
 
 # Import python packages
 import os 
+import jwt
 import sys
 from pathlib import Path
 import pandas as pd
@@ -65,6 +66,17 @@ class ProductSemanticSearchView(APIView):
    # Main function 
     def post(self, request, format=None):
         try:
+
+            required_fields= ['query','tab_type']
+            payload = request.data
+
+            missing_fields = [field for field in required_fields if payload.get(field) is None  or not payload.get(field)]
+            if missing_fields:
+                return Response({
+                    'message':f"{', '.join(missing_fields)}: key is required .",
+                    'status':status.HTTP_400_BAD_REQUEST
+                })
+            
             user_query = request.data.get("query")
             if not user_query:
                 return BAD_RESPONSE("User input is required. Please provide it with the key name: 'query'")
@@ -111,6 +123,12 @@ class ProductSemanticSearchView(APIView):
             # Remove unneccary columns from searched dataframe
             searched_df = searched_df.drop(columns=["Gender", "text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
             matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
+            searched_product_name = matched_row_json[0]["Product Name"]
+            searched_product_type = matched_row_json[0]["Product Type"]
+            ProductName = searched_product_name + searched_product_type
+            # call function to update product track coubnt 
+            vistor_track_res = ProductSearch_Object_create_func(ProductName , payload.get("tab_type"))
+            print('vistor_track_res', vistor_track_res)
             
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
@@ -169,7 +187,6 @@ class ProductSemanticSearchView(APIView):
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return Internal_server_response(error_message)
-
 
 
 # API For get all profit margin data
@@ -537,81 +554,7 @@ class CeoWorkerView(APIView):
         
 
 """                 #######################          CSV RELATED API's              ###########################################               """
-class TrackVisitorCountView(APIView):
-
-    def post(self, request,format = None):
-        try:
-            
-            # Required Fields
-            required_key = ['product_name' ,'count_status']
-
-            # Get payload Data:
-            payload = request.data
-            
-            # Handle Missing Fields : 
-            missing_fields = [field for field in required_key if not payload.get(field) or not field]
-
-
-            if missing_fields:
-                return Response({
-                    "message" : f"{' ,'.join(missing_fields)} key is required",
-                    "status" : status.HTTP_400_BAD_REQUEST
-                })
-            
-            # Get values in Parameters : 
-            current_date = datetime.now().date()
-            track_count_status = payload.get('count_status')
-            product_name = str(payload.get('product_name'))
-
-
-            # Handle incorrect productname values : 
-            if not  product_name.lower().strip() in ["profit" , 'tax', 'ceo_worker']:
-                return Response({
-                    'message': f"Incorrect Product Name , it should be {','.join(['profit' , 'tax', 'ceo_worker'])}",
-                    'status'  : status.HTTP_406_NOT_ACCEPTABLE
-
-                })
-
-            # get or create record for today
-            visit_model_obj, created = Visitor_Track_Count.objects.get_or_create(
-
-                visit_day=current_date,
-                defaults={
-                    'profit_visitor_track_count':  0,
-                    'tax_visitor_track_count' :0,
-                    'ceo_worker_visitor_track_count':  0,
-                    }
-            )
-
-
-            if track_count_status and product_name.lower().strip() =="profit":
-                visit_model_obj.profit_visitor_track_count += 1
-                visit_model_obj.save()
-
-            elif track_count_status and product_name.lower().strip() =="tax":
-                visit_model_obj.tax_visitor_track_count += 1
-                visit_model_obj.save()
-
-            
-            elif track_count_status and product_name.lower().strip() =="ceo_worker":
-                visit_model_obj.ceo_worker_visitor_track_count += 1
-                visit_model_obj.save()
-
-    
-
-            return Response({
-                "message": "success",
-                "status": status.HTTP_200_OK,
-                'profit_visitor_track_count':  visit_model_obj.profit_visitor_track_count,
-                'tax_visitor_track_count' :visit_model_obj.tax_visitor_track_count,
-                'ceo_worker_visitor_track_count':  visit_model_obj.ceo_worker_visitor_track_count,
-            })
-
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"[ERROR] Failed to get track count value, error: {str(e)} in line {exc_tb.tb_lineno}"
-            return Internal_server_response(error_message)
-
+# Use Django SECRET_KEY or define a custom one
 class AdminAuthenticationView(APIView):
     def post(self, request, format=None):
         raw_password = request.data.get('password')
@@ -624,24 +567,71 @@ class AdminAuthenticationView(APIView):
                 }
             )
 
-        # Get admin record
-        admin_obj = AdminAuthenticationModel.objects.first()  # adjust filter if needed
-  
-
+        admin_obj = AdminAuthenticationModel.objects.first()
         if not admin_obj:
-            return Response({
-                "message": "Admin not found",
-                "status": 400
-            })
+            return Response({"message": "Admin not found", "status": 400})
 
-        # Compare raw password with stored hashed password
         if not check_password(raw_password, admin_obj.password):
-            return Response({
-                "message": "Incorrect Password, Please Enter correct password",
-                "status": 400
-            })
+            return Response({"message": "Incorrect Password", "status": 400})
+
+        #  Payload for JWT
+        payload = {
+            "admin_id": admin_obj.id,
+            "exp": datetime.utcnow() + timedelta(minutes=30),  # expires in 30 min
+            "iat": datetime.utcnow()
+        }
+
+        secret_key = os.getenv("SECRET_KEY", "default_secret")  # fallback
+        algorithm = os.getenv("ALGORITHM", "HS256")
+
+        token = jwt.encode(payload, secret_key, algorithm=algorithm)
+
+        # If jwt.encode returns bytes (older PyJWT)
+        if isinstance(token, bytes):
+            token = token.decode("utf-8")
 
         return Response({
             "message": "Login Successfully...",
-            "status": 200
+            "status": 200,
+            "token": token
         })
+
+# APi to get product Visitor Track count data
+class GetProductVisitorCount(APIView):
+    def get(self,request):
+        try:
+
+            date_str = request.GET.get("date")
+
+            Product_Data_obj = ProductSearchTrack.objects.all().values()
+
+            if not Product_Data_obj:
+                return DATA_NOT_FOUND("No data found .")
+
+            df = pd.DataFrame(list(Product_Data_obj))
+
+            # Convert to datetime
+            df["created_at"] = pd.to_datetime(df["created_at"])
+
+            # Extract only date
+            df["date_only"] = df["created_at"].dt.date
+
+            df = df.loc[df["date_only"].astype(str) == str(date_str)]
+            
+
+            if df.empty:
+
+                return DATA_NOT_FOUND(f"No Data exist for Date : {date_str}")
+            
+            return Response({
+                "message": f"No Data Found for Date : {date_str}" if df.empty else f"Data get successfully of date : {date_str}" ,
+                "status": status.HTTP_200_OK,
+                "data": df.to_dict(orient="records")
+            })
+        
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
+            print(error_message)
+            return Internal_server_response(error_message)
+        

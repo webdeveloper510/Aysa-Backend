@@ -29,11 +29,27 @@ class CEOWokrerModel(models.Model):
 
 
 
-class Visitor_Track_Count(models.Model):
-    visit_day = models.DateField()
-    profit_visitor_track_count = models.IntegerField(default=0)
-    tax_visitor_track_count = models.IntegerField(default=0)
-    ceo_worker_visitor_track_count = models.IntegerField(default=0)
+class ProductSearchTrack(models.Model):
+    TAB_CHOICES = [
+        ('profit', 'Profit'),
+        ('tax', 'Tax'),
+        ('ceo_worker', 'CEO Worker'),
+    ]
+
+    #visit_date = models.DateField()
+    product_name = models.CharField(max_length=255)
+    tab_type = models.CharField(max_length=20, choices=TAB_CHOICES)
+    search_count = models.PositiveIntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)  # optional
+    updated_at = models.DateTimeField(auto_now=True)      # optional
+
+    class Meta:
+        unique_together = ('product_name', 'tab_type')  
+        # ensures each product+tab combination is unique
+
+    def __str__(self):
+        return f"{self.product_name} ({self.tab_type}) - {self.search_count}"
 
 
 
