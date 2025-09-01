@@ -23,6 +23,8 @@ from .tax_structure import *
 from .profit_margin_predict import *
 from .ceo_worker import *
 from sentence_transformers import SentenceTransformer , util
+from django.contrib.auth.hashers import make_password
+
 
 """ ###############################          Profit Margin Data    ##################################"""
 # API FOR PRODUCT DATA TRAIN 
@@ -537,28 +539,113 @@ class CeoWorkerView(APIView):
 """                 #######################          CSV RELATED API's              ###########################################               """
 class TrackVisitorCountView(APIView):
 
-    def get(self, request):
+    def post(self, request,format = None):
         try:
-            track_count_status = request.GET.get("visit_value", "false").lower() == "true"
+            
+            # Required Fields
+            required_key = ['product_name' ,'count_status']
+
+            # Get payload Data:
+            payload = request.data
+            
+            # Handle Missing Fields : 
+            missing_fields = [field for field in required_key if not payload.get(field) or not field]
+
+
+            if missing_fields:
+                return Response({
+                    "message" : f"{' ,'.join(missing_fields)} key is required",
+                    "status" : status.HTTP_400_BAD_REQUEST
+                })
+            
+            # Get values in Parameters : 
             current_date = datetime.now().date()
+            track_count_status = payload.get('count_status')
+            product_name = str(payload.get('product_name'))
+
+
+            # Handle incorrect productname values : 
+            if not  product_name.lower().strip() in ["profit" , 'tax', 'ceo_worker']:
+                return Response({
+                    'message': f"Incorrect Product Name , it should be {','.join(['profit' , 'tax', 'ceo_worker'])}",
+                    'status'  : status.HTTP_406_NOT_ACCEPTABLE
+
+                })
 
             # get or create record for today
             visit_model_obj, created = Visitor_Track_Count.objects.get_or_create(
+
                 visit_day=current_date,
-                defaults={"visitor_track_count": 0}
+                defaults={
+                    'profit_visitor_track_count':  0,
+                    'tax_visitor_track_count' :0,
+                    'ceo_worker_visitor_track_count':  0,
+                    }
             )
 
-            if track_count_status:
-                visit_model_obj.visitor_track_count += 1
+
+            if track_count_status and product_name.lower().strip() =="profit":
+                visit_model_obj.profit_visitor_track_count += 1
                 visit_model_obj.save()
+
+            elif track_count_status and product_name.lower().strip() =="tax":
+                visit_model_obj.tax_visitor_track_count += 1
+                visit_model_obj.save()
+
+            
+            elif track_count_status and product_name.lower().strip() =="ceo_worker":
+                visit_model_obj.ceo_worker_visitor_track_count += 1
+                visit_model_obj.save()
+
+    
 
             return Response({
                 "message": "success",
                 "status": status.HTTP_200_OK,
-                "visitor_count_value": visit_model_obj.visitor_track_count
+                'profit_visitor_track_count':  visit_model_obj.profit_visitor_track_count,
+                'tax_visitor_track_count' :visit_model_obj.tax_visitor_track_count,
+                'ceo_worker_visitor_track_count':  visit_model_obj.ceo_worker_visitor_track_count,
             })
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Failed to get track count value, error: {str(e)} in line {exc_tb.tb_lineno}"
             return Internal_server_response(error_message)
+
+class AdminAuthenticationView(APIView):
+    def post(self,request, format = None):
+        
+        # Get Password field
+        raw_password = request.data.get('password')
+
+        # Handle missing field
+        if not raw_password:
+            return Response(
+                {
+                    'message':"Password is required . ",
+                    'status': status.HTTP_400_BAD_REQUEST
+                }
+            )
+        
+        #  Convert String Password in Hashed Password
+        hashed_password =  make_password(raw_password)
+
+        # filter out user password
+        # if not  AdminAuthenticationModel.objects.filter(password = hashed_password).exists():
+        #     return Response({
+        #         "message": 'Incorrect Password , Please Enter correct password',
+        #         "status": 400
+        #     })
+        
+        # return Response({
+        #         "message": 'Login Successfuly ...',
+        #         "status": 200
+        #     })
+        
+        user = AdminAuthenticationModel.objects.create(password = hashed_password)
+        user.save()
+
+        return Response({
+                "message": 'User create Successfully ...',
+                "status": 201
+            })

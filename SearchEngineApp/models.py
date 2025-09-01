@@ -31,6 +31,13 @@ class CEOWokrerModel(models.Model):
 
 class Visitor_Track_Count(models.Model):
     visit_day = models.DateField()
-    visitor_track_count = models.IntegerField(default=0)
-    
-    
+    profit_visitor_track_count = models.IntegerField(default=0)
+    tax_visitor_track_count = models.IntegerField(default=0)
+    ceo_worker_visitor_track_count = models.IntegerField(default=0)
+
+
+
+class AdminAuthenticationModel(models.Model):
+    password = models.CharField(max_length = 1000)
+    created_at = models.DateTimeField(auto_now_add = True)
+    updated_at = models.DateTimeField(auto_now= True)
