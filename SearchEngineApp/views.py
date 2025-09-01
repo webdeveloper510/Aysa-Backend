@@ -594,6 +594,25 @@ class AdminAuthenticationView(APIView):
             "token": token
         })
 
+# API to validate token 
+class TokenProtectedView(APIView):
+    def get(self, request, *args, **kwargs):
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response({"error": "No token provided"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Remove "Bearer " prefix if present
+        if token.startswith("Bearer "):
+            token = token.split(" ")[1]
+
+        validation = validate_token(token)
+
+        if not validation["valid"]:
+            return Response({"error": validation["error"]}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response({"message": "Token is Valid", "payload": validation["payload"]},  status=status.HTTP_202_ACCEPTED)
+
+
 # APi to get product Visitor Track count data
 class GetProductVisitorCount(APIView):
     def get(self,request):

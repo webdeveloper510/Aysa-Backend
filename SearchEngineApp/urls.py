@@ -18,7 +18,8 @@ urlpatterns = [
 
     # URL OF TRACK VISITOR
     path("count-value/", GetProductVisitorCount.as_view()),
-    path("admin-login", AdminAuthenticationView.as_view())
+    path("admin-login", AdminAuthenticationView.as_view()),
+    path("auth-check", TokenProtectedView.as_view())
     
     ]
 

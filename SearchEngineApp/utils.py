@@ -3,6 +3,9 @@ import re
 from .models import *
 from datetime import datetime , timedelta
 import sys
+import os
+import jwt
+from jwt import ExpiredSignatureError, InvalidTokenError
 
 
 PRODUCT_DATA_KEYS = [
@@ -107,3 +110,19 @@ def ProductSearch_Object_create_func(product_name : str , tab_type : str):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         error_message = f"[ERROR] Failed to get track count value, error: {str(e)} in line {exc_tb.tb_lineno}"
         return error_message
+    
+
+# function to validate token
+def validate_token(token: str):
+    secret_key = os.getenv("SECRET_KEY", "default_secret")
+    algorithm = os.getenv("ALGORITHM", "HS256")
+
+    try:
+        # Decode and verify token
+        payload = jwt.decode(token, secret_key, algorithms=[algorithm])
+        return {"valid": True, "payload": payload}
+
+    except ExpiredSignatureError:
+        return {"valid": False, "error": "Token expired"}
+    except InvalidTokenError:
+        return {"valid": False, "error": "Invalid token"}
