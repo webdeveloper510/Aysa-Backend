@@ -33,7 +33,7 @@ class ProductSearchTrack(models.Model):
     TAB_CHOICES = [
         ('profit', 'Profit'),
         ('tax', 'Tax'),
-        ('ceo_worker', 'CEO Worker'),
+        ('ceo-worker', 'CEO Worker'),
     ]
 
     #visit_date = models.DateField()
