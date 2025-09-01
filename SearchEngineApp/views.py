@@ -631,21 +631,13 @@ class AdminAuthenticationView(APIView):
         hashed_password =  make_password(raw_password)
 
         # filter out user password
-        # if not  AdminAuthenticationModel.objects.filter(password = hashed_password).exists():
-        #     return Response({
-        #         "message": 'Incorrect Password , Please Enter correct password',
-        #         "status": 400
-        #     })
+        if not  AdminAuthenticationModel.objects.filter(password = hashed_password).exists():
+            return Response({
+                "message": 'Incorrect Password , Please Enter correct password',
+                "status": 400
+            })
         
-        # return Response({
-        #         "message": 'Login Successfuly ...',
-        #         "status": 200
-        #     })
-        
-        user = AdminAuthenticationModel.objects.create(password = hashed_password)
-        user.save()
-
         return Response({
-                "message": 'User create Successfully ...',
-                "status": 201
+                "message": 'Login Successfuly ...',
+                "status": 200
             })
