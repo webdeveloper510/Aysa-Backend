@@ -69,16 +69,19 @@ class ProfitMarginPreidction:
         for col in search_cols:
             if user_query in pickle_df[col].values:
                 filtered_df = pickle_df[pickle_df[col] == user_query]
-                break
 
         # If matches found, clean up
         if not filtered_df.empty:
+            print("Test Case 1 dataframe : \n ", filtered_df)
+            print("===================================")
             filtered_df = (
                 filtered_df.sort_values("Production Year", ascending=False)
                         .drop_duplicates(subset=["Brand", "Production Year"], keep="first")   # <-- Changed here
                         .head(3)                                           # Keep only top 3
                         .drop(columns=["Category", "Gender", "text", "text_embedding", "brand_embedding"], errors="ignore")
-            )
+                    )
+
+            print("Length of dataframe : \n ", len(filtered_df))
         return filtered_df
 
     # function to apply embedding 
@@ -222,7 +225,6 @@ class ProfitMarginPreidction:
                     # Append only if not already in filtered_rows
                     if not any(row.equals(r) for r in filtered_rows):
                         filtered_rows.append(row)
-        print("filtered rows : \n", filtered_rows)
 
         # Return as DataFrame
         return filtered_rows

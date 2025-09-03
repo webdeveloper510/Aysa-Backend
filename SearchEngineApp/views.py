@@ -25,6 +25,9 @@ from .ceo_worker import *
 from sentence_transformers import SentenceTransformer , util
 from django.contrib.auth.hashers import make_password   , check_password
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 """ ###############################          Profit Margin Data    ##################################"""
 # API FOR PRODUCT DATA TRAIN 
@@ -66,10 +69,19 @@ class ProductSemanticSearchView(APIView):
    # Main function 
     def post(self, request, format=None):
         try:
+            
+            # Get threshold value from environemnt file
+            threshold_value = os.getenv("THRESHOLD_VALUE")
+            if isinstance(threshold_value, str):
+                threshold_value = round(float(threshold_value),2)
 
+            # Required Fields
             required_fields= ['query','tab_type']
+
+            # Get Payload data
             payload = request.data
 
+            # Handle missing field
             missing_fields = [field for field in required_fields if payload.get(field) is None  or not payload.get(field)]
             if missing_fields:
                 return Response({
@@ -77,8 +89,9 @@ class ProductSemanticSearchView(APIView):
                     'status':status.HTTP_400_BAD_REQUEST
                 })
             
-            user_query = request.data.get("query")
-          
+            # get payload value in parameter
+            user_query = payload.get("query")
+
             # Define paths
             pickle_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
@@ -107,12 +120,12 @@ class ProductSemanticSearchView(APIView):
                 
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            # print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
-            # print()
-            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.38]    # Filter out dataframe if similarity score greater than 40
+            print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
+            print()
+            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > threshold_value]    # Filter out dataframe if similarity score greater than 40
             
             if Embedding_df.empty:
-                return ProductResponse("failed", [])
+                return ProductResponse("No Data Matched", [])
 
             # Function -2
             paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df)     # Get matched row parameter dict
@@ -132,13 +145,12 @@ class ProductSemanticSearchView(APIView):
             ProductName = searched_product_name + searched_product_type
             # call function to update product track coubnt 
             vistor_track_res = ProductSearch_Object_create_func(ProductName , payload.get("tab_type"))
-            print('vistor_track_res', vistor_track_res)
             
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
 
-            print("Product_Category_df : \n", Product_Category_df)
-            print()
+            # print("Product_Category_df : \n", Product_Category_df)
+            # print()
 
             # Return Response if only matched row dataframe is true
             if Product_Category_df.empty:
@@ -146,15 +158,16 @@ class ProductSemanticSearchView(APIView):
 
             # Function -4
             Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-            print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
-            print()
+            #print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+            #print()
+
             # Return Response if only matched row dataframe is true
             if Product_Yearly_df.empty:
                 return ProductResponse("success",matched_row_json)
 
             # Function -5
             Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
-            print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+            #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
 
             if Product_Gender_df.empty:
                 return ProductResponse("success",matched_row_json)
@@ -234,7 +247,6 @@ class GetProfitMarginData(APIView):# #
 
 
 """ ###############################          Tax Avenue Data    ##################################"""
-
 
 # API FOR Tax  DATA TRAIN 
 class TaxDataTrainPipeline(APIView):
