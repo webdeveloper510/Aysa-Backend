@@ -95,9 +95,9 @@ class ProductSemanticSearchView(APIView):
             
             # Implement logic when user asked about only product
             if len(split_query) == 1:
-                filtered_df = Profit_Obj.BrandDF(user_query , pickle_df)
-
                 print('Single brand query is hitting .....')
+                filtered_df = Profit_Obj.BrandDF(user_query , pickle_df)
+                print("filtered_df : \n " , filtered_df)
                 
                 if not filtered_df.empty:
                     return ProductResponse('success',filtered_df.to_dict(orient="records") )
@@ -109,7 +109,7 @@ class ProductSemanticSearchView(APIView):
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
             # print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
             # print()
-            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.35]    # Filter out dataframe if similarity score greater than 40
+            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.38]    # Filter out dataframe if similarity score greater than 40
             
             if Embedding_df.empty:
                 return ProductResponse("failed", [])
