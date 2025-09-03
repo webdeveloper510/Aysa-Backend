@@ -87,6 +87,7 @@ class ProductSemanticSearchView(APIView):
             model = SentenceTransformer(transfer_model_path)
             pickle_df = pd.read_pickle(pickle_df_path)
 
+            # CALL A CLASS TO PREDICT PROFIT MARGIN DATA 
             Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
 
             # Handle when user has asked about only brand name
@@ -94,15 +95,20 @@ class ProductSemanticSearchView(APIView):
             
             # Implement logic when user asked about only product
             if len(split_query) == 1:
-                print('Single brand query is hitting .....')
                 filtered_df = Profit_Obj.BrandDF(user_query , pickle_df)
+
+                print('Single brand query is hitting .....')
+                
                 if not filtered_df.empty:
                     return ProductResponse('success',filtered_df.to_dict(orient="records") )
 
+                else:
+                    return DATA_NOT_FOUND(f"No Product Matched with : {user_query}")
+                
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[0:50])
-            print()
+            # print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
+            # print()
             Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > 0.35]    # Filter out dataframe if similarity score greater than 40
             
             if Embedding_df.empty:

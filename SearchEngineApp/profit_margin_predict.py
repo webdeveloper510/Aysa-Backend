@@ -49,23 +49,38 @@ class ProfitMarginPreidction:
     
     
     # This function is return dataframe if user asked about only Brand Name
-    def BrandDF(self, user_query: str , pickle_df: pd.DataFrame) -> pd.DataFrame:
-        pickle_df.loc[:, "Brand"] = pickle_df["Brand"].astype(str).str.lower().str.strip()
-        user_query = str(user_query.lower().strip())
+    def BrandDF(self, user_query: str, pickle_df: pd.DataFrame) -> pd.DataFrame:
 
+        # Normalize dataframe columns
+        for col in ["Brand", "Product Name", "Product Type", "Category"]:
+            if col in pickle_df.columns:
+                pickle_df[col] = pickle_df[col].astype(str).str.lower().str.strip()
+
+        # Normalize query
+        user_query = str(user_query).lower().strip()
+
+        # Columns to check in order
+        search_cols = ["Brand", "Product Name", "Product Type", "Category"]
+
+        # Initialize empty DataFrame
         filtered_df = pd.DataFrame()
-        if user_query in pickle_df["Brand"].values:  
-            filtered_df = pickle_df.loc[(pickle_df["Brand"]==user_query)]
-            filtered_df = filtered_df.sort_values('Production Year', ascending=False)  
-            filtered_df = filtered_df.drop_duplicates(subset=["Production Year"], keep="first")       # Keep only first row of every brand
-            print("filtered_df : \n", filtered_df)
 
-            if len(filtered_df) > 3:
-                filtered_df = filtered_df.iloc[0:3]
+        # Find first column where user_query matches
+        for col in search_cols:
+            if user_query in pickle_df[col].values:
+                filtered_df = pickle_df[pickle_df[col] == user_query]
+                break
 
-            filtered_df = filtered_df.drop(columns=["Category" ,"Gender", "text", "text_embedding"],  errors="ignore")      # remove unneccessary dataframe
-
+        # If matches found, clean up
+        if not filtered_df.empty:
+            filtered_df = (
+                filtered_df.sort_values("Production Year", ascending=False)
+                        .drop_duplicates(subset=["Brand", "Production Year"], keep="first")   # <-- Changed here
+                        .head(3)                                           # Keep only top 3
+                        .drop(columns=["Category", "Gender", "text", "text_embedding", "brand_embedding"], errors="ignore")
+            )
         return filtered_df
+
     # function to apply embedding 
     def apply_embedding(self):
 
