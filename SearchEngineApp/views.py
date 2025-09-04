@@ -28,9 +28,12 @@ from django.contrib.auth.hashers import make_password   , check_password
 from dotenv import load_dotenv
 load_dotenv()
 
-TAX_CEO_WORKER_SIMILARITY = round(float(os.getenv("TAX_CEO_WORKER_SIMILARITY")), 2)
+# use in both  tax and ceo worker semantic search api
+TAX_CEO_WORKER_SIMILARITY = round(float(os.getenv("TAX_CEO_WORKER_SIMILARITY")), 2)     
 TAX_CEO_WORKER_YEAR_SIMILARITY = round(float(os.getenv("TAX_CEO_WORKER_YEAR_SIMILARITY")), 2)
-top_n = int(os.getenv("TOP_N"))
+
+# GET TOP_N MATCHED VALUE
+TOP_N = int(os.getenv("TOP_N"))
 
 
 """ ###############################          Profit Margin Data    ##################################"""
@@ -70,14 +73,92 @@ class ProductTrainPipeline(APIView):
 
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
+
+    def FilterUserQuery(self , input_text: str) -> list:
+        split_text = input_text.split(" ")
+        unique_list = list(set(split_text))
+        return unique_list
+    
+    # FUNCTION TO GET PRODUCT OF SINGLE USER QUERY
+    def get_brand_products(self ,pickle_df, user_query: str) -> pd.DataFrame:
+        try:
+            # Make a copy of df
+            df = pickle_df.copy()
+
+            # Normalize Brand Column
+            df['Brand'] = df['Brand'].astype(str).str.lower().str.strip()
+
+            # Handle synonyms
+            if user_query.lower().strip() in ['apple', 'iphone']:
+                user_query = "apple"
+            else:
+                user_query = user_query.lower().strip()
+
+            # Check if Brand exists
+            mask = df['Brand'].str.contains(user_query, case=False, na=False)
+            if not mask.any():
+                return ProductResponse("error", f"No products found for brand '{user_query}'")
+
+            # Drop unnecessary columns
+            drop_cols = [col for col in ["text_embedding", "brand_embedding", "text", "brand"] if col in df.columns]
+            df = df.drop(columns=drop_cols, errors="ignore")
+
+            # Get Masked DF & Sort
+            masked_df = df[mask]
+            sorted_df = masked_df.sort_values("Production Year", ascending=False)
+
+            # Get Latest Matched Row
+            matched_row = sorted_df.iloc[0].to_dict()
+
+            # Extract Values
+            brand_name = str(matched_row.get("Brand")).lower().strip()
+            product_name = str(matched_row.get("Product Name")).lower().strip()
+
+            # Filter same brand but different products
+            filtered_df = sorted_df.loc[
+                (sorted_df["Brand"].str.lower().str.strip() == brand_name) &
+                (sorted_df["Product Name"].str.lower().str.strip() != product_name)
+            ].sort_values("Production Year", ascending=False)
+
+            # Select one unique product per year
+            selected_rows = []
+            used_products = set()
+
+            for year, group in filtered_df.groupby("Production Year", sort=False):
+                row = group.loc[~group["Product Name"].str.lower().isin(used_products)].head(1)
+                if not row.empty:
+                    selected_rows.append(row)
+                    used_products.add(row["Product Name"].iloc[0].lower())
+
+            if not selected_rows:
+                return ProductResponse("error", f"No alternative products found for '{user_query}'")
+
+            filtered_unique = (
+                pd.concat(selected_rows)
+                .sort_values("Production Year", ascending=False)
+                .reset_index(drop=True)
+            )
+
+            # Format output
+            filtered_unique["Brand"] = filtered_unique["Brand"].str.title()
+            if len(filtered_unique) > 3:
+                filtered_unique = filtered_unique.iloc[0:3]
+
+            return filtered_unique
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] failed to get Products for matched single category , error is : {str(e)} in line no : {exc_tb.tb_lineno}"
+            return error_message
+
+    
    # Main function 
     def post(self, request, format=None):
         try:
-            
+            PROFIT_MARGIN_SIMILARITY_SCORE = os.getenv("PROFIT_MARGIN_SIMILARITY_SCORE")            # use this in produict semantic search api
             # Get threshold value from environemnt file
-            threshold_value = os.getenv("THRESHOLD_VALUE")
-            if isinstance(threshold_value, str):
-                threshold_value = round(float(threshold_value),2)
+            if isinstance(PROFIT_MARGIN_SIMILARITY_SCORE, str):
+                PROFIT_MARGIN_SIMILARITY_SCORE = round(float(PROFIT_MARGIN_SIMILARITY_SCORE),2)
 
             # Required Fields
             required_fields= ['query','tab_type']
@@ -94,7 +175,7 @@ class ProductSemanticSearchView(APIView):
                 })
             
             # get payload value in parameter
-            user_query = payload.get("query")
+            user_query = str(payload.get("query")).lower().strip()
 
             # Define paths
             pickle_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
@@ -108,19 +189,21 @@ class ProductSemanticSearchView(APIView):
             Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
 
             # Handle when user has asked about only brand name
-            split_query = user_query.split()
-            
-            # Implement logic when user asked about only product
-            if len(split_query) == 1:
-                print('Single brand query is hitting .....')
-                filtered_df = Profit_Obj.BrandDF(user_query , pickle_df)
-                print("filtered_df : \n " , filtered_df)
-                
-                if not filtered_df.empty:
-                    return ProductResponse('success',filtered_df.to_dict(orient="records") )
+            user_query_filter_list = self.FilterUserQuery(user_query)
 
-                else:
-                    return DATA_NOT_FOUND(f"No Product Matched with : {user_query}")
+            if len(user_query_filter_list)  ==1:
+                
+                # call function to get dataframe
+                result_df = self.get_brand_products(pickle_df , user_query)
+
+                # HANDLE IF FUNCTION RETURN ERROR
+                if isinstance(result_df ,str):
+                    return Internal_server_response(result_df)
+                
+                 # HANDLE IF FUNCTION RETURN ERROR
+                elif isinstance(result_df ,pd.DataFrame):
+                    json_output= result_df.to_dict(orient="records")
+                    return ProductResponse("success", json_output)
                 
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
@@ -128,7 +211,7 @@ class ProductSemanticSearchView(APIView):
             print()
 
              # Filter out dataframe if similarity score greater than threshold Value
-            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > threshold_value]   
+            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
             
             if Embedding_df.empty:
                 return ProductResponse("No Data Matched", [])
@@ -305,7 +388,7 @@ class TaxSemanticSearchView(APIView):
             df['tax_similarity'] = fullText_similarities
 
             # SORT VALUES 
-            embedding_df = (df.sort_values('tax_similarity', ascending=False).head(top_n))
+            embedding_df = (df.sort_values('tax_similarity', ascending=False).head(TOP_N))
 
             # Filter Dataframe based on the threshold value
             filtered_df = embedding_df.loc[embedding_df["tax_similarity"].astype(float) >= similarity_score]
@@ -325,7 +408,7 @@ class TaxSemanticSearchView(APIView):
             
             matched_row = filtered_df.loc[filtered_df["tax_similarity"].idxmax()]
             matched_row_data = matched_row.to_dict()
-           
+
             return matched_row_data
 
         except Exception as e:
@@ -361,6 +444,7 @@ class TaxSemanticSearchView(APIView):
 
             # Reaf full model and save mode
             df = pd.read_pickle(tax_embedding_df_path)
+            print("TAX DATA ", df.columns.tolist())
 
             original_df = df.copy()
 
@@ -376,6 +460,7 @@ class TaxSemanticSearchView(APIView):
                 if filtered_df.empty:
                     return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
                 
+                print('filtered_df : \n  ', filtered_df)
                 # call function to get most similar row
                 MatchedRow = self.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
                 
@@ -391,7 +476,7 @@ class TaxSemanticSearchView(APIView):
                     
                     serached_df = serached_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"], axis=1)
                     
-                    return ProductResponse("Success",serached_df.to_dict(orient="records"))
+                    return ProductResponse("success",serached_df.to_dict(orient="records"))
                 
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
@@ -426,7 +511,7 @@ class TaxSemanticSearchView(APIView):
                     if len(sorted_df) > 4:
                         sorted_df = sorted_df.iloc[0:4]
 
-                    return ProductResponse("Success",sorted_df.to_dict(orient="records"))
+                    return ProductResponse("success",sorted_df.to_dict(orient="records"))
                 
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
@@ -540,6 +625,7 @@ class CEOWorkerSemanticSearchView(APIView):
 
             # RENAME COLUMN
             df = df.rename(columns={'frontline_text_embedding': 'tax_text_embedding'})
+            print("CEO WORKER ", df.columns.tolist())
 
             # make a copy of original dataframe
             original_df = df.copy()

@@ -4,6 +4,7 @@ from .models import *
 from datetime import datetime , timedelta
 import sys
 import os
+import pandas as pd
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
 
@@ -43,10 +44,8 @@ def preprocess_text(text):
     text = re.sub(r'\s+', ' ', text).strip()          # Remove extra spaces
     return text
 
-
+# Function To Format Profit Margin API
 def format_profit_margin(x):
-    import pandas as pd
-    
     if pd.isnull(x):
         return ""
     
@@ -79,7 +78,6 @@ def format_profit_margin(x):
             return f"{val:.2f}%"
     except:
         return s
-
 
 
 # function to filter year from the user query
