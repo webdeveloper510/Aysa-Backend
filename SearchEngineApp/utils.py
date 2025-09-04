@@ -82,9 +82,9 @@ def format_profit_margin(x):
 
 
 
-# Function to get Year from text 
+# function to filter year from the user query
 def get_year(text: str) -> str:
-    match = re.search(r"\b(19|20)\d{2}\b", text)  # matches years 1900–2099
+    match = re.search(r"(19|20)\d{2}", text)  # no word boundaries
     return match.group(0) if match else "None"
 
 
@@ -126,3 +126,4 @@ def validate_token(token: str):
         return {"valid": False, "error": "Token expired"}
     except InvalidTokenError:
         return {"valid": False, "error": "Invalid token"}
+

@@ -28,6 +28,10 @@ from django.contrib.auth.hashers import make_password   , check_password
 from dotenv import load_dotenv
 load_dotenv()
 
+TAX_CEO_WORKER_SIMILARITY = round(float(os.getenv("TAX_CEO_WORKER_SIMILARITY")), 2)
+TAX_CEO_WORKER_YEAR_SIMILARITY = round(float(os.getenv("TAX_CEO_WORKER_YEAR_SIMILARITY")), 2)
+top_n = int(os.getenv("TOP_N"))
+
 
 """ ###############################          Profit Margin Data    ##################################"""
 # API FOR PRODUCT DATA TRAIN 
@@ -122,7 +126,9 @@ class ProductSemanticSearchView(APIView):
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
             print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
             print()
-            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > threshold_value]    # Filter out dataframe if similarity score greater than 40
+
+             # Filter out dataframe if similarity score greater than threshold Value
+            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > threshold_value]   
             
             if Embedding_df.empty:
                 return ProductResponse("No Data Matched", [])
@@ -138,7 +144,7 @@ class ProductSemanticSearchView(APIView):
                 return ProductResponse("failed",[])
 
             # Remove unneccary columns from searched dataframe
-            searched_df = searched_df.drop(columns=["Gender", "text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
+            searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
             matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
             searched_product_name = matched_row_json[0]["Product Name"]
             searched_product_type = matched_row_json[0]["Product Type"]
@@ -149,8 +155,8 @@ class ProductSemanticSearchView(APIView):
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
 
-            # print("Product_Category_df : \n", Product_Category_df)
-            # print()
+            print("Product_Category_df : \n", Product_Category_df)
+            print()
 
             # Return Response if only matched row dataframe is true
             if Product_Category_df.empty:
@@ -158,8 +164,8 @@ class ProductSemanticSearchView(APIView):
 
             # Function -4
             Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-            #print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
-            #print()
+            print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+            print()
 
             # Return Response if only matched row dataframe is true
             if Product_Yearly_df.empty:
@@ -167,7 +173,7 @@ class ProductSemanticSearchView(APIView):
 
             # Function -5
             Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
-            #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+            print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
 
             if Product_Gender_df.empty:
                 return ProductResponse("success",matched_row_json)
@@ -188,7 +194,7 @@ class ProductSemanticSearchView(APIView):
 
             # Drop Unneccessary columns if it filtered_df is dataframe
             if isinstance(filtered_df , pd.DataFrame) and not filtered_df.empty:
-                filtered_df = filtered_df.drop(columns=["text", "Gender","similarity_score", "text_embedding", "brand_embedding", "brand"],  errors="ignore")      # remove unneccessary dataframe
+                filtered_df = filtered_df.drop(columns=["text","similarity_score", "text_embedding", "brand_embedding", "brand"],  errors="ignore")      # remove unneccessary dataframe
 
             # Merge bot dataframe
             merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
@@ -283,8 +289,49 @@ class TaxDataTrainPipeline(APIView):
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    top_n = 80
-    similarity = 0.75
+
+    # Function to get most matched query 
+    def GetMatchedRowDict(self , model , user_query: str ,Input_df : pd.DataFrame, similarity_score : float) -> dict:
+        try:
+            df =Input_df.copy()
+            query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
+
+            # Convert all full Text  embeddings to tensor
+            tax_embeddings = [torch.tensor(e).to(self.device) for e in df['tax_text_embedding']]
+            tax_embedding_tensor = torch.stack(tax_embeddings)
+
+            # Cosine similarity on full Text
+            fullText_similarities = util.cos_sim(query_embedding, tax_embedding_tensor)[0].cpu().numpy()
+            df['tax_similarity'] = fullText_similarities
+
+            # SORT VALUES 
+            embedding_df = (df.sort_values('tax_similarity', ascending=False).head(top_n))
+
+            # Filter Dataframe based on the threshold value
+            filtered_df = embedding_df.loc[embedding_df["tax_similarity"].astype(float) >= similarity_score]
+
+            if filtered_df.empty:
+
+                # Clean matched text before searching
+                clean_query = re.sub(r"\s+", " ", user_query.strip().lower())
+                normalized_matched = embedding_df["text"].astype(str).str.lower().str.replace(r"\s+", " ", regex=True).str.strip()
+                mask = normalized_matched.str.contains(clean_query, case=False, na=False)
+
+                if mask.any():
+                    matched_row = embedding_df[mask]
+                    matched_row_data = matched_row.to_dict(orient="records")[0]
+                    return matched_row_data
+                return []
+            
+            matched_row = filtered_df.loc[filtered_df["tax_similarity"].idxmax()]
+            matched_row_data = matched_row.to_dict()
+           
+            return matched_row_data
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to get matched row from dataframe error is : {str(e)} in line no : {exc_tb.tb_lineno}"
+            return error_message
 
     def post(self , request , format=None):
         try:
@@ -303,12 +350,8 @@ class TaxSemanticSearchView(APIView):
                 })
             
             # Take Payload query value in parameter
-            user_query = request.data.get("query")
-
-            # Call function to get year status from  the user query ...
-            Filter_year_from_user_query= get_year(str(user_query))
-            YEAR_STATUS = True if  Filter_year_from_user_query != 'None' else False
-
+            user_query = payload.get("query")
+         
             # Define paths
             tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
@@ -318,79 +361,77 @@ class TaxSemanticSearchView(APIView):
 
             # Reaf full model and save mode
             df = pd.read_pickle(tax_embedding_df_path)
-         
-            # make a copy of original dataframe
+
             original_df = df.copy()
 
-            # convert_user_query in embedding 
-            query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
-
-            # Convert all full Text  embeddings to tensor
-            tax_embeddings = [torch.tensor(e).to(self.device) for e in df['tax_text_embedding']]
-            tax_embedding_tensor = torch.stack(tax_embeddings)
-
-            # Cosine similarity on full Text
-            fullText_similarities = util.cos_sim(query_embedding, tax_embedding_tensor)[0].cpu().numpy()
-            df['tax_similarity'] = fullText_similarities
-
-
-            embedding_df = (
-                df.drop(columns=["tax_text_embedding" , "text"])
-                .sort_values('tax_similarity', ascending=False)
-                .head(self.top_n)
-            )
-
-            # Most similar row
-            matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
-            matched_row_data = matched_row.to_dict()
-
-            # Get company name from matched row dict
-            CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
-            Year = matched_row_data.get("Year")
-
-            # Take Empty dataframe
-            filtered_df= pd.DataFrame()
-
+            # Call function to get year status from  the user query ...
+            FilterYear= get_year(user_query)
             
-           # Check if year exists in user query
-            if YEAR_STATUS:
-                filtered_df = original_df.loc[
-                    (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName)
-                    & (original_df["Year"].astype(int) == int(Year))
-                ]
+            if FilterYear != "None":
+                print('filter year ', FilterYear)
+                
+                # Filter datfarame based on the year
+                filtered_df = df.loc[df["Year"].astype(int) == int(FilterYear)]
+
+                if filtered_df.empty:
+                    return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
+                
+                # call function to get most similar row
+                MatchedRow = self.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
+                
+                # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
+                if isinstance(MatchedRow , str):
+                    return Internal_server_response(MatchedRow)
+                
+                # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
+                elif isinstance(MatchedRow , dict):
+                    serached_df = pd.DataFrame([MatchedRow])
+                    
+                    # print("serached_df : \n ", serached_df[["Company Name", "Year", "Taxes Paid", "Taxes Avoided"]])
+                    
+                    serached_df = serached_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"], axis=1)
+                    
+                    return ProductResponse("Success",serached_df.to_dict(orient="records"))
+                
+                # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
+                else:
+                    return DATA_NOT_FOUND('DATA NOT FOUND')
+              
             else:
-                filtered_df = original_df.loc[
-                    original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName
-                ]
+                
+                # Add new column
+                MatchedRow = self.GetMatchedRowDict(model , user_query , df , TAX_CEO_WORKER_SIMILARITY)
+                  
+                # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
+                if isinstance(MatchedRow , str):
+                    return Internal_server_response(MatchedRow)
+                
+                # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
+                elif isinstance(MatchedRow , dict):
 
-            # Handle if filetred dataframe is empty 
-            if filtered_df.empty:
-                return ProductResponse("failed", [])
-            
-            # Drop unncessary columns
-            filtered_df = filtered_df.drop(columns=["text", "tax_text_embedding"]).reset_index(drop=True)
+                    CompanyName = str(MatchedRow.get("Company Name")).lower().strip()
 
-          
-            if len(filtered_df) > 4:
-                filtered_df = filtered_df.iloc[0:4]
+                    # FILTERED DATAFRAME BASED ON THE COMPANY NAME
+                    filtered_df = original_df.loc[original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName]
 
-            sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
+                    # DROP COLUMNS
+                    filtered_df = filtered_df.drop(columns=["text", "tax_text_embedding"]).reset_index(drop=True)
 
-            first_row = sorted_df.iloc[0]
-            first_row_dict = first_row.to_dict()
+                    # SORT DATAFRAME BASED ON THE YEAR COLUMN
+                    sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
+                    
+                    # print("sorted_df : \n ", sorted_df[["Company Name", "Year", "Taxes Paid", "Taxes Avoided"]])
 
+                    # IF LENGTH OF THE SORTED DATAFRAME GET ONLY FIRST 4 ROWS
+                    if len(sorted_df) > 4:
+                        sorted_df = sorted_df.iloc[0:4]
 
-            soreted_filetered_product_name = first_row_dict.get("Company Name") + str(first_row_dict.get("Year"))
-                       
-            PRODUCT_NAME = user_query if  YEAR_STATUS else soreted_filetered_product_name
+                    return ProductResponse("Success",sorted_df.to_dict(orient="records"))
+                
+                # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
+                else:
+                    return DATA_NOT_FOUND('DATA NOT FOUND')
 
-            # Call function to update track count of Tax data:
-            ProductSearch_Object_create_func(PRODUCT_NAME , payload.get("tab_type"))
-
-            if sorted_df.empty:
-                return ProductResponse("failed", [])
-            
-            return ProductResponse("success", sorted_df.to_dict(orient="records"))
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -463,8 +504,6 @@ class CEOWorkerTrainPipeline(APIView):
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    top_n = 80
-    similarity = 0.75
 
     def post(self , request , format=None):
         try:
@@ -484,11 +523,7 @@ class CEOWorkerSemanticSearchView(APIView):
                 })
             
             # Take Payload query value in parameter
-            user_query = request.data.get("query")
-
-            # Call function to get year status from  the user query ...
-            Filter_year_from_user_query= get_year(user_query)
-            YEAR_STATUS = True if  Filter_year_from_user_query != 'None' else False
+            user_query = payload.get("query")
 
             # Define paths
             ceo_worker_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_worker_embedding.pkl")
@@ -497,81 +532,88 @@ class CEOWorkerSemanticSearchView(APIView):
             # Load model
             model = SentenceTransformer(transfer_model_path)
 
+            # MAKE OBJECT OF TAX SEMANTIC SEARCH CLASS FUNCTION 
+            tax_obj = TaxSemanticSearchView()
+
             # Reaf full model and save mode
             df = pd.read_pickle(ceo_worker_embedding_df_path)
+
+            # RENAME COLUMN
+            df = df.rename(columns={'frontline_text_embedding': 'tax_text_embedding'})
 
             # make a copy of original dataframe
             original_df = df.copy()
 
-            # convert_user_query in embedding 
-            query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
+            # Call function to get year status from  the user query ...
+            FilterYear= get_year(user_query)
 
-            # Convert all full Text  embeddings to tensor
-            ceo_worker_embeddings = [torch.tensor(e).to(self.device) for e in df['frontline_text_embedding']]
-            frontline_embedding_tensor = torch.stack(ceo_worker_embeddings)
+            if FilterYear != "None":
+                print('filter year ', FilterYear)
+                
+                # Filter datfarame based on the year
+                filtered_df = df.loc[df["Year"].astype(int) == int(FilterYear)]
 
-            # Cosine similarity on full Text
-            fullText_similarities = util.cos_sim(query_embedding, frontline_embedding_tensor)[0].cpu().numpy()
-            df['ceo_worker_similarity'] = fullText_similarities
-
-            embedding_df = (
-                df.drop(columns=["frontline_text_embedding" , "text"])
-                .sort_values('ceo_worker_similarity', ascending=False)
-                .head(self.top_n)
-            )
-
-             # Most similar row
-            matched_row = embedding_df.loc[embedding_df["ceo_worker_similarity"].idxmax()]
-            matched_row_data = matched_row.to_dict()
-
-            # Get company name from matched row dict
-            CompanyName = str(matched_row_data.get("Company Name", "")).lower().strip()
-            CEOName = str(matched_row_data.get("CEO Name", "")).lower().strip()
-            Year = matched_row_data.get("Year")
-
-
-            filtered_df = pd.DataFrame()
-            # Check if year exists in user query
-            if YEAR_STATUS:
-                filtered_df = original_df.loc[
-                    (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName) &
-                    (original_df["CEO Name"].astype(str).str.lower().str.strip() == CEOName) &
-                    (original_df["Year"].astype(int) == int(Year))
-                ]
+                if filtered_df.empty:
+                    return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
+                
+                # call function to get most similar row
+                MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
+                
+                # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
+                if isinstance(MatchedRow , str):
+                    return Internal_server_response(MatchedRow)
+                
+                # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
+                elif isinstance(MatchedRow , dict):
+                    serached_df = pd.DataFrame([MatchedRow])
+                    
+                    #print("serached_df : \n ", serached_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
+                    
+                    serached_df = serached_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"])
+                    
+                    return ProductResponse("Success",serached_df.to_dict(orient="records"))
+                
+                # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
+                else:
+                    return DATA_NOT_FOUND('DATA NOT FOUND')
+              
             else:
-                filtered_df = original_df.loc[
-                    (original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName) &
-                    (original_df["CEO Name"].astype(str).str.lower().str.strip() == CEOName)
-                ]
+                
+                # Add new column
+                MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , df , TAX_CEO_WORKER_SIMILARITY)
 
-            # Handle if dataframe is empty
-            if filtered_df.empty:
-                return ProductResponse("failed", [])
-            
-            # Drop unncessary columns
-            filtered_df = filtered_df.drop(columns=["text", "frontline_text_embedding"]).reset_index(drop=True)
+                # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
+                if isinstance(MatchedRow , str):
+                    return Internal_server_response(MatchedRow)
+                
+                # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
+                elif isinstance(MatchedRow , dict):
 
-            if len(filtered_df)>4:
-                filtered_df = filtered_df.iloc[0:4]
+                    CompanyName = str(MatchedRow.get("Company Name")).lower().strip()
 
-            sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
+                    # FILTERED DATAFRAME BASED ON THE COMPANY NAME
+                    filtered_df = original_df.loc[original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName]
 
-            first_row = sorted_df.iloc[0]
-            first_row_dict = first_row.to_dict()
+                    # DROP COLUMNS
+                    filtered_df = filtered_df.drop(columns=["text", "tax_text_embedding"]).reset_index(drop=True)
+
+                    # SORT DATAFRAME BASED ON THE YEAR COLUMN
+                    sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
+                    
+                    #print("sorted_df : \n ", sorted_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
+
+                    # IF LENGTH OF THE SORTED DATAFRAME GET ONLY FIRST 4 ROWS
+                    if len(sorted_df) > 4:
+                        sorted_df = sorted_df.iloc[0:4]
+
+                    return ProductResponse("Success",sorted_df.to_dict(orient="records"))
+                
+                # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
+                else:
+                    return DATA_NOT_FOUND('DATA NOT FOUND')
 
 
-            soreted_filetered_product_name = first_row_dict.get("Company Name") +" " + str(first_row_dict.get("Year"))
-                       
-            PRODUCT_NAME = user_query if  YEAR_STATUS else soreted_filetered_product_name
-
-            # Call function to update track count of Tax data:
-            ProductSearch_Object_create_func(PRODUCT_NAME , payload.get("tab_type"))
-
-            if sorted_df.empty:
-                return ProductResponse("failed", [])
-            
-            return ProductResponse("success", sorted_df.to_dict(orient="records"))
-
+           
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()

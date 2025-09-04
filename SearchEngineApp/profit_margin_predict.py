@@ -72,16 +72,13 @@ class ProfitMarginPreidction:
 
         # If matches found, clean up
         if not filtered_df.empty:
-            print("Test Case 1 dataframe : \n ", filtered_df)
-            print("===================================")
             filtered_df = (
                 filtered_df.sort_values("Production Year", ascending=False)
                         .drop_duplicates(subset=["Brand", "Production Year"], keep="first")   # <-- Changed here
                         .head(3)                                           # Keep only top 3
-                        .drop(columns=["Category", "Gender", "text", "text_embedding", "brand_embedding"], errors="ignore")
+                        .drop(columns=["Category", "text", "text_embedding", "brand_embedding"], errors="ignore")
                     )
 
-            print("Length of dataframe : \n ", len(filtered_df))
         return filtered_df
 
     # function to apply embedding 
