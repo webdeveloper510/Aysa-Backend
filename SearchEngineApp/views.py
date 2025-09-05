@@ -887,8 +887,6 @@ class SyncProfitMarginDataView(APIView):
                 else:
                     updated +=1 
 
-                print("inserted ", inserted ,"updated ", updated )
-
             return Response({
                 "message": f'CEO WORKER Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
                 "status": status.HTTP_201_CREATED
