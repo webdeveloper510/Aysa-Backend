@@ -523,14 +523,16 @@ class TaxSemanticSearchView(APIView):
 class TaxAvenueView(APIView):
     def get(self, request):
         try:
-            #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'Tax_Avoidance.csv')
 
-            if not os.path.exists(input_csv_file_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
-            
+            # Get Data from Tax model
+            tax_data = TaxDataModel.objects.all().values()            
+
+            # Handle no data found
+            if not tax_data :
+                return DATA_NOT_FOUND("No Data found for Tax Tab")
+
             # Read csv 
-            df = pd.read_csv(input_csv_file_path)
+            df = pd.DataFrame(list(tax_data))
 
             # Clean NaN and infinity values
             if not df.empty:
@@ -538,14 +540,14 @@ class TaxAvenueView(APIView):
             
             # Return Response
             return Response({
-                "message": "success" if not df.empty else "failed",
-                "status": status.HTTP_200_OK if not df.empty  else 404, 
+                "message": "Tax Tab Data get successfully ....",
+                "status": status.HTTP_200_OK , 
                 "data": df.to_dict(orient="records") if not df.empty else []
             })
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
+            error_message = f"[ERROR] Failed to get Tax Data error is {str(e)} in line {exc_tb.tb_lineno})"
             print(error_message)
             return Internal_server_response(error_message)
 
@@ -706,14 +708,16 @@ class CEOWorkerSemanticSearchView(APIView):
 class CeoWorkerView(APIView):
     def get(self, request):
         try:
-            #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'Worker_Pay_Gap.csv')
 
-            if not os.path.exists(input_csv_file_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
+            # Get CEO WORKER Data from DATABASE
+            ceo_worker_data = CEOWokrerModel.objects.all().values()
+            
+            # Handle if there is no data found
+            if not ceo_worker_data:
+                return DATA_NOT_FOUND("No Data Found for CEO Worker Tab ")
             
             # Read csv 
-            df = pd.read_csv(input_csv_file_path)
+            df = pd.DataFrame(list(ceo_worker_data))
 
             # Clean NaN and infinity values
             if not df.empty:
@@ -721,8 +725,8 @@ class CeoWorkerView(APIView):
             
             # Return Response
             return Response({
-                "message": "success" if not df.empty else "failed",
-                "status": status.HTTP_200_OK if not df.empty  else 404, 
+                "message": "CEO Worker Tab Data get successfully ....",
+                "status": status.HTTP_200_OK , 
                 "data": df.to_dict(orient="records") if not df.empty else []
             })
             
