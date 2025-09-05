@@ -297,7 +297,7 @@ class GetProfitMarginData(APIView):# #""
     def get(self,format=None):
         try:
             #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
+            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margin_merge.csv')
             if not os.path.exists(input_csv_file_path):
                 return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
             
@@ -888,7 +888,7 @@ class SyncProfitMarginDataView(APIView):
                     updated +=1 
 
             return Response({
-                "message": f'CEO WORKER Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
+                "message": f'Profit Margin  Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
                 "status": status.HTTP_201_CREATED
             })
 
