@@ -44,27 +44,28 @@ class ProductTrainPipeline(APIView):
             # Vector Database dir path
             Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "Profit_Margin")
             os.makedirs(Emedding_dir_path , exist_ok=True)
-
-            #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margins.csv')
-            if not os.path.exists(input_csv_file_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
             
             # Transformer model 
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
             os.makedirs(TransferModelDir , exist_ok=True)
             
             # Call function to train model with all rows
-            model_response = AllProductDetailMain(input_csv_file_path, Emedding_dir_path, TransferModelDir)
+            model_response = AllProductDetailMain(Emedding_dir_path, TransferModelDir)
+
+            # Handle when empty list comes
+            if isinstance(model_response , list) and not model_response:
+                return DATA_NOT_FOUND("No Data found for Profit Margin Data Tab")
+
+            # Handle when error message come
+            elif isinstance(model_response , str):
+                return Internal_server_response(model_response)
             
-            if model_response is None:
-                return Response({"message": "Failed","status": status.HTTP_500_INTERNAL_SERVER_ERROR})
-
-            return Response({
-                "message": model_response,
-            }, status=status.HTTP_200_OK)
-        
-
+            elif isinstance(model_response , pd.DataFrame):
+                return Response({
+                "message": "Model Trained successfully with Profit Margin Data ",
+                "status": status.HTTP_200_OK
+                })
+            
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
@@ -207,8 +208,8 @@ class ProductSemanticSearchView(APIView):
                 
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
-            print()
+            #print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
+            #print()
 
              # Filter out dataframe if similarity score greater than threshold Value
             Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
@@ -238,8 +239,8 @@ class ProductSemanticSearchView(APIView):
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
 
-            print("Product_Category_df : \n", Product_Category_df)
-            print()
+            #print("Product_Category_df : \n", Product_Category_df)
+            #print()
 
             # Return Response if only matched row dataframe is true
             if Product_Category_df.empty:
@@ -247,8 +248,8 @@ class ProductSemanticSearchView(APIView):
 
             # Function -4
             Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-            print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
-            print()
+            #print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+            #print()
 
             # Return Response if only matched row dataframe is true
             if Product_Yearly_df.empty:
@@ -256,7 +257,7 @@ class ProductSemanticSearchView(APIView):
 
             # Function -5
             Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
-            print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+            #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[50:90])
 
             if Product_Gender_df.empty:
                 return ProductResponse("success",matched_row_json)
@@ -266,22 +267,20 @@ class ProductSemanticSearchView(APIView):
 
             # Function -7 
             filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list)
-    
-            # Handle if filtered datframe return empty list
-            if isinstance(filtered_df , list):
-                return ProductResponse('success', matched_row_json)
-            
-            # Add percentage sign
-            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
-            
+
+            if filtered_df.empty or isinstance(filtered_df , list):
+                print("-- Skipping There is no any compare data found")
 
             # Drop Unneccessary columns if it filtered_df is dataframe
             if isinstance(filtered_df , pd.DataFrame) and not filtered_df.empty:
                 filtered_df = filtered_df.drop(columns=["text","similarity_score", "text_embedding", "brand_embedding", "brand"],  errors="ignore")      # remove unneccessary dataframe
 
+            #Add percentage sign
+            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
+ 
             # Merge bot dataframe
             merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
-
+            
             # Only return three product in API
             if len(merge_df) > 3:
                 merge_df = merge_df.iloc[0:3]
@@ -296,7 +295,7 @@ class ProductSemanticSearchView(APIView):
 
 
 # API For get all profit margin data
-class GetProfitMarginData(APIView):# #
+class GetProfitMarginData(APIView):# #""
     def get(self,format=None):
         try:
             #CSV file name
@@ -368,7 +367,6 @@ class TaxDataTrainPipeline(APIView):
             print(error_message)
             return Internal_server_response(error_message)
           
-
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -706,7 +704,6 @@ class CEOWorkerSemanticSearchView(APIView):
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
             return Internal_server_response(error_message)
 
-
 # API For get CEO Worker data
 class CeoWorkerView(APIView):
     def get(self, request):
@@ -839,3 +836,181 @@ class GetProductVisitorCount(APIView):
             print(error_message)
             return Internal_server_response(error_message)
         
+
+""" ###############################          DATABASE API'S       ###################################  """
+class SyncProfitMarginDataView(APIView):
+
+    def get(self, format=None):
+        try:
+            file_path = os.path.join(os.getcwd() , "Data", "profit_margin_merge.csv")    # Make a file path
+
+            # Check if file path is exist or not
+            if not os.path.exists(file_path):
+                return DATA_NOT_FOUND("The path '{file_path}' does not exist.")
+            
+            # READ CSV 
+            df = pd.read_csv(file_path)
+
+            # REMOVE EXTRA SPACES FROM THE COLUMNS
+            df.columns = df.columns.str.strip()
+
+            inserted= 0
+            updated =0
+            
+            #ITERATE THROUGH THE DATAFRAME
+
+            for idx , row_data in df.iterrows():
+                BRAND = row_data.get('Brand')
+                PRODUCT_NAME = row_data.get('Product Name')
+                PRODUCT_TYPE = row_data.get('Product Type')
+                CATEGORY = row_data.get('Category')
+                GENDER = row_data.get('Gender')
+                YEAR = row_data.get('Production Year')
+                PRODUCT_URL = row_data.get('Link to Product Pictures')
+                RELEASE_PRICE = row_data.get('Release Price')
+                PROFIT_MARGIN = row_data.get('Profit Margin')
+                WHOLESALE_PRICE = row_data.get("Wholesale Price")
+               
+                Profit_data_obj , created= ProfitData.objects.get_or_create(
+                        brand = BRAND,
+                        product_name = PRODUCT_NAME,
+                        product_type = PRODUCT_TYPE,
+                        category = CATEGORY,
+                        gender = GENDER,
+                        year = YEAR,
+                        product_url = PRODUCT_URL,
+                        release_price = RELEASE_PRICE,
+                        profit_margin = PROFIT_MARGIN,
+                        wholesale_price = WHOLESALE_PRICE
+                )
+
+                if created:
+                    inserted += 1
+                else:
+                    updated +=1 
+
+                print("inserted ", inserted ,"updated ", updated )
+
+            return Response({
+                "message": f'CEO WORKER Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
+                "status": status.HTTP_201_CREATED
+            })
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to Sync Profit Margin Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
+            print(error_message)
+            return Internal_server_response(error_message)
+        
+
+class SyncTaxDataView(APIView):
+
+    def get(self, request, format=None):
+        try:
+            sync = request.GET.get("sync", "false").lower() == "true"               # GET SYNC value from the query parameter
+            file_path = os.path.join(os.getcwd() , "Data", "Tax_Avoidance.csv")    # Make a file path
+
+            # Check if file path is exist or not
+            if not os.path.exists(file_path):
+                return DATA_NOT_FOUND("The path '{file_path}' does not exist.")
+            
+            # READ CSV 
+            df = pd.read_csv(file_path)
+
+            # REMOVE EXTRA SPACES FROM THE COLUMNS
+            df.columns = df.columns.str.strip()
+
+            inserted= 0
+            updated =0
+            
+            #ITERATE THROUGH THE DATAFRAME
+            ['Company Name', 'Year', 'Taxes Paid', 'Taxes Avoided']
+
+            for idx , row_data in df.iterrows():
+                COMPANY_NAME = row_data.get('Company Name')
+                YEAR = row_data.get('Year')
+                TAXES_PAID = row_data.get('Taxes Paid')
+                TAXES_AVOIDED = row_data.get('Taxes Avoided')
+               
+               
+                Tax_data_obj , created= TaxDataModel.objects.get_or_create(
+                        company_name = COMPANY_NAME,
+                        Year = YEAR,
+                        taxes_paid = TAXES_PAID,
+                        taxes_avoided = TAXES_AVOIDED,
+                )
+
+                if created:
+                    inserted += 1
+                else:
+                    updated +=1 
+
+                print("inserted ", inserted ,"updated ", updated )
+
+            return Response({
+                "message": f'Tax Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
+                "status": status.HTTP_201_CREATED
+            })
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to Sync Tax Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
+            print(error_message)
+            return Internal_server_response(error_message)
+        
+
+class SyncCEOWorkerDataView(APIView):
+
+    def get(self, request, format=None):
+        try:
+            sync = request.GET.get("sync", "false").lower() == "true"               # GET SYNC value from the query parameter
+            file_path = os.path.join(os.getcwd() , "Data", "Worker_Pay_Gap.csv")    # Make a file path
+
+            # Check if file path is exist or not
+            if not os.path.exists(file_path):
+                return DATA_NOT_FOUND("The path '{file_path}' does not exist.")
+            
+            # READ CSV 
+            df = pd.read_csv(file_path)
+
+            # REMOVE EXTRA SPACES FROM THE COLUMNS
+            df.columns = df.columns.str.strip()
+
+            inserted= 0
+            updated =0
+            
+            #ITERATE THROUGH THE DATAFRAME
+
+            for idx , row_data in df.iterrows():
+                COMPANY_NAME = row_data.get('Company Name')
+                YEAR = row_data.get('Year')
+                CEO_NAME = row_data.get('CEO Name')
+                CEO_TOTAL_COMPENSATION = row_data.get('CEO Total Compensation')
+                WORKER_SALARY = row_data.get('Frontline Worker Salary')
+               
+               
+                Tax_data_obj , created= CEOWokrerModel.objects.get_or_create(
+                        company_name = COMPANY_NAME,
+                        year = YEAR,
+                        ceo_name = CEO_NAME,
+                        ceo_total_compensation = CEO_TOTAL_COMPENSATION,
+                        worker_salary = WORKER_SALARY
+                )
+
+                if created:
+                    inserted += 1
+                else:
+                    updated +=1 
+
+                print("inserted ", inserted ,"updated ", updated )
+
+            return Response({
+                "message": f'CEO WORKER Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
+                "status": status.HTTP_201_CREATED
+            })
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to Sync CEO WORKER Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
+            print(error_message)
+            return Internal_server_response(error_message)

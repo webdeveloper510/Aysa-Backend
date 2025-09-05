@@ -19,7 +19,12 @@ urlpatterns = [
     # URL OF TRACK VISITOR
     path("count-value/", GetProductVisitorCount.as_view()),
     path("admin-login", AdminAuthenticationView.as_view()),
-    path("auth-check", TokenProtectedView.as_view())
+    path("auth-check", TokenProtectedView.as_view()),
     
+    # RDS API"S 
+    path("sync-profit-margin-data", SyncProfitMarginDataView.as_view()),
+    path("sync-tax-data", SyncTaxDataView.as_view()),
+    path("sync-ceo-worker-data", SyncCEOWorkerDataView.as_view())
+
     ]
 

@@ -1,39 +1,24 @@
-import pandas as pd
-import numpy as np
 import sys
 import os
 import torch
-import joblib
+import pandas as pd
+from .models import *
 from sentence_transformers import SentenceTransformer , util
-from sklearn.metrics import silhouette_score
-from sklearn.cluster import KMeans
 from .utils import preprocess_text
 from .type_mapping import *
 from sklearn.preprocessing import LabelEncoder
+from .response import *
 le = LabelEncoder()
 
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-gender_map = {
-"Women": "Women",
-"Female": "Women",
-"Men": "Men",
-"male": "Men",
-"Unisex": "Unisex",
-"Unixes": "Unisex",
-"Kids": "Kids",
-"Boys": "Kids",
-"Girls": "Kids",
-"Baby": "Kids",
-"Babies": "Kids",
-}
+
 
 
 class ProductModelStructure:
 
-    def __init__(self, csv_path):
-        self.csv_path = csv_path
+    def __init__(self):
         self.max_range = 20
         self.random_state_value = 42
         self.device= torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -53,54 +38,79 @@ class ProductModelStructure:
 
         return model
 
-    def read_csv(self):
-        print("Step 1: Reading CSV file ....")
+    def DataAugmentation(self):
+        print("Step 1: Data Augmentation and Create Dataframe ....")
         try:
-            df = pd.read_csv(self.csv_path)
-            # remove space from the columns name
-            df.columns = df.columns.str.strip()
-
-            # Drop Unneccsary columns
-            if "Unnamed: 8" in df.columns:
-                df = df.drop("Unnamed: 8", axis=1)
             
+            # GET PROFIT MARGIN DATA FROM THE PROFIT DATA MODEL
+            profit_margin_data = ProfitData.objects.all().values()
 
-            # Make correction of gender column 
-            df['Gender'] = df['Gender'].fillna('Unisex') # Fill nan values with Unisex which is used for both
-            df['Gender'] = df['Gender'].astype(str).str.strip().map(gender_map) # Map gender columns with gender map dictionary 
+            if not profit_margin_data :
+                return []
+            
+            # CREATE A DATAFRAME
+            df = pd.DataFrame(list(profit_margin_data))
+
+            # REMOVE EXTRA SPACE FROM DATABASE
+            df.columns = df.columns.str.strip()
+            
+            # REMOVE EXTRA COLUMNS FROM THE DATAFRAME
+            if "id"  in df.columns.str.strip():
+                df = df.drop("id", axis=1)
+
+
+            rename_columns_dict ={
+                'brand' : "Brand",
+                'product_name' : "Product Name",
+                'product_type' : "Product Type",
+                'category' : "Category",
+                'gender' : "Gender",
+                'year' : "Production Year",
+                'product_url' : "Link to Product Pictures",
+                'release_price' : "Release Price",
+                'profit_margin' : "Profit Margin",
+                'wholesale_price' : "Wholesale Price",
+
+            } 
+
+            # RENAME DATAFRAME COLUMNS
+            df = df.rename(columns=rename_columns_dict)
+            
+            # MAKE CORRECTION OF WHOLESALE PRICE COLUMN
+            df["Wholesale Price"] = df["Wholesale Price"].astype(str).str.replace("nan", "0")
+
+            #Make correction of gender column 
+            df["Gender"] = df["Gender"].fillna("Unisex").astype(str).str.strip()
+            df["Gender"] = df["Gender"].map(gender_map).fillna("Unisex")
 
             # remove only rows which have no product Name
             df = df.dropna(subset=['Product Name']) 
-            df.drop_duplicates(inplace=True) # Remove duplicacy from dataframe
+            df.drop_duplicates(inplace=True) # Remove duplicacy from dataframe  
 
-            # Remove extra spaces from the smartphone
-            df["Product Type"] = df["Product Type"].str.strip()
-
-            # Map typed 
-            # Combine two dictionaries
-            combined_map = {**makeup_variant_map, **skincare_variant_map, **bodycare_variant_map, **car_variant_map, **womens_outfit_varient_map , **scent_varient_map}
+            #MAP dictionaries
+            combined_map = {
+                **makeup_variant_map,
+                **skincare_variant_map,
+                **bodycare_variant_map,
+                **car_variant_map,
+                **womens_outfit_varient_map,
+                **scent_varient_map
+            }
             df["Type Mapped"] = df["Product Type"].map(combined_map).fillna(df["Category"])
-
-            # create csv
-            #df.to_csv("sample.csv", index=False)
-
-            #filtered_df = df.loc[df["Category"] =="Sunglasses"]
-            #print("filtered_df : \n ",filtered_df["Product Type"].unique().tolist())
 
             # remove nan values
             df.dropna(inplace=True)
-
-            # remove duplicacy 
             df.drop_duplicates(inplace=True)
+
+            if df.empty:
+                return []
 
             return df
         
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
-            error_message = f"Faile to read csv file and clean categories , error occur {str(e)} in line no : {exc_tb.tb_lineno}"
-            print(error_message)
-            return []
-
+            error_message = f"[ERROR] Failed to Data Augmentation , error occur {str(e)} in line no : {exc_tb.tb_lineno}"
+            return error_message
 
     # function to create new column with name 'text' only used 'product name' and 'type' column .
     def preprocess_text_data(self, df):
@@ -121,12 +131,11 @@ class ProductModelStructure:
         
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
-            error_message = f"Failed preprocess text  , error occur {str(e)} in line no : {exc_tb.tb_lineno}"
-            print(error_message)
-            return []
+            error_message = f"[ERROR] Failed to Preprocess Text  , error occur {str(e)} in line no : {exc_tb.tb_lineno}"
+            return error_message
 
     def apply_kmeans(self, df, embedding_dir_path):
-        print(f"Step 3: Text Embedding is starting ........")
+        print(f"Step 3: Start to Implement Embedding on Text ........")
         try:
 
             # make a model path 
@@ -147,38 +156,38 @@ class ProductModelStructure:
             # Save dataframe on pickle file
             df.to_pickle(full_text_embedding_path)
             print( f"Full Embedding DataFrame saved to {full_text_embedding_path}")
-
-            return "success"
+            return df
         
         except Exception as e:
-            raise Exception(f"KMeans clustering failed: {e}")
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to Implement Embedding , error occur {str(e)} in line no : {exc_tb.tb_lineno}"
+            return error_message
         
 
-def AllProductDetailMain(file_path, embedding_dir_path , TransferModelDir):
+def AllProductDetailMain(embedding_dir_path , TransferModelDir):
     try:
-        product_structure = ProductModelStructure(file_path)
-        
+        product_structure = ProductModelStructure()        
         # call function to upload or run local model 
         model = product_structure.DownloadUpdateModel(TransferModelDir)
 
         # function to read csv and remove duplicacy and nan values
-        df = product_structure.read_csv()
-        if isinstance(df, list): 
-            return None
+        dataframe  = product_structure.DataAugmentation()
 
+        if isinstance(dataframe , list) or isinstance(dataframe, str):
+            return dataframe
+            
         # Get cleaned df 
-        cleaned_df = product_structure.preprocess_text_data(df)
-        if isinstance(cleaned_df, list): 
-            return None
+        cleaned_df = product_structure.preprocess_text_data(dataframe)
+        if isinstance(cleaned_df, str): 
+            return cleaned_df
         
-        response = product_structure.apply_kmeans(cleaned_df, embedding_dir_path)
-
-        return response     
+        Embedding_Df_response = product_structure.apply_kmeans(cleaned_df, embedding_dir_path)
+        return Embedding_Df_response
 
     except Exception as e:
-        error_message = f" Failed to process product model structure: {e}"
-        print(error_message)
-        return None
+        exc_type , exc_obj , exc_tb = sys.exc_info()
+        error_message = f"[ERROR] Failed to Data Augmentation , error occur {str(e)} in line no : {exc_tb.tb_lineno}"
+        return error_message
 
 
 

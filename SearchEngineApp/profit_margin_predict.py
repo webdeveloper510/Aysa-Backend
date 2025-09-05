@@ -288,6 +288,5 @@ class ProfitMarginPreidction:
 
             filtered_df = filtered_df[(filtered_df['Brand'].str.strip() == brand_name) & 
                                     (filtered_df['Profit Margin'].astype(float) == profit_margin)]
-
         return filtered_df
 

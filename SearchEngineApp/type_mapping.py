@@ -1,3 +1,17 @@
+gender_map = {
+        "Women": "Women",
+        "Female": "Women",
+        "Men": "Men",
+        "male": "Men",
+        "Unisex": "Unisex",
+        "Unixes": "Unisex",
+        "Kids": "Kids",
+        "Boys": "Kids",
+        "Girls": "Kids",
+        "Baby": "Kids",
+        "Babies": "Kids",
+    }
+
 smartphone_variant_map = {
     # --- Base / Entry-level ---
     # Apple iPhone
@@ -213,7 +227,6 @@ makeup_variant_map = {
     'Nail Colour': 'Nail Colour',
 }
 
-
 skincare_variant_map = {
     'Cream' : 'Skincare',
     'Moisture' : 'Skincare',
@@ -322,7 +335,6 @@ car_variant_map = {
     'Mini Bagvan': 'Cars',
     'Midsize Crossover': 'Cars',
 }
-
 
 scent_varient_map = {
 
