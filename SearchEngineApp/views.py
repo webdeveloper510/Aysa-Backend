@@ -71,7 +71,6 @@ class ProductTrainPipeline(APIView):
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
             return Internal_server_response(error_message)
 
-
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
 
@@ -292,7 +291,6 @@ class ProductSemanticSearchView(APIView):
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
             print(error_message)
             return Internal_server_response(error_message)
-
 
 # API For get all profit margin data
 class GetProfitMarginData(APIView):# #""
