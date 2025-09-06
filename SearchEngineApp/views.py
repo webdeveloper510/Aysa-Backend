@@ -533,6 +533,14 @@ class TaxAvenueView(APIView):
 
             # Read csv 
             df = pd.DataFrame(list(tax_data))
+            
+            # Rename columns 
+            df = df.rename(columns={
+                "company_name": "Company Name",
+                "year": "Year",
+                "taxes_paid": "Taxes Paid",
+                "taxes_avoided": "Taxes Avoided",
+            })
 
             # Clean NaN and infinity values
             if not df.empty:
