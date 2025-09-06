@@ -719,6 +719,16 @@ class CeoWorkerView(APIView):
             # Read csv 
             df = pd.DataFrame(list(ceo_worker_data))
 
+            # Rename columns 
+            df = df.rename(columns={
+                "company_name": "Company Name",
+                "year": "Year",
+                "ceo_name": "CEO Name",
+                "company_name": "Company Name",
+                "ceo_total_compensation": "CEO Total Compensation",
+                "worker_salary": "Frontline Worker Salary",
+
+            })
             # Clean NaN and infinity values
             if not df.empty:
                 df.dropna(inplace=True)
