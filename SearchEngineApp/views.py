@@ -631,7 +631,6 @@ class CEOWorkerSemanticSearchView(APIView):
 
             # RENAME COLUMN
             df = df.rename(columns={'frontline_text_embedding': 'tax_text_embedding'})
-            print("CEO WORKER ", df.columns.tolist())
 
             # make a copy of original dataframe
             original_df = df.copy()
@@ -1032,3 +1031,144 @@ class SyncCEOWorkerDataView(APIView):
             error_message = f"[ERROR] Failed to Sync CEO WORKER Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
             print(error_message)
             return Internal_server_response(error_message)
+        
+
+"""     ###################################           GLOBAL API'S                    ###############################       """
+
+class GlobalSearchAPIView(APIView):
+
+    # function to filter tax data based on the brand name and year
+    def Filter_Tax_Data(self,brand_name: str , year: int)-> list:
+
+        # Tax Embedding DF Path
+        tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
+        tax_df = pd.read_pickle(tax_embedding_df_path)
+
+        # Filtered Df
+        filtered_tax_df = tax_df.loc[
+            (tax_df["Company Name"].str.lower().str.strip() == brand_name)&
+            (tax_df["Year"].astype(int) == year)
+        ]   
+
+        # Drop Unneccessary columns
+        filtered_tax_df = filtered_tax_df.drop(columns=['tax_text_embedding','text'],axis=1)
+
+        # Convert into json
+        json_output = filtered_tax_df.to_dict(orient="records")
+
+        return json_output
+    
+    # function to filter ceo worker data based on the brand name and year
+    def Filter_CeoWorker_Data(self,brand_name: str , year: int)-> list:
+        
+        # CEO Worker  Embedding DF Path
+        Ceo_worker_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_worker_embedding.pkl")
+        ceo_worker_df = pd.read_pickle(Ceo_worker_embedding_df_path)
+
+        # Filtered Df
+        filtered_ceo_worker_df = ceo_worker_df.loc[
+            (ceo_worker_df["Company Name"].str.lower().str.strip() == brand_name)&
+            (ceo_worker_df["Year"].astype(int) == year)
+        ]   
+        
+        # Drop Unneccessary columns
+        filtered_ceo_worker_df = filtered_ceo_worker_df.drop(columns=['frontline_text_embedding','text'],axis=1)
+        
+        # Convert into json
+        json_output = filtered_ceo_worker_df.to_dict(orient="records")
+
+        return json_output
+
+
+    def post(self,request, format=None):
+        try:
+            # Get Query from User
+            user_query = request.data.get("query")
+            
+            # Handle If query key is empty...
+            if not user_query:
+                return Response({
+                    "message": "Please provide your question using the 'query' key." 
+                })
+            
+            # Import Base url from the setting file
+            from SearchMind.settings import BASE_URL
+            import requests
+
+            # Payload data
+            data = {"query":user_query , "tab_type": "profit"}
+            headers = {
+                "content_type": "application/json"
+            }
+
+            # API URL
+            url = f"{BASE_URL}/product-semantic-search"
+            print(f"Api is hitting on url: {url}")
+
+            response = requests.post(url , json= data , headers=headers)
+
+            # Check if response status is 200
+            if response.status_code ==200:
+                
+                # Get response data.
+                response_text = response.text
+
+                # Handle if output json type is string
+                if isinstance(response_text , str):
+                    import ast
+                    response_text = ast.literal_eval(response_text)
+                
+                # Get data response
+                response_status = response_text["status"]
+                if response_status == 200:
+                    
+                    # Get json data 
+                    json_data = response_text["data"]
+                    
+                    # check if json data length is true
+                    if len(json_data) > 0:
+
+                        # get first matched data row
+                        matched_row = json_data[0]
+
+
+                        Brand_name = str(matched_row["Brand"]).lower().strip()# Brand name
+                        Year = int(matched_row["Production Year"]) # Year
+
+                        # Filter OUT Tax Data
+                        tax_data_json = self.Filter_Tax_Data(Brand_name, Year)
+                        ceo_worker_data = self.Filter_CeoWorker_Data(Brand_name, Year)
+
+                      
+                        return Response({
+                            "message": "success",
+                            "status": 200,
+                            "data": response_text["data"],
+                            "tax_data": tax_data_json,
+                            "ceo_worker_data": ceo_worker_data
+
+                        })
+
+                    # Return bad response if no data found
+                    else:
+                        return Response({
+                            "message": "Data not found",
+                            "status": 404
+                        }, status=status.HTTP_404_NOT_FOUND)
+                    
+                else:
+                    return Response({
+                        "message": response_text["message"],
+                        "status": response_status
+                    }, status=response_status)
+                
+            else :
+                return Response({
+                    "message": 'Bad request'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] , Failed to Read Gloabl search Query, error occur is : {str(e)} in line no : {exc_tb.tb_lineno}"
+            print(error_message)
+            return error_message
+

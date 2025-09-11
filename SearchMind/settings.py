@@ -35,6 +35,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['api.the-aysa.com','localhost','127.0.0.1']
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -153,3 +154,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+            
+#BASE_URL ="http://127.0.0.1:8000"
+BASE_URL= "https://api.the-aysa.com"

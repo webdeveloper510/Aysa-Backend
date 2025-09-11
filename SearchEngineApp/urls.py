@@ -24,7 +24,9 @@ urlpatterns = [
     # RDS API"S 
     path("sync-profit-margin-data", SyncProfitMarginDataView.as_view()),
     path("sync-tax-data", SyncTaxDataView.as_view()),
-    path("sync-ceo-worker-data", SyncCEOWorkerDataView.as_view())
+    path("sync-ceo-worker-data", SyncCEOWorkerDataView.as_view()),
 
+    # GLOBAL API URLS
+    path("global-search", GlobalSearchAPIView.as_view()),
     ]
 
