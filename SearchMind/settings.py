@@ -156,4 +156,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
             
 #BASE_URL ="http://127.0.0.1:8000"
-BASE_URL= "https://api.the-aysa.com"
+BASE_URL ="https://api.the-aysa.com"
