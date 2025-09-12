@@ -172,7 +172,7 @@ class ProductSemanticSearchView(APIView):
                 return Response({
                     'message':f"{', '.join(missing_fields)}: key is required .",
                     'status':status.HTTP_400_BAD_REQUEST
-                })
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             # get payload value in parameter
             user_query = str(payload.get("query")).lower().strip()
@@ -323,7 +323,7 @@ class GetProfitMarginData(APIView):# #""
                 "message": "success" if not df.empty else "failed",
                 "status": status.HTTP_200_OK if not df.empty  else 404, 
                 "data": df.to_dict(orient="records") if not df.empty else []
-            })
+            }, status = status.HTTP_200_OK if not df.empty  else 404)
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -440,7 +440,6 @@ class TaxSemanticSearchView(APIView):
 
             # Reaf full model and save mode
             df = pd.read_pickle(tax_embedding_df_path)
-            print("TAX DATA ", df.columns.tolist())
 
             original_df = df.copy()
 
@@ -549,9 +548,9 @@ class TaxAvenueView(APIView):
             # Return Response
             return Response({
                 "message": "Tax Tab Data get successfully ....",
-                "status": status.HTTP_200_OK , 
+                "status": status.HTTP_200_OK, 
                 "data": df.to_dict(orient="records") if not df.empty else []
-            })
+            }, status=status.HTTP_200_OK)
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -611,7 +610,7 @@ class CEOWorkerSemanticSearchView(APIView):
                 return Response({
                     'message':f"{', '.join(missing_fields)}: key is required .",
                     'status':status.HTTP_400_BAD_REQUEST
-                })
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             # Take Payload query value in parameter
             user_query = payload.get("query")
@@ -659,10 +658,9 @@ class CEOWorkerSemanticSearchView(APIView):
                     serached_df = pd.DataFrame([MatchedRow])
                     
                     #print("serached_df : \n ", serached_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
-                    
                     serached_df = serached_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"])
                     
-                    return ProductResponse("Success",serached_df.to_dict(orient="records"))
+                    return ProductResponse("success",serached_df.to_dict(orient="records"))
                 
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
@@ -697,15 +695,11 @@ class CEOWorkerSemanticSearchView(APIView):
                     if len(sorted_df) > 4:
                         sorted_df = sorted_df.iloc[0:4]
 
-                    return ProductResponse("Success",sorted_df.to_dict(orient="records"))
+                    return ProductResponse("success",sorted_df.to_dict(orient="records"))
                 
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
                     return DATA_NOT_FOUND('DATA NOT FOUND')
-
-
-           
-
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occur Reason: {str(e)} (line {exc_tb.tb_lineno})"
@@ -745,7 +739,7 @@ class CeoWorkerView(APIView):
                 "message": "CEO Worker Tab Data get successfully ....",
                 "status": status.HTTP_200_OK , 
                 "data": df.to_dict(orient="records") if not df.empty else []
-            })
+            }, status=status.HTTP_200_OK)
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
