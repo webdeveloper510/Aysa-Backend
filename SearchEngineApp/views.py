@@ -627,6 +627,10 @@ class CEOWorkerSemanticSearchView(APIView):
 
             # Reaf full model and save mode
             df = pd.read_pickle(ceo_worker_embedding_df_path)
+            
+            # Remove Unnamed: 0 columns
+            if  'Unnamed: 0' in df.columns:
+                df = df.drop("Unnamed: 0", axis=1)
 
             # RENAME COLUMN
             df = df.rename(columns={'frontline_text_embedding': 'tax_text_embedding'})
