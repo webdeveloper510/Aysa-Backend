@@ -1059,20 +1059,28 @@ class GlobalSearchAPIView(APIView):
         return json_output
     
     # function to filter ceo worker data based on the brand name and year
-    def Filter_CeoWorker_Data(self,brand_name: str , year: int)-> list:
+    def Filter_CeoWorker_Data(self,device_type : str ,brand_name: str , year: int)-> list:
         
         # CEO Worker  Embedding DF Path
-        Ceo_worker_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_worker_embedding.pkl")
-        ceo_worker_df = pd.read_pickle(Ceo_worker_embedding_df_path)
+        Ceo_worker_tablet_csv_path= os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Phone_Tablet.csv")
+        Ceo_worker_website_path = os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Website.csv")
+
+        # Read CSV
+        tablet_df = pd.read_csv(Ceo_worker_tablet_csv_path)
+        website_df = pd.read_csv(Ceo_worker_website_path)
+
+        # Take Empty dataframe
+        df = pd.DataFrame()
+        if device_type =="mobile":
+            df = tablet_df
+        else:
+            df = website_df
 
         # Filtered Df
-        filtered_ceo_worker_df = ceo_worker_df.loc[
-            (ceo_worker_df["Company Name"].str.lower().str.strip() == brand_name)&
-            (ceo_worker_df["Year"].astype(int) == year)
+        filtered_ceo_worker_df = df.loc[
+            (df["Company Name"].str.lower().str.strip() == brand_name)&
+            (df["Year"].astype(int) == year)
         ]   
-        
-        # Drop Unneccessary columns
-        filtered_ceo_worker_df = filtered_ceo_worker_df.drop(columns=['frontline_text_embedding','text'],axis=1)
         
         # Convert into json
         json_output = filtered_ceo_worker_df.to_dict(orient="records")
@@ -1083,20 +1091,34 @@ class GlobalSearchAPIView(APIView):
     def post(self,request, format=None):
         try:
             # Get Query from User
-            user_query = request.data.get("query")
+            required_field =["query", "device_type"]
+
+            # get payload
+            payload = request.data
+            missing_fields = [ field for field in required_field if payload.get(field) is None or not payload.get(field)]
             
-            # Handle If query key is empty...
-            if not user_query:
+            if missing_fields:
                 return Response({
-                    "message": "Please provide your question using the 'query' key." 
-                })
+                    "message": f'{", ".join(missing_fields)} key is required. ',
+                    "status": 400,
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            device_type =str(payload.get("device_type")).lower().strip()
+
+            if device_type not in ["mobile", "desktop"]:
+                return Response({
+                    "message": "Invalid device type , Please choose one from them ['mobile' , 'desktop']" ,
+                    "status": 400,
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             # Import Base url from the setting file
             from SearchMind.settings import BASE_URL
             import requests
 
+
             # Payload data
-            data = {"query":user_query , "tab_type": "profit"}
+            data = {"query":payload.get("query") , "tab_type": "profit"}
             headers = {
                 "content_type": "application/json"
             }
@@ -1137,15 +1159,14 @@ class GlobalSearchAPIView(APIView):
 
                         # Filter OUT Tax Data
                         tax_data_json = self.Filter_Tax_Data(Brand_name, Year)
-                        ceo_worker_data = self.Filter_CeoWorker_Data(Brand_name, Year)
+                        ceo_worker_data = self.Filter_CeoWorker_Data(device_type ,Brand_name, Year)
 
-                      
                         return Response({
                             "message": "success",
                             "status": 200,
                             "data": response_text["data"],
-                            "tax_data": tax_data_json,
-                            "ceo_worker_data": ceo_worker_data
+                            "tax_data": tax_data_json if tax_data_json else [],
+                            "ceo_worker_data": ceo_worker_data if ceo_worker_data else []
 
                         })
 
