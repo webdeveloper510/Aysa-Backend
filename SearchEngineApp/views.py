@@ -296,8 +296,9 @@ class ProductSemanticSearchView(APIView):
             # Function -7 
             filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list)
 
-            if filtered_df.empty or isinstance(filtered_df , list):
+            if isinstance(filtered_df , list):
                 print("-- Skipping There is no any compare data found")
+                return ProfitProductResponse('success', searched_df.to_dict(orient="records"), [])
 
             # Drop Unneccessary columns if it filtered_df is dataframe
             if isinstance(filtered_df , pd.DataFrame) and not filtered_df.empty:
@@ -672,7 +673,6 @@ class CEOWorkerSemanticSearchView(APIView):
             tax_obj = TaxSemanticSearchView()
 
             df = pd.DataFrame()
-
             # Reaf PHONE DATAFRAME
             if device_type =="mobile":
                 df = pd.read_pickle(ceo_phone_embedding_df_path)
