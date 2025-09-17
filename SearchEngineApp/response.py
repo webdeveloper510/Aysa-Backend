@@ -14,11 +14,12 @@ def Success_RESPONSE(query, result_dict):
         "status": status.HTTP_200_OK
     }, status= status.HTTP_200_OK)
 
-def ProductResponse(message , final_data):
+def ProductResponse(message , final_data, CEO_DATA):
     return Response({
         "message": message ,
         "status": status.HTTP_200_OK if message =='success' else 404,
-        "data": final_data
+        "data": final_data, 
+        'ceo_worker_data': CEO_DATA
     }, status=status.HTTP_200_OK if message =='success' else 404)
 
 def Internal_server_response(message: str):
