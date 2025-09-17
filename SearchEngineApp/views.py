@@ -595,19 +595,26 @@ class CEOWorkerTrainPipeline(APIView):
         try:
             # Vector Database dir path
             Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "CEO-Worker")
-            os.makedirs(Emedding_dir_path , exist_ok=True)
+            os.makedirs(Emedding_dir_path , exist_ok=True)          # Make a dir if does not exist
 
             #CSV file name
             File_path = os.path.join(os.getcwd() , "Data", 'Worker_Pay_Gap.csv')
-            if not os.path.exists(File_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {File_path}")
+            # CEO Worker  Embedding DF Path
+            Tablet_File_path= os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Phone_Tablet.csv")
+            Website_File_path = os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Website.csv")
+
+            if not os.path.exists(Tablet_File_path):
+                return DATA_NOT_FOUND(f"File Not Found with Name : {Tablet_File_path}")
+            
+            if not os.path.exists(Website_File_path):
+                return DATA_NOT_FOUND(f"File Not Found with Name : {Website_File_path}")
 
             # Transformer model 
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
             os.makedirs(TransferModelDir , exist_ok=True)
             
             # Call function to train model with all rows
-            CeoworkerModelResponse = CeoWorkerMainFunc(File_path, Emedding_dir_path, TransferModelDir)
+            CeoworkerModelResponse = CeoWorkerMainFunc(Tablet_File_path,Website_File_path , Emedding_dir_path, TransferModelDir)
             
             return Response({
                 "status": status.HTTP_200_OK,
@@ -623,16 +630,6 @@ class CEOWorkerTrainPipeline(APIView):
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    def filter_ceo_worker(self ,df):  
-        # CEO Worker  Embedding DF Path
-        Ceo_worker_tablet_csv_path= os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Phone_Tablet.csv")
-        Ceo_worker_website_path = os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Website.csv")
-
-        # Read CSV
-        tablet_df = pd.read_csv(Ceo_worker_tablet_csv_path)
-        website_df = pd.read_csv(Ceo_worker_website_path)
-
 
     def post(self , request , format=None):
         try:
@@ -663,25 +660,31 @@ class CEOWorkerSemanticSearchView(APIView):
             # Take Payload query value in parameter
             user_query = payload.get("query")
 
-            # Define paths
-            ceo_worker_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_worker_embedding.pkl")
-            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
-            
+            # Paths 
+            ceo_phone_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_phone_embedding.pkl")
+            ceo_desktop_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_desktop_embedding.pkl")
+
             # Load model
+            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
             model = SentenceTransformer(transfer_model_path)
 
             # MAKE OBJECT OF TAX SEMANTIC SEARCH CLASS FUNCTION 
             tax_obj = TaxSemanticSearchView()
 
-            # Reaf full model and save mode
-            df = pd.read_pickle(ceo_worker_embedding_df_path)
-            
+            df = pd.DataFrame()
+
+            # Reaf PHONE DATAFRAME
+            if device_type =="mobile":
+                df = pd.read_pickle(ceo_phone_embedding_df_path)
+                df = df.rename(columns={'phone_text_embedding': 'tax_text_embedding', 'phone_text': 'text'})
+
+            else:
+                df = pd.read_pickle(ceo_desktop_embedding_df_path)
+                df = df.rename(columns={'desktop_text_embedding': 'tax_text_embedding','desktop_text': 'text'})
+
             # Remove Unnamed: 0 columns
             if  'Unnamed: 0' in df.columns:
                 df = df.drop("Unnamed: 0", axis=1)
-
-            # RENAME COLUMN
-            df = df.rename(columns={'frontline_text_embedding': 'tax_text_embedding'})
 
             # make a copy of original dataframe
             original_df = df.copy()
@@ -718,9 +721,7 @@ class CEOWorkerSemanticSearchView(APIView):
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
                     return DATA_NOT_FOUND('DATA NOT FOUND')
-              
             else:
-                
                 # Add new column
                 MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , df , TAX_CEO_WORKER_SIMILARITY)
 
@@ -747,7 +748,6 @@ class CEOWorkerSemanticSearchView(APIView):
                     # IF LENGTH OF THE SORTED DATAFRAME GET ONLY FIRST 4 ROWS
                     if len(sorted_df) > 4:
                         sorted_df = sorted_df.iloc[0:4]
-
 
                     return ProductResponse("success",sorted_df.to_dict(orient="records"))
                 

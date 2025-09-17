@@ -17,8 +17,9 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 class CeoWorkerModelStructure:
 
-    def __init__(self, csv_path):
-        self.csv_path = csv_path
+    def __init__(self, Tablet_File_path, Website_File_path):
+        self.phone_csv_path  = Tablet_File_path
+        self.Website_File_path  = Website_File_path
         self.max_range = 20
         self.random_state_value = 42
         self.device= torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -42,14 +43,16 @@ class CeoWorkerModelStructure:
     def read_csv(self):
         print("Step 1: Reading CSV file ....")
         try:
-            df = pd.read_csv(self.csv_path)
-            # remove nan values
-            df.dropna(inplace=True)
+            # Read Phone/Tablet CSV
+            tablet_df = pd.read_csv(self.phone_csv_path)
+            tablet_df.dropna(inplace=True)
+            tablet_df.drop_duplicates(inplace=True)
 
-            # remove duplicacy 
-            df.drop_duplicates(inplace=True)
-
-            return df
+            # Read website CSV
+            website_df = pd.read_csv(self.Website_File_path)
+            website_df.dropna(inplace=True)
+            website_df.drop_duplicates(inplace=True)
+            return tablet_df , website_df
         
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
@@ -58,21 +61,24 @@ class CeoWorkerModelStructure:
             return []
 
     # function to create new column with name 'text' only used 'product name' and 'type' column .
-    def preprocess_text_data(self, df):
+    def preprocess_text_data(self,tablet_df , website_df):
         
         print("Step 2: Text Preprocessing is running ......")
         try:
 
             # make a copy of dataframe
-            df = df.copy()
+            phone_df = tablet_df.copy()
+            desktop_df = website_df.copy()
 
             # Add two column with different columns groups
-            df["text"] = (df["Company Name"] +" " +df["Year"].astype(str) +" " +df["CEO Name"].astype(str))
-
             # Apply preprocess columns on both column
-            df["text"] = df["text"].apply(preprocess_text)
+            phone_df["phone_text"] = (phone_df["Company Name"] +" " +phone_df["Year"].astype(str) +" " +phone_df["CEO Name"].astype(str))
+            phone_df["phone_text"] = phone_df["phone_text"].apply(preprocess_text)
 
-            return df
+            desktop_df["desktop_text"] = (desktop_df["Company Name"] +" " +desktop_df["Year"].astype(str) +" " +desktop_df["CEO Name"].astype(str))
+            desktop_df["desktop_text"] = desktop_df["desktop_text"].apply(preprocess_text)
+
+            return phone_df , desktop_df
         
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
@@ -80,26 +86,23 @@ class CeoWorkerModelStructure:
             print(error_message)
             return []
 
-    def apply_kmeans(self, df, embedding_dir_path):
+    def apply_kmeans(self,phone_df, desktop_df, embedding_dir_path, model):
         print(f"Step 3: Text Embedding is starting ........")
         try:
 
-            # make a model path 
-            transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
+            # Phone Tablet Embedding
+            phone_embeddings_full_text = model.encode(phone_df['phone_text'].tolist(), show_progress_bar=True)
+            phone_df["phone_text_embedding"] = list(phone_embeddings_full_text)
+            full_text_embedding_path = os.path.join(embedding_dir_path,"ceo_phone_embedding.pkl")
+            phone_df.to_pickle(full_text_embedding_path)
+            print( f"CEO Worker Phone / Tablet DataFrame saved to {full_text_embedding_path}")
 
-            # Load sentence transer model
-            model = SentenceTransformer(transfer_model_path)
-
-            embeddings_full_text = model.encode(df['text'].tolist(), show_progress_bar=True)
-
-            df["frontline_text_embedding"] = list(embeddings_full_text)
-
-            # save embedding df
-            full_text_embedding_path = os.path.join(embedding_dir_path,"ceo_worker_embedding.pkl")
-
-            # Save dataframe on pickle file
-            df.to_pickle(full_text_embedding_path)
-            print( f"CEO Worker Frontline Embedding DataFrame saved to {full_text_embedding_path}")
+            # Phone Tablet Embedding
+            desktop_embeddings_full_text = model.encode(desktop_df['desktop_text'].tolist(), show_progress_bar=True)
+            desktop_df["desktop_text_embedding"] = list(desktop_embeddings_full_text)
+            full_text_embedding_path = os.path.join(embedding_dir_path,"ceo_desktop_embedding.pkl")
+            desktop_df.to_pickle(full_text_embedding_path)
+            print( f"CEO Worker Website  DataFrame saved to {full_text_embedding_path}")
 
             return "success"
         
@@ -107,24 +110,24 @@ class CeoWorkerModelStructure:
             raise Exception(f"KMeans clustering failed: {e}")
         
 
-def CeoWorkerMainFunc(file_path, embedding_dir_path , TransferModelDir):
+def CeoWorkerMainFunc(Tablet_File_path ,Website_File_path, embedding_dir_path , TransferModelDir):
     try:
-        product_structure = CeoWorkerModelStructure(file_path)
+        product_structure = CeoWorkerModelStructure(Tablet_File_path, Website_File_path)
         
         # call function to upload or run local model 
         model = product_structure.DownloadUpdateModel(TransferModelDir)
 
         # function to read csv and remove duplicacy and nan values
-        df = product_structure.read_csv()
-        if isinstance(df, list): 
+        tablet_df , website_df  = product_structure.read_csv()
+        if isinstance(tablet_df, list) or isinstance(website_df, list): 
             return None
 
         # Get cleaned df 
-        cleaned_df = product_structure.preprocess_text_data(df)
-        if isinstance(cleaned_df, list): 
+        cleaned_phone_df , cleaned_desktop_df= product_structure.preprocess_text_data(tablet_df ,website_df)
+        if isinstance(cleaned_phone_df, list) or isinstance(cleaned_desktop_df ,list): 
             return None
         
-        response = product_structure.apply_kmeans(cleaned_df, embedding_dir_path)
+        response = product_structure.apply_kmeans(cleaned_phone_df,cleaned_desktop_df,  embedding_dir_path, model)
 
         return response     
 
