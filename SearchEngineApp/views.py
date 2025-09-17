@@ -624,11 +624,21 @@ class CEOWorkerTrainPipeline(APIView):
 class CEOWorkerSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    def filter_ceo_worker(self ,df):  
+        # CEO Worker  Embedding DF Path
+        Ceo_worker_tablet_csv_path= os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Phone_Tablet.csv")
+        Ceo_worker_website_path = os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Website.csv")
+
+        # Read CSV
+        tablet_df = pd.read_csv(Ceo_worker_tablet_csv_path)
+        website_df = pd.read_csv(Ceo_worker_website_path)
+
+
     def post(self , request , format=None):
         try:
             
             # GET USER QUERY FROM POST REQUEST 
-            required_fields= ['query','tab_type']
+            required_fields= ['query','tab_type', 'device_type']
             
             # Get payload data 
             payload = request.data
@@ -639,6 +649,15 @@ class CEOWorkerSemanticSearchView(APIView):
                 return Response({
                     'message':f"{', '.join(missing_fields)}: key is required .",
                     'status':status.HTTP_400_BAD_REQUEST
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Handle device type value
+            device_type =str(payload.get("device_type")).lower().strip()
+
+            if device_type not in ["mobile", "desktop"]:
+                return Response({
+                    "message": "Invalid device type , Please choose one from them ['mobile' , 'desktop']" ,
+                    "status": 400,
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # Take Payload query value in parameter
@@ -688,12 +707,13 @@ class CEOWorkerSemanticSearchView(APIView):
                 
                 # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
                 elif isinstance(MatchedRow , dict):
-                    serached_df = pd.DataFrame([MatchedRow])
+                    searched_df = pd.DataFrame([MatchedRow])
                     
-                    #print("serached_df : \n ", serached_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
-                    serached_df = serached_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"])
+                    #print("searched_df : \n ", searched_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
+                    searched_df = searched_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"])
+                    print("searched_df : \n ", searched_df)
                     
-                    return ProductResponse("success",serached_df.to_dict(orient="records"))
+                    return ProductResponse("success",searched_df.to_dict(orient="records"))
                 
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
@@ -727,6 +747,7 @@ class CEOWorkerSemanticSearchView(APIView):
                     # IF LENGTH OF THE SORTED DATAFRAME GET ONLY FIRST 4 ROWS
                     if len(sorted_df) > 4:
                         sorted_df = sorted_df.iloc[0:4]
+
 
                     return ProductResponse("success",sorted_df.to_dict(orient="records"))
                 
@@ -1145,7 +1166,7 @@ class GlobalSearchAPIView(APIView):
 
 
             # Payload data
-            data = {"query":payload.get("query") , "tab_type": "profit"}
+            data = {"query":payload.get("query") , "tab_type": "profit", "device_type":device_type }
             headers = {
                 "content_type": "application/json"
             }
@@ -1179,7 +1200,6 @@ class GlobalSearchAPIView(APIView):
 
                         # get first matched data row
                         matched_row = json_data[0]
-
 
                         Brand_name = str(matched_row["Brand"]).lower().strip()# Brand name
                         Year = int(matched_row["Production Year"]) # Year
