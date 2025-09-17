@@ -224,7 +224,7 @@ class ProductSemanticSearchView(APIView):
                         # GET CEO WORKER GAP DATA BASED ON THE PROFIT MARGIN DATA
                         CEO_WORKER_JSON_DATA = global_search_obj.Filter_CeoWorker_Data(device_type ,brand_name , production_year)
 
-                    return ProductResponse("success", json_output, CEO_WORKER_JSON_DATA)
+                    return ProfitProductResponse("success", json_output, CEO_WORKER_JSON_DATA)
                 
             # Function -1
             Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
@@ -235,7 +235,7 @@ class ProductSemanticSearchView(APIView):
             Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
             
             if Embedding_df.empty:
-                return ProductResponse("No Data Matched", [], [])
+                return ProfitProductResponse("No Data Matched", [], [])
 
             # Function -2
             paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df)     # Get matched row parameter dict
@@ -245,7 +245,7 @@ class ProductSemanticSearchView(APIView):
 
             # if searched dataframe is empty  return empty json 
             if searched_df.empty:
-                return ProductResponse("failed",[], [])
+                return ProfitProductResponse("failed",[], [])
 
             # Remove unneccary columns from searched dataframe
             searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
@@ -272,7 +272,7 @@ class ProductSemanticSearchView(APIView):
 
             # Return Response if only matched row dataframe is true
             if Product_Category_df.empty:
-                return ProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
+                return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
 
             # Function -4
             Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
@@ -281,14 +281,14 @@ class ProductSemanticSearchView(APIView):
 
             # Return Response if only matched row dataframe is true
             if Product_Yearly_df.empty:
-                return ProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
+                return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
 
             # Function -5
             Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
             #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[50:90])
 
             if Product_Gender_df.empty:
-                return ProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
+                return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
 
             # Function -6
             brand_product_type_list= Profit_Obj.Filter_rows_list(paramter_dict , Product_Gender_df) 
@@ -313,7 +313,7 @@ class ProductSemanticSearchView(APIView):
             if len(merge_df) > 3:
                 merge_df = merge_df.iloc[0:3]
 
-            return ProductResponse('success', merge_df.to_dict(orient="records"), CEO_WORKER_JSON_DATA)
+            return ProfitProductResponse('success', merge_df.to_dict(orient="records"), CEO_WORKER_JSON_DATA)
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
