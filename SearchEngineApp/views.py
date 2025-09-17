@@ -215,7 +215,7 @@ class ProductSemanticSearchView(APIView):
                 # HANDLE IF FUNCTION RETURN ERROR
                 elif isinstance(result_df ,pd.DataFrame):
                     json_output= result_df.to_dict(orient="records")
-                    
+
                     CEO_WORKER_JSON_DATA=[]
                     if json_output:
                         brand_name = str(json_output[0]["Brand"]).lower().strip()
@@ -1212,7 +1212,7 @@ class GlobalSearchAPIView(APIView):
                 
             else :
                 return Response({
-                    "message": 'Bad request'
+                    "message": 'Getting issue in product semantic search api'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
