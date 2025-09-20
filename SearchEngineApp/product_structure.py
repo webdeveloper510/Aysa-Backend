@@ -130,6 +130,7 @@ class ProductModelStructure:
 
             # save embedding df
             full_text_embedding_path = os.path.join(embedding_dir_path,"profit_embedding.pkl")
+            df["Link to Product Pictures"] = df["Link to Product Pictures"].str.lower().str.strip()
 
             # Save dataframe on pickle file
             df.to_pickle(full_text_embedding_path)

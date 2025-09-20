@@ -1102,7 +1102,7 @@ class GlobalSearchAPIView(APIView):
 
         # Filtered Df
         filtered_tax_df = tax_df.loc[
-            (tax_df["Company Name"].str.lower().str.strip() == brand_name)&
+            (tax_df["Company Name"].str.lower().str.strip().str.contains(brand_name, case=False))&
             (tax_df["Year"].astype(int) == year)
         ]   
 
@@ -1111,6 +1111,8 @@ class GlobalSearchAPIView(APIView):
 
         # Convert into json
         json_output = filtered_tax_df.to_dict(orient="records")
+        if json_output:
+            json_output= json_output[0]
 
         return json_output
     
@@ -1140,6 +1142,7 @@ class GlobalSearchAPIView(APIView):
         
         # Convert into json
         json_output = filtered_ceo_worker_df.to_dict(orient="records")
+
 
         return json_output
 
@@ -1202,7 +1205,7 @@ class GlobalSearchAPIView(APIView):
                     
                     # Get json data 
                     json_data = response_text["data"]
-                    
+
                     # check if json data length is true
                     if len(json_data) > 0:
 
