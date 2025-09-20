@@ -13,14 +13,12 @@ le = LabelEncoder()
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-
-
-
 class ProductModelStructure:
 
-    def __init__(self):
+    def __init__(self , csv_path):
         self.max_range = 20
         self.random_state_value = 42
+        self.csv_path = csv_path
         self.device= torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def DownloadUpdateModel(self , TransferModelDir):
@@ -43,14 +41,11 @@ class ProductModelStructure:
         try:
             
             # GET PROFIT MARGIN DATA FROM THE PROFIT DATA MODEL
-            profit_margin_data = ProfitData.objects.all().values()
+            df = pd.read_csv(self.csv_path)
 
-            if not profit_margin_data :
+            if df.empty :
                 return []
             
-            # CREATE A DATAFRAME
-            df = pd.DataFrame(list(profit_margin_data))
-
             # REMOVE EXTRA SPACE FROM DATABASE
             df.columns = df.columns.str.strip()
             
@@ -58,23 +53,6 @@ class ProductModelStructure:
             if "id"  in df.columns.str.strip():
                 df = df.drop("id", axis=1)
 
-
-            rename_columns_dict ={
-                'brand' : "Brand",
-                'product_name' : "Product Name",
-                'product_type' : "Product Type",
-                'category' : "Category",
-                'gender' : "Gender",
-                'year' : "Production Year",
-                'product_url' : "Link to Product Pictures",
-                'release_price' : "Release Price",
-                'profit_margin' : "Profit Margin",
-                'wholesale_price' : "Wholesale Price",
-
-            } 
-
-            # RENAME DATAFRAME COLUMNS
-            df = df.rename(columns=rename_columns_dict)
             
             # MAKE CORRECTION OF WHOLESALE PRICE COLUMN
             df["Wholesale Price"] = df["Wholesale Price"].astype(str).str.replace("nan", "0")
@@ -100,7 +78,7 @@ class ProductModelStructure:
 
             # remove nan values
             df.dropna(inplace=True)
-            df.drop_duplicates(inplace=True)
+            print("dataframe size / shape ", df.shape)
 
             if df.empty:
                 return []
@@ -164,9 +142,9 @@ class ProductModelStructure:
             return error_message
         
 
-def AllProductDetailMain(embedding_dir_path , TransferModelDir):
+def AllProductDetailMain(embedding_dir_path , TransferModelDir, File_path):
     try:
-        product_structure = ProductModelStructure()        
+        product_structure = ProductModelStructure(File_path)        
         # call function to upload or run local model 
         model = product_structure.DownloadUpdateModel(TransferModelDir)
 

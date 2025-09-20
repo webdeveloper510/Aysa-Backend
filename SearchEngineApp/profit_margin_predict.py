@@ -156,7 +156,6 @@ class ProfitMarginPreidction:
 
         # Get matched_gender from response_dict
         matched_gender = response_dict.get("matched_gender")
-        print("Matched gender:", matched_gender)
 
         if matched_gender:
             matched_gender = matched_gender.lower()

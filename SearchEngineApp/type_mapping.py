@@ -221,6 +221,7 @@ makeup_variant_map = {
     'Brow Gel': 'Eye',
     'Eyeliner': 'Eye',
     'Sculpting Wax': 'Eye',
+    "Eyebrow": "Eye",
 
     'Stick': 'Makeup',   # too generic → better leave broad
     'Makeup Set': 'Makeup Set',
@@ -235,7 +236,8 @@ skincare_variant_map = {
     'Triple Serum' : 'Skincare',
     'Correcting Serum' : 'Skincare',
     'Truth Serum': 'Skincare',
-    'Drench'     : 'Skincare'
+    'Drench': 'Skincare',
+    'Cleanser': 'Skincare'
 }
 
 bodycare_variant_map={

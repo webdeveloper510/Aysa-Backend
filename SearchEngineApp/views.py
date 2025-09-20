@@ -49,8 +49,10 @@ class ProductTrainPipeline(APIView):
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
             os.makedirs(TransferModelDir , exist_ok=True)
             
+            # CSV PATH
+            File_path =  os.path.join(os.getcwd() ,"Data", "profit_margin_merge.csv")
             # Call function to train model with all rows
-            model_response = AllProductDetailMain(Emedding_dir_path, TransferModelDir)
+            model_response = AllProductDetailMain(Emedding_dir_path, TransferModelDir, File_path)
 
             # Handle when empty list comes
             if isinstance(model_response , list) and not model_response:
@@ -196,6 +198,7 @@ class ProductSemanticSearchView(APIView):
             # Load model
             model = SentenceTransformer(transfer_model_path)
             pickle_df = pd.read_pickle(pickle_df_path)
+            print("pickle_df columns ==> ", pickle_df.columns.tolist())
 
             # CALL A CLASS TO PREDICT PROFIT MARGIN DATA 
             Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
@@ -234,6 +237,7 @@ class ProductSemanticSearchView(APIView):
              # Filter out dataframe if similarity score greater than threshold Value
             Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
             
+            print("embedding df columns ===> ", Embedding_df.columns.tolist())
             if Embedding_df.empty:
                 return ProfitProductResponse("No Data Matched", [], [])
 
@@ -250,6 +254,7 @@ class ProductSemanticSearchView(APIView):
             # Remove unneccary columns from searched dataframe
             searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
             matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
+
 
             # Get Required Parameter from the Matched Dataframe
             brand_name = str(matched_row_json[0]["Brand"]).lower().strip()
