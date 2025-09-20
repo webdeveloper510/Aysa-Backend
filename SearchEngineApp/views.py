@@ -353,6 +353,9 @@ class GetProfitMarginData(APIView):# #""
             # Rename  column Name
             df= df.rename({"Product Type": "Type"}, axis=1)
 
+            df = df.dropna(subset=['Product Name']) 
+            df.drop_duplicates(inplace=True) # Remove duplicacy from dataframe  
+
             # Return Response
             return Response({
                 "message": "success" if not df.empty else "failed",
