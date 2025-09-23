@@ -1099,7 +1099,7 @@ class GlobalSearchAPIView(APIView):
     def Filter_Tax_Data(self,brand_name: str , year: int)-> list:
 
         # Tax Embedding DF Path
-        tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
+        tax_embedding_df_path = os.path.join(os.getcwd(),"static" , "media",  "EmbeddingDir", "Tax", "tax_embedding.pkl")
         tax_df = pd.read_pickle(tax_embedding_df_path)
 
         # Filtered Df
@@ -1122,8 +1122,8 @@ class GlobalSearchAPIView(APIView):
     def Filter_CeoWorker_Data(self,device_type : str ,brand_name: str , year: int)-> list:
         
         # CEO Worker  Embedding DF Path
-        Ceo_worker_tablet_csv_path= os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Phone_Tablet.csv")
-        Ceo_worker_website_path = os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Website.csv")
+        Ceo_worker_tablet_csv_path= os.path.join(os.getcwd(),"static" , "media", "CEO Worker Data", "Phone_Tablet.csv")
+        Ceo_worker_website_path = os.path.join(os.getcwd(), "static" , "media" ,"CEO Worker Data","Website.csv")
 
         # Read CSV
         tablet_df = pd.read_csv(Ceo_worker_tablet_csv_path)
