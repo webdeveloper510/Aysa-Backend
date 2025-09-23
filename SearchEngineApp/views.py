@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 import torch
+import csv
 
 # import Project files
 from .response import *
@@ -39,20 +40,111 @@ TOP_N = int(os.getenv("TOP_N"))
 """ ###############################          Profit Margin Data    ##################################"""
 # API FOR PRODUCT DATA TRAIN 
 class ProductTrainPipeline(APIView):
-    def get(self,format =None):
+    def check_suffix(self, file) -> bool:
+        
+        suffix_status = False
+
+        file_name = file.name
+
+        if file_name.endswith(".csv"):
+           suffix_status= True
+        
+        return suffix_status
+    
+    def check_columns(self, tab_type: str, dataframe: pd.DataFrame) -> bool:
+        columns_status = True
+
+        # Normalize dataframe column names
+        dataframe_columns = dataframe.columns.str.strip().tolist()
+
+        # Select expected columns
+        expected_columns = PRODUCT_DATA_COLUMNS
+        if tab_type == "tax":
+            expected_columns = TAX_DATA_COLUMNS
+        elif tab_type == "ceo-worker":
+            if "Pay Ratio" in dataframe_columns:
+                 expected_columns = PHONE_CEO_WORKER_DATA_COLUMNS
+            else:
+                expected_columns = WEBSITE_CEO_WORKER_DATA_COLUMNS
+
+        # Normalize expected columns too
+        expected_columns = [col.strip() for col in expected_columns]
+
+        # Check if expected columns match exactly
+        if set(expected_columns) != set(dataframe_columns):
+            columns_status = False
+
+        return columns_status
+
+
+    def post(self,request , format =None):
         try:
-            # Vector Database dir path
-            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "Profit_Margin")
+            
+            # Take file as input
+            uploaded_file = request.FILES.get("file")
+
+            # Handle if file is not found
+            if not uploaded_file:
+                return Response({
+                    "message": "File Not Found , Please Upload file with use key name is 'file'.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },status= status.HTTP_400_BAD_REQUEST)
+            
+            # Check file Type
+            file_type_status = self.check_suffix(uploaded_file)
+            if not file_type_status:
+                return Response({
+                        "message": "Invalid File Type , Only CSV file Accepted.",
+                        "status": status.HTTP_406_NOT_ACCEPTABLE,
+                    },
+                    status= status.HTTP_406_NOT_ACCEPTABLE)
+
+            # check if filename is not matched
+            if uploaded_file.name != "profit_margin.csv":
+                return Response({
+                    "message": f'Invalid File Name , Rename your files with profit_margin.csv',
+                    "status": status.HTTP_400_BAD_REQUEST
+                }, status= status.HTTP_400_BAD_REQUEST)
+
+
+            # Check dataframe columns 
+            df = pd.read_csv(uploaded_file)
+            column_status = self.check_columns("profit" ,df)
+            if not column_status:
+                return Response({
+                        "message": f"Columns does not matched , Accepted columns list is : {PRODUCT_DATA_COLUMNS}",
+                        "status": status.HTTP_406_NOT_ACCEPTABLE,
+                },
+                status= status.HTTP_406_NOT_ACCEPTABLE)
+
+            
+            # Define a Base Dir Path and create dir
+            BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , "Profit Data")
+            os.makedirs(BASE_DIR_PATH , exist_ok=True)
+
+
+            # Define file path
+            file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
+
+            # Replace old file with new file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"Old File replace with new file : {file_path}")
+
+            with open(file_path , "wb+") as destination: 
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
+            # Make a directory to save Embedding model
+            Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Profit Margin")
             os.makedirs(Emedding_dir_path , exist_ok=True)
             
             # Transformer model 
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
             os.makedirs(TransferModelDir , exist_ok=True)
             
-            # CSV PATH
-            File_path =  os.path.join(os.getcwd() ,"Data", "profit_margin_merge.csv")
-            # Call function to train model with all rows
-            model_response = AllProductDetailMain(Emedding_dir_path, TransferModelDir, File_path)
+            # Call a function from product stucture file 
+            model_response = AllProductDetailMain(Emedding_dir_path, TransferModelDir, file_path)
 
             # Handle when empty list comes
             if isinstance(model_response , list) and not model_response:
@@ -192,13 +284,12 @@ class ProductSemanticSearchView(APIView):
             user_query = str(payload.get("query")).lower().strip()
 
             # Define paths
-            pickle_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Profit_Margin", "profit_embedding.pkl")
+            pickle_df_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Profit Margin" ,"profit_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
 
             # Load model
             model = SentenceTransformer(transfer_model_path)
             pickle_df = pd.read_pickle(pickle_df_path)
-            print("pickle_df columns ==> ", pickle_df.columns.tolist())
 
             # CALL A CLASS TO PREDICT PROFIT MARGIN DATA 
             Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
@@ -332,7 +423,7 @@ class GetProfitMarginData(APIView):# #""
     def get(self,format=None):
         try:
             #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'profit_margin_merge.csv')
+            input_csv_file_path = os.path.join(os.getcwd(), "static", "media" , "Profit Data", 'profit_margin.csv')
             if not os.path.exists(input_csv_file_path):
                 return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
             
@@ -374,29 +465,81 @@ class GetProfitMarginData(APIView):# #""
 
 # API FOR Tax  DATA TRAIN 
 class TaxDataTrainPipeline(APIView):
-    def get(self,format =None):
+    def post(self,request ,format =None):
         try:
+            # Take file as input
+            uploaded_file = request.FILES.get("file")
+
+            # Handle if file is not found
+            if not uploaded_file:
+                return Response({
+                    "message": "File Not Found , Please Upload file with use key name is 'file'.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },status= status.HTTP_400_BAD_REQUEST)
+            
+            # call product object 
+            profit_margin_obj = ProductTrainPipeline()
+
+            # Check file Type
+            file_type_status = profit_margin_obj.check_suffix(uploaded_file)
+            if not file_type_status:
+                return Response({
+                        "message": "Invalid File Type , Only CSV file Accepted.",
+                        "status": status.HTTP_406_NOT_ACCEPTABLE,
+                    },
+                    status= status.HTTP_406_NOT_ACCEPTABLE)
+
+            # Handle if file name is not matched
+            if uploaded_file.name != "Tax_Avoidance.csv":
+                return Response({
+                    "message": f'Invalid File Name , Rename your files with Tax_Avoidance.csv',
+                    "status": status.HTTP_400_BAD_REQUEST
+                }, status= status.HTTP_400_BAD_REQUEST)
+
+            # Check dataframe columns 
+            df = pd.read_csv(uploaded_file)
+            column_status = profit_margin_obj.check_columns("tax" ,df)
+            if not column_status:
+                return Response({
+                        "message": f"Columns does not matched , Accepted columns list is : {TAX_DATA_COLUMNS}",
+                        "status": status.HTTP_406_NOT_ACCEPTABLE,
+                },
+                status= status.HTTP_406_NOT_ACCEPTABLE)
+
+            # Define a Base Dir Path and create dir
+            BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , "Tax Data")
+            os.makedirs(BASE_DIR_PATH , exist_ok=True)
+
+            # Define file path
+            file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
+
+            # Replace old file with new file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"Old File replace with new file : {file_path}")
+
+            with open(file_path , "wb+") as destination: 
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
             # Vector Database dir path
-            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "Tax")
+            Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Tax")
             os.makedirs(Emedding_dir_path , exist_ok=True)
 
-            #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd() , "Data", 'Tax_Avoidance.csv')
-            if not os.path.exists(input_csv_file_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
-            
             # Transformer model 
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
             os.makedirs(TransferModelDir , exist_ok=True)
             
             # Call function to train model with all rows
-            TaxModelResponse = TaxMainFunc(input_csv_file_path, Emedding_dir_path, TransferModelDir)
+            TaxModelResponse = TaxMainFunc(file_path, Emedding_dir_path, TransferModelDir)
+
+            if TaxModelResponse =="success":
+                TaxModelResponse = "Tax model data train successfully ..."
 
             return Response({
                 "message": TaxModelResponse,
             }, status=status.HTTP_200_OK)
         
-
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
@@ -470,7 +613,7 @@ class TaxSemanticSearchView(APIView):
             user_query = payload.get("query")
          
             # Define paths
-            tax_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "Tax", "tax_embedding.pkl")
+            tax_embedding_df_path = os.path.join(os.getcwd(),"static", "media",  "EmbeddingDir", "Tax", "tax_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
             
             # Load model
@@ -562,22 +705,10 @@ class TaxAvenueView(APIView):
         try:
 
             # Get Data from Tax model
-            tax_data = TaxDataModel.objects.all().values()            
+            tax_csv_file_path = os.path.join(os.getcwd(), "static", "media" , "Tax Data", 'Tax_Avoidance.csv')
 
-            # Handle no data found
-            if not tax_data :
-                return DATA_NOT_FOUND("No Data found for Tax Tab")
-
-            # Read csv 
-            df = pd.DataFrame(list(tax_data))
-            
-            # Rename columns 
-            df = df.rename(columns={
-                "company_name": "Company Name",
-                "year": "Year",
-                "taxes_paid": "Taxes Paid",
-                "taxes_avoided": "Taxes Avoided",
-            })
+            # Read CSV
+            df = pd.read_csv(tax_csv_file_path)
 
             # Clean NaN and infinity values
             if not df.empty:
@@ -600,23 +731,81 @@ class TaxAvenueView(APIView):
 
 # API FOR  CEO WORKER DATA TRAIN 
 class CEOWorkerTrainPipeline(APIView):
-    def get(self, format =None):
+    def post(self, request ,format =None):
         try:
+            # Take file as input
+            payload = request.FILES
+
+            required_files = ["phone_csv", "desktop_csv"]
+
+            # Handle missing files
+            missing_files = [file for file in required_files if file not in payload or payload.get(file) is None]
+            if missing_files:
+                return Response({
+                    "message": f"{','.join(missing_files)} file is required ",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },status= status.HTTP_400_BAD_REQUEST)
+            
+
+            # Make a Profit Margin object
+            profit_margin_obj = ProductTrainPipeline()
+
+            for field in required_files:
+                uploaded_file = payload.get(field)
+                
+                # Check file Type
+                file_type_status = profit_margin_obj.check_suffix(uploaded_file)
+                if not file_type_status:
+                    return Response({
+                            "message": f"{uploaded_file} is Invalid File Type , Only CSV file Accepted.",
+                            "status": status.HTTP_406_NOT_ACCEPTABLE,
+                        },
+                        status= status.HTTP_406_NOT_ACCEPTABLE)
+               
+                # Handle if file name is not matched
+                if uploaded_file.name not in ["Phone_Tablet.csv", "Website.csv"]:
+                    return Response({
+                        "message": f'Invalid File Name , Rename your files with {",".join(["Phone_Tablet.csv", "Website.csv"])}',
+                        "status": status.HTTP_400_BAD_REQUEST
+                    }, status= status.HTTP_400_BAD_REQUEST)
+
+                #Check dataframe columns 
+                df = pd.read_csv(uploaded_file)
+                column_status = profit_margin_obj.check_columns("ceo-worker" ,df)
+
+                # Handle based on the csv name
+                expected_columns = WEBSITE_CEO_WORKER_DATA_COLUMNS if "website" in uploaded_file.name.lower() else PHONE_CEO_WORKER_DATA_COLUMNS
+
+                if not column_status:
+                    return Response({
+                            "message": f"{uploaded_file} file Columns does not matched , Accepted columns list is : {expected_columns}",
+                            "status": status.HTTP_406_NOT_ACCEPTABLE,
+                    },
+                    status= status.HTTP_406_NOT_ACCEPTABLE)
+
+                # Define a Base Dir Path and create dir
+                BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , "CEO Worker Data")
+                os.makedirs(BASE_DIR_PATH , exist_ok=True)
+
+                # Define file path
+                file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
+
+                # Replace old file with new file
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    print(f"Old File replace with new file : {file_path}")
+
+                with open(file_path , "wb+") as destination: 
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+
             # Vector Database dir path
-            Emedding_dir_path = os.path.join(os.getcwd() ,"EmbeddingDir", "CEO-Worker")
+            Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "CEO-Worker")
             os.makedirs(Emedding_dir_path , exist_ok=True)          # Make a dir if does not exist
 
             #CSV file name
-            File_path = os.path.join(os.getcwd() , "Data", 'Worker_Pay_Gap.csv')
-            # CEO Worker  Embedding DF Path
-            Tablet_File_path= os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Phone_Tablet.csv")
-            Website_File_path = os.path.join(os.getcwd(), "CEO_WORKER_UPDATED_DATA", "Website.csv")
-
-            if not os.path.exists(Tablet_File_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {Tablet_File_path}")
-            
-            if not os.path.exists(Website_File_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {Website_File_path}")
+            Tablet_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Phone_Tablet.csv")
+            Website_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Website.csv")
 
             # Transformer model 
             TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
@@ -670,8 +859,8 @@ class CEOWorkerSemanticSearchView(APIView):
             user_query = payload.get("query")
 
             # Paths 
-            ceo_phone_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_phone_embedding.pkl")
-            ceo_desktop_embedding_df_path = os.path.join(os.getcwd(), "EmbeddingDir", "CEO-Worker", "ceo_desktop_embedding.pkl")
+            ceo_phone_embedding_df_path = os.path.join(os.getcwd(), "static" , "media" , "EmbeddingDir", "CEO-Worker", "ceo_phone_embedding.pkl")
+            ceo_desktop_embedding_df_path = os.path.join(os.getcwd(),  "static" , "media" , "EmbeddingDir", "CEO-Worker", "ceo_desktop_embedding.pkl")
 
             # Load model
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
@@ -773,25 +962,15 @@ class CeoWorkerView(APIView):
         try:
 
             # Get CEO WORKER Data from DATABASE
-            ceo_worker_data = CEOWokrerModel.objects.all().values()
+            ceo_worker_file_path = os.path.join(os.getcwd() , "static", "media", "CEO Worker Data", "Website.csv")
+
+            # Read csv 
+            df = pd.read_csv(ceo_worker_file_path)
             
             # Handle if there is no data found
-            if not ceo_worker_data:
+            if df.empty:
                 return DATA_NOT_FOUND("No Data Found for CEO Worker Tab ")
             
-            # Read csv 
-            df = pd.DataFrame(list(ceo_worker_data))
-
-            # Rename columns 
-            df = df.rename(columns={
-                "company_name": "Company Name",
-                "year": "Year",
-                "ceo_name": "CEO Name",
-                "company_name": "Company Name",
-                "ceo_total_compensation": "CEO Total Compensation",
-                "worker_salary": "Frontline Worker Salary",
-
-            })
             # Clean NaN and infinity values
             if not df.empty:
                 df.dropna(inplace=True)
@@ -908,183 +1087,6 @@ class GetProductVisitorCount(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            print(error_message)
-            return Internal_server_response(error_message)
-        
-
-""" ###############################          DATABASE API'S       ###################################  """
-class SyncProfitMarginDataView(APIView):
-
-    def get(self, format=None):
-        try:
-            file_path = os.path.join(os.getcwd() , "Data", "profit_margin_merge.csv")    # Make a file path
-
-            # Check if file path is exist or not
-            if not os.path.exists(file_path):
-                return DATA_NOT_FOUND("The path '{file_path}' does not exist.")
-            
-            # READ CSV 
-            df = pd.read_csv(file_path)
-
-            # REMOVE EXTRA SPACES FROM THE COLUMNS
-            df.columns = df.columns.str.strip()
-
-            inserted= 0
-            updated =0
-            
-            #ITERATE THROUGH THE DATAFRAME
-
-            for idx , row_data in df.iterrows():
-                BRAND = row_data.get('Brand')
-                PRODUCT_NAME = row_data.get('Product Name')
-                PRODUCT_TYPE = row_data.get('Product Type')
-                CATEGORY = row_data.get('Category')
-                GENDER = row_data.get('Gender')
-                YEAR = row_data.get('Production Year')
-                PRODUCT_URL = row_data.get('Link to Product Pictures')
-                RELEASE_PRICE = row_data.get('Release Price')
-                PROFIT_MARGIN = row_data.get('Profit Margin')
-                WHOLESALE_PRICE = row_data.get("Wholesale Price")
-               
-                Profit_data_obj , created= ProfitData.objects.get_or_create(
-                        brand = BRAND,
-                        product_name = PRODUCT_NAME,
-                        product_type = PRODUCT_TYPE,
-                        category = CATEGORY,
-                        gender = GENDER,
-                        year = YEAR,
-                        product_url = PRODUCT_URL,
-                        release_price = RELEASE_PRICE,
-                        profit_margin = PROFIT_MARGIN,
-                        wholesale_price = WHOLESALE_PRICE
-                )
-
-                if created:
-                    inserted += 1
-                else:
-                    updated +=1 
-
-            return Response({
-                "message": f'Profit Margin  Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
-                "status": status.HTTP_201_CREATED
-            })
-
-        except Exception as e:
-            exc_type , exc_obj , exc_tb = sys.exc_info()
-            error_message = f"[ERROR] Failed to Sync Profit Margin Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
-            print(error_message)
-            return Internal_server_response(error_message)
-        
-
-class SyncTaxDataView(APIView):
-
-    def get(self, request, format=None):
-        try:
-            sync = request.GET.get("sync", "false").lower() == "true"               # GET SYNC value from the query parameter
-            file_path = os.path.join(os.getcwd() , "Data", "Tax_Avoidance.csv")    # Make a file path
-
-            # Check if file path is exist or not
-            if not os.path.exists(file_path):
-                return DATA_NOT_FOUND("The path '{file_path}' does not exist.")
-            
-            # READ CSV 
-            df = pd.read_csv(file_path)
-
-            # REMOVE EXTRA SPACES FROM THE COLUMNS
-            df.columns = df.columns.str.strip()
-
-            inserted= 0
-            updated =0
-            
-            #ITERATE THROUGH THE DATAFRAME
-            ['Company Name', 'Year', 'Taxes Paid', 'Taxes Avoided']
-
-            for idx , row_data in df.iterrows():
-                COMPANY_NAME = row_data.get('Company Name')
-                YEAR = row_data.get('Year')
-                TAXES_PAID = row_data.get('Taxes Paid')
-                TAXES_AVOIDED = row_data.get('Taxes Avoided')
-               
-               
-                Tax_data_obj , created= TaxDataModel.objects.get_or_create(
-                        company_name = COMPANY_NAME,
-                        Year = YEAR,
-                        taxes_paid = TAXES_PAID,
-                        taxes_avoided = TAXES_AVOIDED,
-                )
-
-                if created:
-                    inserted += 1
-                else:
-                    updated +=1 
-
-                print("inserted ", inserted ,"updated ", updated )
-
-            return Response({
-                "message": f'Tax Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
-                "status": status.HTTP_201_CREATED
-            })
-
-        except Exception as e:
-            exc_type , exc_obj , exc_tb = sys.exc_info()
-            error_message = f"[ERROR] Failed to Sync Tax Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
-            print(error_message)
-            return Internal_server_response(error_message)
-        
-
-class SyncCEOWorkerDataView(APIView):
-
-    def get(self, request, format=None):
-        try:
-            sync = request.GET.get("sync", "false").lower() == "true"               # GET SYNC value from the query parameter
-            file_path = os.path.join(os.getcwd() , "Data", "Worker_Pay_Gap.csv")    # Make a file path
-
-            # Check if file path is exist or not
-            if not os.path.exists(file_path):
-                return DATA_NOT_FOUND("The path '{file_path}' does not exist.")
-            
-            # READ CSV 
-            df = pd.read_csv(file_path)
-
-            # REMOVE EXTRA SPACES FROM THE COLUMNS
-            df.columns = df.columns.str.strip()
-
-            inserted= 0
-            updated =0
-            
-            #ITERATE THROUGH THE DATAFRAME
-
-            for idx , row_data in df.iterrows():
-                COMPANY_NAME = row_data.get('Company Name')
-                YEAR = row_data.get('Year')
-                CEO_NAME = row_data.get('CEO Name')
-                CEO_TOTAL_COMPENSATION = row_data.get('CEO Total Compensation')
-                WORKER_SALARY = row_data.get('Frontline Worker Salary')
-               
-               
-                Tax_data_obj , created= CEOWokrerModel.objects.get_or_create(
-                        company_name = COMPANY_NAME,
-                        year = YEAR,
-                        ceo_name = CEO_NAME,
-                        ceo_total_compensation = CEO_TOTAL_COMPENSATION,
-                        worker_salary = WORKER_SALARY
-                )
-
-                if created:
-                    inserted += 1
-                else:
-                    updated +=1 
-
-                print("inserted ", inserted ,"updated ", updated )
-
-            return Response({
-                "message": f'CEO WORKER Data Sync successfully , Total Insert New Record is : {inserted} and Updated Records is : {updated}',
-                "status": status.HTTP_201_CREATED
-            })
-
-        except Exception as e:
-            exc_type , exc_obj , exc_tb = sys.exc_info()
-            error_message = f"[ERROR] Failed to Sync CEO WORKER Data Into Database, error occur {str(e)} in line no {exc_tb.tb_lineno}"
             print(error_message)
             return Internal_server_response(error_message)
         

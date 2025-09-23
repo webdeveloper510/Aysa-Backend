@@ -7,17 +7,13 @@ import os
 import pandas as pd
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
+PRODUCT_DATA_COLUMNS = ['Brand', 'Product Name', 'Product Type', 'Category', 'Gender', 'Production Year', 'Profit Margin', 'Profit Made', 'Release Price', 'Wholesale Price', 'Link to Product Pictures']
 
+TAX_DATA_COLUMNS = ['Company Name', 'Year', 'Taxes Paid', 'Taxes Avoided']
 
-PRODUCT_DATA_KEYS = [
-    'Brand', 'Product Name', 'Type', 'Production Year',
-    'Link to Product Pictures', 'Release Price',
-    'Profit Made', 'Profit Margin'
-]
+PHONE_CEO_WORKER_DATA_COLUMNS = ['Company Name', 'Year', 'CEO Name', 'CEO Total Compensation', 'Frontline Worker Salary', 'Pay Ratio']
 
-TAX_DATA_KEYS = ['Company Name', 'Year', 'Tax Paid', 'Tax Avoided']
-
-CEO_WORKER_DATA_KEYS =['Company Name', 'Year', 'CEO Name', 'CEO Total Compensation', 'Frontline Worker Salary']
+WEBSITE_CEO_WORKER_DATA_COLUMNS = ['Company Name', 'Year', 'CEO Name', 'CEO Total Compensation', 'Frontline Worker Salary', 'Pay Ration']
 
 # function to convert data into list 
 def ListToDict(input_list):
