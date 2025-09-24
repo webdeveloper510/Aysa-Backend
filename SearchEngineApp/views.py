@@ -179,6 +179,9 @@ class ProductSemanticSearchView(APIView):
             # Make a copy of df
             df = pickle_df.copy()
 
+            # Drop Duplicate Rows from the dataframe
+            df = df.drop_duplicates(subset=["Brand", "Product Name", "Product Type", "Category", "Production Year"])
+
             # Normalize Brand Column
             df['Brand'] = df['Brand'].astype(str).str.lower().str.strip()
 
@@ -328,7 +331,6 @@ class ProductSemanticSearchView(APIView):
              # Filter out dataframe if similarity score greater than threshold Value
             Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
             
-            print("embedding df columns ===> ", Embedding_df.columns.tolist())
             if Embedding_df.empty:
                 return ProfitProductResponse("No Data Matched", [], [])
 
@@ -353,6 +355,7 @@ class ProductSemanticSearchView(APIView):
             searched_product_name = matched_row_json[0]["Product Name"]
             searched_product_type = matched_row_json[0]["Product Type"]
             ProductName = searched_product_name + searched_product_type
+
 
             # GET CEO WORKER GAP DATA BASED ON THE PROFIT MARGIN DATA
             CEO_WORKER_JSON_DATA = global_search_obj.Filter_CeoWorker_Data(device_type ,brand_name , production_year)
@@ -554,7 +557,7 @@ class TaxSemanticSearchView(APIView):
     def GetMatchedRowDict(self , model , user_query: str ,Input_df : pd.DataFrame, similarity_score : float) -> dict:
         try:
             df =Input_df.copy()
-            
+
             # Remove dupicate rows
             df = df.drop_duplicates(subset=["Company Name", "Year"])
 
@@ -886,6 +889,10 @@ class CEOWorkerSemanticSearchView(APIView):
             if  'Unnamed: 0' in df.columns:
                 df = df.drop("Unnamed: 0", axis=1)
 
+
+            # Remove dupicate rows from the CEO WORKER csv
+            df = df.drop_duplicates(subset=["Company Name", "Year", "CEO Name"])
+
             # make a copy of original dataframe
             original_df = df.copy()
 
@@ -1138,17 +1145,15 @@ class GlobalSearchAPIView(APIView):
             df = tablet_df
         else:
             df = website_df
-
-        # Filtered Df
+        
+        #Filtered Df
         filtered_ceo_worker_df = df.loc[
             (df["Company Name"].str.lower().str.strip() == brand_name)&
             (df["Year"].astype(int) == year)
         ]   
-        
+
         # Convert into json
         json_output = filtered_ceo_worker_df.to_dict(orient="records")
-
-
         return json_output
 
 
