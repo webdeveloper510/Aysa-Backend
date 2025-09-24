@@ -1022,6 +1022,19 @@ class TrainModelView(APIView):
         elif tab_type =="ceo-worker":
             Base_dir="CEO Worker Data"
         return Base_dir
+    
+        
+    def Handle_invalid_filename(self,filename, tab_type):
+        file_names_array = ["Website.csv", "Phone_Tablet.csv"]
+
+        correct_filename = 'profit_margin.csv'
+        if tab_type == 'tax' and filename != 'Tax_Avoidance.csv':
+            correct_filename =  'Tax_Avoidance.csv'
+        elif tab_type =="ceo-worker" and filename not in file_names_array:
+            correct_filename = ', '.join(file_names_array) 
+        
+        return correct_filename
+
 
 
     def post(self , request , format=None):
@@ -1039,6 +1052,8 @@ class TrainModelView(APIView):
             if missing_fields:
                 return BAD_RESPONSE(f"{','.join(missing_fields)} key is required.")
             
+            TAB_TYPE = payload.get("tab_type")
+            
             # Check if Upload file is None
             if not uploaded_file:
                 return BAD_RESPONSE(f"Please Select file before make request , use 'file' key to upload file")
@@ -1050,11 +1065,12 @@ class TrainModelView(APIView):
 
             # check if filename is not matched
             if uploaded_file.name not in file_names_array:
-                return BAD_RESPONSE(f"Invalid file name. Correct file names are: {', '.join(file_names_array)}")
+                corrected_filename = self.Handle_invalid_filename(uploaded_file.name, TAB_TYPE)
+                return BAD_RESPONSE(f"Invalid file name. Correct file name is : {corrected_filename}")
 
             
             # GET TAB TYPE and check it is correct or not 
-            TAB_TYPE = payload.get("tab_type")
+           
             if TAB_TYPE not in tab_types:
                 return BAD_RESPONSE(f"Invalid Tab Type , Valid Tab type is {', '.join(tab_types)}")
             
