@@ -22,7 +22,7 @@ os.environ["DJANGO_RUNSERVER_HIDE_WARNING"] = "true"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-HOST ='local'
+HOST ='live'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -145,7 +145,7 @@ MEDIA_URL = "/media/"
 # Define media root
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')  # Ensure this directory exists
 
-if HOST =='live':
+if HOST =='local':
     BASE_URL='http://127.0.0.1:8000'
                 
 else:
