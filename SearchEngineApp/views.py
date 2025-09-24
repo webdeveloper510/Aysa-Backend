@@ -39,135 +39,7 @@ TAX_CEO_WORKER_YEAR_SIMILARITY = round(float(os.getenv("TAX_CEO_WORKER_YEAR_SIMI
 # GET TOP_N MATCHED VALUE
 TOP_N = int(os.getenv("TOP_N"))
 
-
 """ ###############################          Profit Margin Data    ##################################"""
-# API FOR PRODUCT DATA TRAIN 
-class ProductTrainPipeline(APIView):
-    def check_suffix(self, file) -> bool:
-        
-        suffix_status = False
-
-        file_name = file.name
-
-        if file_name.endswith(".csv"):
-           suffix_status= True
-        
-        return suffix_status
-    
-    def check_columns(self, tab_type: str, dataframe: pd.DataFrame) -> bool:
-        columns_status = True
-
-        # Normalize dataframe column names
-        dataframe_columns = dataframe.columns.str.strip().tolist()
-
-        # Select expected columns
-        expected_columns = PRODUCT_DATA_COLUMNS
-        if tab_type == "tax":
-            expected_columns = TAX_DATA_COLUMNS
-        elif tab_type == "ceo-worker":
-            if "Pay Ratio" in dataframe_columns:
-                 expected_columns = PHONE_CEO_WORKER_DATA_COLUMNS
-            else:
-                expected_columns = WEBSITE_CEO_WORKER_DATA_COLUMNS
-
-        # Normalize expected columns too
-        expected_columns = [col.strip() for col in expected_columns]
-
-        # Check if expected columns match exactly
-        if set(expected_columns) != set(dataframe_columns):
-            columns_status = False
-
-        return columns_status
-
-
-    def post(self,request , format =None):
-        try:
-            
-            # Take file as input
-            uploaded_file = request.FILES.get("file")
-
-            # Handle if file is not found
-            if not uploaded_file:
-                return Response({
-                    "message": "File Not Found , Please Upload file with use key name is 'file'.",
-                    "status": status.HTTP_400_BAD_REQUEST,
-                },status= status.HTTP_400_BAD_REQUEST)
-            
-            # Check file Type
-            file_type_status = self.check_suffix(uploaded_file)
-            if not file_type_status:
-                return Response({
-                        "message": "Invalid File Type , Only CSV file Accepted.",
-                        "status": status.HTTP_406_NOT_ACCEPTABLE,
-                    },
-                    status= status.HTTP_406_NOT_ACCEPTABLE)
-
-            # check if filename is not matched
-            if uploaded_file.name != "profit_margin.csv":
-                return Response({
-                    "message": f'Invalid File Name , Rename your files with profit_margin.csv',
-                    "status": status.HTTP_400_BAD_REQUEST
-                }, status= status.HTTP_400_BAD_REQUEST)
-
-
-            # Check dataframe columns 
-            df = pd.read_csv(uploaded_file)
-            column_status = self.check_columns("profit" ,df)
-            if not column_status:
-                return Response({
-                        "message": f"Columns does not matched , Accepted columns list is : {PRODUCT_DATA_COLUMNS}",
-                        "status": status.HTTP_406_NOT_ACCEPTABLE,
-                },
-                status= status.HTTP_406_NOT_ACCEPTABLE)
-
-            
-            # Define a Base Dir Path and create dir
-            BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , "Profit Data")
-            os.makedirs(BASE_DIR_PATH , exist_ok=True)
-
-
-            # Define file path
-            file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
-
-            # Replace old file with new file
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                print(f"Old File replace with new file : {file_path}")
-
-            with open(file_path , "wb+") as destination: 
-                for chunk in uploaded_file.chunks():
-                    destination.write(chunk)
-
-            # Make a directory to save Embedding model
-            Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Profit Margin")
-            os.makedirs(Emedding_dir_path , exist_ok=True)
-            
-            # Transformer model 
-            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
-            os.makedirs(TransferModelDir , exist_ok=True)
-            
-            # Call a function from product stucture file 
-            model_response = AllProductDetailMain(Emedding_dir_path, TransferModelDir, file_path)
-
-            # Handle when empty list comes
-            if isinstance(model_response , list) and not model_response:
-                return DATA_NOT_FOUND("No Data found for Profit Margin Data Tab")
-
-            # Handle when error message come
-            elif isinstance(model_response , str):
-                return Internal_server_response(model_response)
-            
-            elif isinstance(model_response , pd.DataFrame):
-                return Response({
-                "message": "Model Trained successfully with Profit Margin Data ",
-                "status": status.HTTP_200_OK
-                })
-            
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            return Internal_server_response(error_message)
-
 # API to inference product trained model
 class ProductSemanticSearchView(APIView):
 
@@ -468,90 +340,6 @@ class GetProfitMarginData(APIView):# #""
 
 
 """ ###############################          Tax Avenue Data    ##################################"""
-
-# API FOR Tax  DATA TRAIN 
-class TaxDataTrainPipeline(APIView):
-    def post(self,request ,format =None):
-        try:
-            # Take file as input
-            uploaded_file = request.FILES.get("file")
-
-            # Handle if file is not found
-            if not uploaded_file:
-                return Response({
-                    "message": "File Not Found , Please Upload file with use key name is 'file'.",
-                    "status": status.HTTP_400_BAD_REQUEST,
-                },status= status.HTTP_400_BAD_REQUEST)
-            
-            # call product object 
-            profit_margin_obj = ProductTrainPipeline()
-
-            # Check file Type
-            file_type_status = profit_margin_obj.check_suffix(uploaded_file)
-            if not file_type_status:
-                return Response({
-                        "message": "Invalid File Type , Only CSV file Accepted.",
-                        "status": status.HTTP_406_NOT_ACCEPTABLE,
-                    },
-                    status= status.HTTP_406_NOT_ACCEPTABLE)
-
-            # Handle if file name is not matched
-            if uploaded_file.name != "Tax_Avoidance.csv":
-                return Response({
-                    "message": f'Invalid File Name , Rename your files with Tax_Avoidance.csv',
-                    "status": status.HTTP_400_BAD_REQUEST
-                }, status= status.HTTP_400_BAD_REQUEST)
-
-            # Check dataframe columns 
-            df = pd.read_csv(uploaded_file)
-            column_status = profit_margin_obj.check_columns("tax" ,df)
-            if not column_status:
-                return Response({
-                        "message": f"Columns does not matched , Accepted columns list is : {TAX_DATA_COLUMNS}",
-                        "status": status.HTTP_406_NOT_ACCEPTABLE,
-                },
-                status= status.HTTP_406_NOT_ACCEPTABLE)
-
-            # Define a Base Dir Path and create dir
-            BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , "Tax Data")
-            os.makedirs(BASE_DIR_PATH , exist_ok=True)
-
-            # Define file path
-            file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
-
-            # Replace old file with new file
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                print(f"Old File replace with new file : {file_path}")
-
-            with open(file_path , "wb+") as destination: 
-                for chunk in uploaded_file.chunks():
-                    destination.write(chunk)
-
-            # Vector Database dir path
-            Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Tax")
-            os.makedirs(Emedding_dir_path , exist_ok=True)
-
-            # Transformer model 
-            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
-            os.makedirs(TransferModelDir , exist_ok=True)
-            
-            # Call function to train model with all rows
-            TaxModelResponse = TaxMainFunc(file_path, Emedding_dir_path, TransferModelDir)
-
-            if TaxModelResponse =="success":
-                TaxModelResponse = "Tax model data train successfully ..."
-
-            return Response({
-                "message": TaxModelResponse,
-            }, status=status.HTTP_200_OK)
-        
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            print(error_message)
-            return Internal_server_response(error_message)
-          
 # API to inference Tax trained model
 class TaxSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -737,102 +525,6 @@ class TaxAvenueView(APIView):
             return Internal_server_response(error_message)
 
 """ ###############################          CEO Worker Frontline Data    ##################################"""
-
-# API FOR  CEO WORKER DATA TRAIN 
-class CEOWorkerTrainPipeline(APIView):
-    def post(self, request ,format =None):
-        try:
-            # Take file as input
-            payload = request.FILES
-
-            required_files = ["phone_csv", "desktop_csv"]
-
-            # Handle missing files
-            missing_files = [file for file in required_files if file not in payload or payload.get(file) is None]
-            if missing_files:
-                return Response({
-                    "message": f"{','.join(missing_files)} file is required ",
-                    "status": status.HTTP_400_BAD_REQUEST,
-                },status= status.HTTP_400_BAD_REQUEST)
-            
-
-            # Make a Profit Margin object
-            profit_margin_obj = ProductTrainPipeline()
-
-            for field in required_files:
-                uploaded_file = payload.get(field)
-                
-                # Check file Type
-                file_type_status = profit_margin_obj.check_suffix(uploaded_file)
-                if not file_type_status:
-                    return Response({
-                            "message": f"{uploaded_file} is Invalid File Type , Only CSV file Accepted.",
-                            "status": status.HTTP_406_NOT_ACCEPTABLE,
-                        },
-                        status= status.HTTP_406_NOT_ACCEPTABLE)
-               
-                # Handle if file name is not matched
-                if uploaded_file.name not in ["Phone_Tablet.csv", "Website.csv"]:
-                    return Response({
-                        "message": f'Invalid File Name , Rename your files with {",".join(["Phone_Tablet.csv", "Website.csv"])}',
-                        "status": status.HTTP_400_BAD_REQUEST
-                    }, status= status.HTTP_400_BAD_REQUEST)
-
-                #Check dataframe columns 
-                df = pd.read_csv(uploaded_file)
-                column_status = profit_margin_obj.check_columns("ceo-worker" ,df)
-
-                # Handle based on the csv name
-                expected_columns = WEBSITE_CEO_WORKER_DATA_COLUMNS if "website" in uploaded_file.name.lower() else PHONE_CEO_WORKER_DATA_COLUMNS
-
-                if not column_status:
-                    return Response({
-                            "message": f"{uploaded_file} file Columns does not matched , Accepted columns list is : {expected_columns}",
-                            "status": status.HTTP_406_NOT_ACCEPTABLE,
-                    },
-                    status= status.HTTP_406_NOT_ACCEPTABLE)
-
-                # Define a Base Dir Path and create dir
-                BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , "CEO Worker Data")
-                os.makedirs(BASE_DIR_PATH , exist_ok=True)
-
-                # Define file path
-                file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
-
-                # Replace old file with new file
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                    print(f"Old File replace with new file : {file_path}")
-
-                with open(file_path , "wb+") as destination: 
-                    for chunk in uploaded_file.chunks():
-                        destination.write(chunk)
-
-            # Vector Database dir path
-            Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "CEO-Worker")
-            os.makedirs(Emedding_dir_path , exist_ok=True)          # Make a dir if does not exist
-
-            #CSV file name
-            Tablet_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Phone_Tablet.csv")
-            Website_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Website.csv")
-
-            # Transformer model 
-            TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
-            os.makedirs(TransferModelDir , exist_ok=True)
-            
-            # Call function to train model with all rows
-            CeoworkerModelResponse = CeoWorkerMainFunc(Tablet_File_path,Website_File_path , Emedding_dir_path, TransferModelDir)
-            
-            return Response({
-                "status": status.HTTP_200_OK,
-                "message": CeoworkerModelResponse,
-            })
-
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            error_message = f"Failed to train Model error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            print(error_message)
-            return Internal_server_response(error_message)
 
 # API to inference CEO Worker  data
 class CEOWorkerSemanticSearchView(APIView):
@@ -1105,7 +797,6 @@ class GetProductVisitorCount(APIView):
         
 
 """     ###################################           GLOBAL API'S                    ###############################       """
-
 class GlobalSearchAPIView(APIView):
 
     # function to filter tax data based on the brand name and year
@@ -1262,7 +953,6 @@ class GlobalSearchAPIView(APIView):
             print(error_message)
             return error_message
 
-
 # APi for send file url
 class DataFilesSync(APIView):
     def get(self, request, format=None):
@@ -1297,4 +987,151 @@ class DataFilesSync(APIView):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Failed to load data files, error: {str(e)} in line {exc_tb.tb_lineno}"
+            return Internal_server_response(error_message)
+
+# APi for train model
+class TrainModelView(APIView):
+
+    # function to return transfer model dir path
+    def transfer_model_base_dir_path(self):
+        TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
+        os.makedirs(TransferModelDir , exist_ok=True)
+        return TransferModelDir
+
+    
+    # function to return Embedding Dir Path
+    def embedding_model_base_dir_path(self, tab_type):
+        embedding_base_dir ="Profit Margin"
+
+        if tab_type == "tax":
+            embedding_base_dir=  "Tax"
+
+        elif tab_type =="ceo-worker":
+            embedding_base_dir = "CEO-Worker"
+
+        Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", embedding_base_dir)
+        os.makedirs(Emedding_dir_path , exist_ok=True)
+        return Emedding_dir_path
+    
+    def DATA_DIR_PATH(self, tab_type):
+        # Saved dir 
+        Base_dir = "Profit Data"
+        if tab_type =="tax":
+            Base_dir ="Tax Data"
+
+        elif tab_type =="ceo-worker":
+            Base_dir="CEO Worker Data"
+        return Base_dir
+
+
+    def post(self , request , format=None):
+        try:
+            file_names_array = ["profit_margin.csv", "Tax_Avoidance.csv", "Website.csv", "Phone_Tablet.csv"]
+            tab_types =["profit" , "tax", "ceo-worker"]
+
+            # Get Payload 
+            payload = request.data
+            uploaded_file = request.FILES.get("file")
+
+            # Required Fields 
+            required_fields = ["tab_type"]
+            missing_fields = [field for field in required_fields if field not in payload or payload.get(field) is None]
+            if missing_fields:
+                return BAD_RESPONSE(f"{','.join(missing_fields)} key is required.")
+            
+            # Check if Upload file is None
+            if not uploaded_file:
+                return BAD_RESPONSE(f"Please Select file before make request , use 'file' key to upload file")
+            
+            # Check file Type
+            file_type_status = check_suffix(uploaded_file)
+            if not file_type_status:
+                return FILE_NOT_ACCEPTABLE_RESPONSE( "Invalid File Type , Only CSV file Accepted.")
+
+            # check if filename is not matched
+            if uploaded_file.name not in file_names_array:
+                return BAD_RESPONSE(f"Invalid file name. Correct file names are: {', '.join(file_names_array)}")
+
+            
+            # GET TAB TYPE and check it is correct or not 
+            TAB_TYPE = payload.get("tab_type")
+            if TAB_TYPE not in tab_types:
+                return BAD_RESPONSE(f"Invalid Tab Type , Valid Tab type is {', '.join(tab_types)}")
+            
+            # Check dataframe columns 
+            df = pd.read_csv(uploaded_file)
+            column_status , expected_columns = check_columns(TAB_TYPE ,df)
+            if not column_status:
+                return FILE_NOT_ACCEPTABLE_RESPONSE(f"Columns does not matched , Accepted columns list is : {expected_columns}")
+
+            # Get Base dir where csv load 
+            Base_dir = self.DATA_DIR_PATH(TAB_TYPE)
+           
+            # Define a Base Dir Path and create dir
+            BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , Base_dir)
+            os.makedirs(BASE_DIR_PATH , exist_ok=True)
+
+            # Define file path
+            file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
+
+            # Replace old file with new file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"Old File replace with new file : {file_path}")
+
+            with open(file_path , "wb+") as destination: 
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+
+            if TAB_TYPE =="profit":
+                # Call a function from product stucture file 
+                model_response = AllProductDetailMain(self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path(), file_path)
+
+                # send response when response return Dataframe
+                if isinstance(model_response , pd.DataFrame):
+                    return Response({
+                    "message": "Model Trained successfully with Profit Margin Data ",
+                    "status": status.HTTP_200_OK
+                    })
+                
+                # Handle when empty list comes
+                elif isinstance(model_response , list) and not model_response:
+                    return DATA_NOT_FOUND("No Data found for Profit Margin Data Tab")
+
+                # Handle when error message come
+                elif isinstance(model_response , str):
+                    return Internal_server_response(model_response)
+            
+            elif TAB_TYPE == "tax":
+                TaxModelResponse = TaxMainFunc(file_path, self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path())
+
+                if TaxModelResponse =="success":
+                    TaxModelResponse = "Tax Model Train successfully ..."
+
+                return Response({
+                    "message": TaxModelResponse,
+                }, status=status.HTTP_200_OK)
+
+            elif TAB_TYPE =="ceo-worker":
+                #CSV file name
+                Tablet_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Phone_Tablet.csv")
+                Website_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Website.csv")
+
+                # Transformer model 
+                TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")
+                os.makedirs(TransferModelDir , exist_ok=True)
+                
+                # Call function to train model with all rows
+                CeoworkerModelResponse = CeoWorkerMainFunc(Tablet_File_path,Website_File_path , self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path())
+                
+                if CeoworkerModelResponse =="success":
+                    CeoworkerModelResponse = "Model Train successfully ..."
+                return Response({
+                    "status": status.HTTP_200_OK,
+                    "message": CeoworkerModelResponse,
+                })
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to upload new data files, error: {str(e)} in line {exc_tb.tb_lineno}"
             return Internal_server_response(error_message)

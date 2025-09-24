@@ -35,3 +35,10 @@ def Internal_server_response(message: str):
         "message": message ,
         "status": status.HTTP_500_INTERNAL_SERVER_ERROR,
     }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def FILE_NOT_ACCEPTABLE_RESPONSE(message):
+    return Response({
+        "message": message,
+        "status": status.HTTP_406_NOT_ACCEPTABLE,
+    },
+    status= status.HTTP_406_NOT_ACCEPTABLE)
