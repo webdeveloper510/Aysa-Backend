@@ -22,6 +22,7 @@ os.environ["DJANGO_RUNSERVER_HIDE_WARNING"] = "true"
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+HOST ='local'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -34,10 +35,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['api.the-aysa.com','localhost','127.0.0.1']
 
-
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,9 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 CORS_ORIGIN_ALLOW_ALL = True
-
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "https://localhost:5500",
@@ -69,7 +65,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://localhost:3000",
     "https://api.the-aysa.com",
 ]
-
 ROOT_URLCONF = 'SearchMind.urls'
 
 TEMPLATES = [
@@ -93,14 +88,10 @@ REST_FRAMEWORK = {
     )
 }
 
-
-
 WSGI_APPLICATION = 'SearchMind.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -111,7 +102,6 @@ DATABASES = {
         "PORT" : 3306
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -147,13 +137,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_ROOT ='staticfiles'
+STATICFILES_DIRS = [os.path.join(BASE_DIR,"static")]
+STATIC_URL = '/static/'
+MEDIA_URL = "/media/"
+
+# Define media root
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static', 'media')  # Ensure this directory exists
+
+if HOST =='live':
+    BASE_URL='http://127.0.0.1:8000'
+                
+else:
+    BASE_URL='https://api.the-aysa.com'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-            
-#BASE_URL ="http://127.0.0.1:8000"
-BASE_URL ="https://api.the-aysa.com"

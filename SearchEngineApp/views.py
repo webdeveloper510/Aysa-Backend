@@ -25,6 +25,9 @@ from .profit_margin_predict import *
 from .ceo_worker import *
 from sentence_transformers import SentenceTransformer , util
 from django.contrib.auth.hashers import make_password   , check_password
+from SearchMind.settings import *
+import requests
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -1182,9 +1185,7 @@ class GlobalSearchAPIView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # Import Base url from the setting file
-            from SearchMind.settings import BASE_URL
-            import requests
-
+   
 
             # Payload data
             data = {"query":payload.get("query") , "tab_type": "profit", "device_type":device_type }
@@ -1261,3 +1262,35 @@ class GlobalSearchAPIView(APIView):
             print(error_message)
             return error_message
 
+
+# APi for send file url
+class DataFilesSync(APIView):
+    def get(self, request, format=None):
+        try:
+            base_path = os.path.join(os.getcwd(), "static", "media")
+
+            # Define your files
+            files = [
+                ("Profit Data", "profit_margin.csv"),
+                ("Tax Data", "Tax_Avoidance.csv"),
+                ("CEO Worker Data", "Phone_Tablet.csv"),
+                ("CEO Worker Data", "Website.csv"),
+            ]
+
+            file_list = []
+
+            for folder, filename in files:
+                file_path = os.path.join(base_path, folder, filename)
+                file_url = file_path.replace(os.getcwd(), BASE_URL)
+
+                file_list.append({
+                    "filename": filename,
+                    "file_url": file_url
+                })
+
+            return Response({"files": file_list, "status": 200}, status=200)
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to load data files, error: {str(e)} in line {exc_tb.tb_lineno}"
+            return Internal_server_response(error_message)
