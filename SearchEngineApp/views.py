@@ -1282,6 +1282,10 @@ class DataFilesSync(APIView):
             for folder, filename in files:
                 file_path = os.path.join(base_path, folder, filename)
                 file_url = file_path.replace(os.getcwd(), BASE_URL)
+                
+                # check if host live then replace static string
+                if HOST =="live":
+                    file_url = file_url.replace("/static", "")
 
                 file_list.append({
                     "filename": filename,
