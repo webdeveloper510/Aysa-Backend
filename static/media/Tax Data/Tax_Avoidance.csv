@@ -3,7 +3,7 @@ Amazon,2021,$2.1 billion,$5.4 billion
 Amazon,2022,$700 million,$6.5 billion
 Amazon,2023,$1.3 billion,$5.2 billion
 Amazon,2024,$500 million,$7.1 billion
-Apple,2021,$14.5 billion,$4.1 billion
+Apple,2021,$14.5 billion,$6.5 billion
 Apple,2022,$13.9 billion,$4.8 billion
 Apple,2023,$15.2 billion,$3.6 billion
 Apple,2024,$14.1 billion,$4.2 billion
@@ -19,10 +19,6 @@ Meta (Facebook),2021,$2.3 billion,$3.7 billion
 Meta (Facebook),2022,$1.8 billion,$4.1 billion
 Meta (Facebook),2023,$2.5 billion,$3.3 billion
 Meta (Facebook),2024,$2.0 billion,$3.9 billion
-Tesla,2021,$300 million,$1.1 billion
-Tesla,2022,$0.00,$2.3 billion
-Tesla,2023,$0.00,$2.7 billion
-Tesla,2024,$0.00,$3.1 billion
 Netflix,2021,$800 million,$900 million
 Netflix,2022,$700 million,$1.0 billion
 Netflix,2023,$900 million,$800 million
@@ -841,10 +837,6 @@ Dr. Martens (US ops),2021,$40 million,$20 million
 Dr. Martens (US ops),2022,$40 million,$20 million
 Dr. Martens (US ops),2023,$50 million,$20 million
 Dr. Martens (US ops),2024,$50 million,$20 million
-ASICS America (expanded),2021,$20 million,$10 million
-ASICS America (expanded),2022,$20 million,$10 million
-ASICS America (expanded),2023,$20 million,$10 million
-ASICS America (expanded),2024,$20 million,$10 million
 K-Swiss (Evolved within Caleres),2021,$10 million,$10 million
 K-Swiss (Evolved within Caleres),2022,$10 million,$10 million
 K-Swiss (Evolved within Caleres),2023,$10 million,$10 million
@@ -993,10 +985,6 @@ Big Lots,2021,$30 million,$20 million
 Big Lots,2022,$30 million,$20 million
 Big Lots,2023,$30 million,$20 million
 Big Lots,2024,$30 million,$20 million
-Fred Meyer (Kroger ops),2021,$100 million,$70 million
-Fred Meyer (Kroger ops),2022,$100 million,$70 million
-Fred Meyer (Kroger ops),2023,$110 million,$70 million
-Fred Meyer (Kroger ops),2024,$110 million,$70 million
 Kroger,2021,$1.2 billion,$900 million
 Kroger,2022,$1.30 billion,$1.00 billion
 Kroger,2023,$1.30 billion,$1.00 billion
@@ -1073,26 +1061,22 @@ Food 4 Less,2021,$10 million,$10 million
 Food 4 Less,2022,$10 million,$10 million
 Food 4 Less,2023,$10 million,$10 million
 Food 4 Less,2024,$10 million,$10 million
-Aldi US Operations,2021,$80 million,$60 million
-Aldi US Operations,2022,$80 million,$60 million
-Aldi US Operations,2023,$90 million,$60 million
-Aldi US Operations,2024,$90 million,$60 million
 Trader Joe's,2021,$50 million,$40 million
 Trader Joe's,2022,$50 million,$40 million
 Trader Joe's,2023,$60 million,$40 million
 Trader Joe's,2024,$60 million,$40 million
-ALDI US (Distinct ops),2021,$80 million,$60 million
-ALDI US (Distinct ops),2022,$80 million,$60 million
-ALDI US (Distinct ops),2023,$90 million,$60 million
-ALDI US (Distinct ops),2024,$90 million,$60 million
+ALDI US,2021,$80 million,$60 million
+ALDI US,2022,$80 million,$60 million
+ALDI US,2023,$90 million,$60 million
+ALDI US,2024,$90 million,$60 million
 Casey’s General Stores,2021,$30 million,$20 million
 Casey’s General Stores,2022,$30 million,$20 million
 Casey’s General Stores,2023,$30 million,$20 million
 Casey’s General Stores,2024,$30 million,$20 million
-Giant Food (Ahold Delhaize US),2021,$40 million,$30 million
-Giant Food (Ahold Delhaize US),2022,$40 million,$30 million
-Giant Food (Ahold Delhaize US),2023,$40 million,$30 million
-Giant Food (Ahold Delhaize US),2024,$40 million,$30 million
+Giant Food  ,2021,$40 million,$30 million
+Giant Food  ,2022,$40 million,$30 million
+Giant Food  ,2023,$40 million,$30 million
+Giant Food  ,2024,$40 million,$30 million
 Dollar General,2021,$300 million,$200 million
 Dollar General,2022,$300 million,$200 million
 Dollar General,2023,$300 million,$200 million
@@ -1949,3 +1933,385 @@ GoPro,2021,$0M,$281M
 GoPro,2022,~$5.6M,$0M
 GoPro,2023,$0M,$0M
 GoPro,2024,$0M,$0M
+Versace,2024,$54 M,$98.7 M
+Versace,2023,$29 M,$106.9 M
+Versace,2022,$92 M,$98 M
+Versace,2021,$66 M,$0.00
+Dior,2024,$560 M,$-565.7 M
+Dior,2023,$616 M,$-140.2 M
+Dior,2022,$582 M,$-217 M
+Luis Vuitton,2024,$556 M,$-1462.1 M
+Luis Vuitton,2023,$612 M,$-1222.2 M
+Luis Vuitton,2022,$579 M,$-1229.4 M
+H&M ,2024,1$63 M,$144.9 M
+H&M ,2023,$528 M,$0.00
+H&M ,2022,$332 M,$0.00
+H&M ,2021,$472 M,$0.00
+Gucci,2021,$500 M,$300 M
+Gucci,2022,$600 M,$300 M
+Gucci,2023,$600 M,$400 M
+Gucci,2024,$700 M,$400 M
+Cartier ,2021,$100 M,$70 M
+Cartier ,2022,$110 M,$70 M
+Cartier ,2023,$110 M,$80 M
+Cartier ,2024,$120 M,$80 M
+Zara,2024,$204 M,$209.52 M
+Zara,2023,$1871 M,$263.78 M
+Zara,2022,$1405.95 M,$134.4 M
+Zara,2021,$1239 M,$119.18 M
+Lululemon ,2021,$120 M,$80 M
+Lululemon ,2022,$130 M,$80 M
+Lululemon ,2023,$140 M,$90 M
+Lululemon ,2024,$150 M,$90 M
+J-Crew,2024,$32.45 M ,$4.425 M 
+J-Crew,2023,$29.7 M ,$4.05 M 
+J-Crew,2022,$28.6 M ,$3.9 M 
+J-Crew,2021,$25.3 M ,$3.45 M 
+Nordstorm,2024,$99 M ,$-0.75 M 
+Nordstorm,2023,$13 M ,$23.75 M 
+Nordstorm,2022,$92 M ,$-7.75 M 
+Nordstorm,2021,$68 M ,$-6.5 M 
+Everlane,2021,$0.00,$0.00
+Everlane,2022,$0.21 M ,$0.03 M 
+Everlane,2023,$0.92 M ,$0.13 M 
+Everlane,2024,$0.44 M ,$0.06 M 
+Banana Republic ,2021,$67 M ,1$3.75 M 
+Banana Republic ,2022,$63 M ,$-97.75 M 
+Banana Republic ,2023,$54 M ,$85 M 
+Banana Republic ,2024,$2024 M,$-8.75 M 
+Samsung,2024,$2.26 B,$4.07 B
+Samsung,2023,$-3.43 B,$4.89 B
+Samsung,2022,$-7.15 B,$17.76 B
+Samsung,2021,$11.75 B,$2.02 B
+Google,2021,$4.9 B,$6.4 B
+Google,2022,$5.3 B,$6.1 B
+Google,2023,$6.0 B,$5.7 B
+Google,2024,$5.8 B,$6.0 B
+Sony,2021,$900 M,$335 M
+Sony,2022,$203 M,$944 M
+Sony,2023,$175 M,$868 M
+Sony,2024,$198 M,$638 M
+LG,2021,$0.45 B,$0.13 B
+LG,2022,$0.34 B,$0.14 B
+LG,2023,$0.33 B,$0.12 B
+LG,2024,$0.41 B,$0.12 B
+Asics   ,2021,$20 M,$10 M
+Asics   ,2022,$20 M,$10 M
+Asics   ,2023,$20 M,$10 M
+Asics   ,2024,$20 M,$10 M
+Adidas  ,2021,$300 M,$200 M
+Adidas  ,2022,$320 M,$210 M
+Adidas  ,2023,$330 M,$220 M
+Adidas  ,2024,$340 M,$220 M
+Ford,2021,$-130 M,4575 M
+Ford,2022,$-864 M,110 M
+Ford,2023,$-362 M,1353.8 M
+Ford,2024,$1339 M,469.2 M
+Toyota ,2021,$7.5 B,1.8 B
+Toyota ,2022,$8.2 B,2.7 B
+Toyota ,2023,$7.4 B,900 M
+Toyota ,2024,$13.1 B,1.6 B
+Chevrolet,2021,"$2,771 M",$0.00
+Chevrolet,2022,"$1,888 M",$372 M
+Chevrolet,2023,$563 M,"$1,521 M"
+Chevrolet,2024,"$2,556 M",$215 M
+General Motor,2021,$500 M,$1.23 B
+General Motor,2022,$600 M,$0.37 B
+General Motor,2023,$1.2 B,$1.52 B
+General Motor,2024,$1 B,$210 M
+Rivian ,2021,$0.00,$0.00
+Rivian ,2022,$4.00,$0.00
+Rivian ,2023,$1.00,$363 M 
+Rivian ,2024,$1.00,$363 M 
+Lucid,2021,$0.00,$0.00
+Lucid,2022,$0.00,$0.00
+Lucid,2023,$0.00,$0.00
+Lucid,2024,$0.00,$0.00
+BMW ,2021,$5.9 B,$500 M
+BMW ,2022,$6.8 B,$500 M
+BMW ,2023,$5.5 B,$300 M
+BMW ,2024,$3 B,$0.00
+Mercedes-Benz ,2021,$5 B,$1.0 B
+Mercedes-Benz ,2022,$5.1 B,$800 M
+Mercedes-Benz ,2023,$4.5 B,$600 M
+Mercedes-Benz ,2024,$3.2 B,$300 M
+Lexus,2021,$7.5 B,$1.8 B
+Lexus,2022,$8.2 B,$2.7 B
+Lexus,2023,$7.4 B,$900 M
+Lexus,2024,$13.1 B,$1.6 B
+Audi,2021,$4.7 B,$2.4 B
+Audi,2022,$6.2 B,$0.8 B
+Audi,2023,$5.3 B,$2.2 B
+Audi,2024,$4.4 B,$1.5 B
+Porsche,2021,$2450 M,$177 M
+Porsche,2022,$2950 M,$158 M
+Porsche,2023,$3300 M,$116 M
+Porsche,2024,$1750 M,$11 M
+Ferrari,2021,$280 M,$11 M
+Ferrari,2022,$250 M,$47 M
+Ferrari,2023,$370 M,$43 M
+Ferrari,2024,$400 M,$98 M
+Lamborghini,2021,$115 M,$11 M
+Lamborghini,2022,$135 M,$23 M
+Lamborghini,2023,$160 M,$23 M
+Lamborghini,2024,$180 M,$36 M
+Rolls-Royce,2021,$0.00,$0.00
+Rolls-Royce,2022,$0.00,$0.00
+Rolls-Royce,2023,$30 M,$580 M
+Rolls-Royce,2024,$600 M,$228 M
+Bentley,2021,$190 M,$14 M
+Bentley,2022,$165 M,$9 M
+Bentley,2023,$180 M,$6 M
+Bentley,2024,$85 M,$0.00
+Jaguar ,2021,$0.00,$0.00
+Jaguar ,2022,$64 M,$0.00
+Jaguar ,2023,$146 M,$0.00
+Jaguar ,2024,$176 M,$0.00
+Maserati,2021,$45 M,$0.00
+Maserati,2022,$36 M,$0.00
+Maserati,2023,$47 M,$0.00
+Maserati,2024,$47 M,$0.00
+Range Rover,2021,$0.00,$0.00
+Range Rover,2022,$346 M,$0.00
+Range Rover,2023,$24 M,$0.00
+Range Rover,2024,$594 M,$0.00
+Rolex,2021,$0.00,$320 M
+Rolex,2022,$0.00,$340 M
+Rolex,2023,$0.00,$340 M
+Rolex,2024,$0.00,$370 M
+Patek Philippe ,2021,$0.00,$50 M
+Patek Philippe ,2022,$0.00,$60 M
+Patek Philippe ,2023,$0.00,$70 M
+Patek Philippe ,2024,$0.00,$70 M
+Audemars Piguet ,2021,$0.00,$70 M
+Audemars Piguet ,2022,$0.00,$70 M
+Audemars Piguet ,2023,$0.00,$80 M
+Audemars Piguet ,2024,$0.00,$90 M
+Fitbit,2021,$0.00,$0.00
+Fitbit,2022,$0.00,$0.00
+Fitbit,2023,$0.00,$0.00
+Fitbit,2024,$0.00,$0.00
+Huawei ,2021,$2.7 B,$1.6 B
+Huawei ,2022,$2.3 B,$700 M
+Huawei ,2023,$1.9 B,$1 B
+Huawei ,2024,$1.6 B,$600 M
+Amazfit,2021,$7 M,$4 M
+Amazfit,2022,$0.00,$0.00
+Amazfit,2023,$3 M,$2 M
+Amazfit,2024,$0.00,$0.00
+TicWatch,2021,$8  M,$5 M
+TicWatch,2022,$11 M,$6 M
+TicWatch,2023,$11 M,$4  M
+TicWatch,2024,$23 M,4133 M
+HP ,2021,$900 M,$700 M
+HP ,2022,$800 M,$800 M
+HP ,2023,$700 M,$900 M
+HP ,2024,$600 M,$1.0 B
+JBL,2024,$502 M,$4.71 M 
+JBL,2023,$319 M ,$-178.98 M 
+JBL,2022,$209 M ,$23.51 M 
+JBL,2021,$211 M ,$-47.76 M 
+Dell,2024,$783 M ,$244 M 
+Dell,2023,$1520 M ,$123 M 
+Dell,2022,$1202 M ,$466 M 
+Dell,2021,$289 M ,$359 M 
+Lenovo,2024,$613.9 M ,$78.2 M 
+Lenovo,2023,$528.1 M ,$78.8 M 
+Lenovo,2022,$729.5 M ,$69.5 M 
+Lenovo,2021,$623.9 M ,$–17.6 M 
+Asus,2024,$92 M ,$15 M 
+Asus,2023,$124 M ,$7 M 
+Asus,2022,$0.00,$4 M 
+Asus,2021,$262 M ,$-24 M 
+Acer,2024,$0.00,$55.9 M 
+Acer,2023,$57.62 M ,$50.07 M 
+Acer,2022,$145.2 M ,$52.85 M 
+Acer,2021,$87.81 M ,$110.5 M 
+Valve,2021,$621.60 M ,$118.40 M
+Valve,2022,$638.40 M ,$121.60 M
+Valve,2023,$730.80 M ,$139.20 M
+Valve,2024,$907.20 M  ,$172.80 M
+HTC,2024,$0.00,$0.00
+HTC,2023,$0.00,$0.00
+HTC,2022,$0.00,$0.00
+HTC,2021,$0.00,$0.00
+Meta ,2021,$2.3 B,$3.7 B
+Meta ,2022,$1.8 B,$4.1 B
+Meta ,2023,$2.5 B,$3.3 B
+Meta ,2024,$2.0 B,$3.9 B
+GE Appliances ,2021,$82 M,$33 M
+GE Appliances ,2022,$85 M,$34 M
+GE Appliances ,2023,$84 M,$34 M
+GE Appliances ,2024,$83 M,$33 M
+Frigidaire,2021,$34 M,$14 M
+Frigidaire,2022,$28 M,$11 M
+Frigidaire,2023,$34 M,$13 M
+Frigidaire,2024,$34 M,$13 M
+Bosch,2021,$944 M,$224 M
+Bosch,2022,"$1,129 M",$0.00
+Bosch,2023,"$1,443 M",$0.00
+Bosch,2024,"$1,508 M",$0.00
+Maytag,2024,$10 M,$0 M
+Maytag,2023,$77 M,$18 M
+Maytag,2022,$265 M,$65 M
+Maytag,2021,$518 M,$127 M
+KitchenAid,2021,$518 M,$0.00
+KitchenAid,2022,$265 M,$0.00
+KitchenAid,2023,$77 M,$47 M
+KitchenAid,2024,$10 M,$3 M
+Haier,2021,$418 M,$198 M
+Haier,2022,$454 M,$207 M
+Haier,2023,$421 M,$275 M
+Haier,2024,$439 M,$351 M
+Sub-Zero,2021,$5 M,$2 M
+Sub-Zero,2022,$5 M,$2 M
+Sub-Zero,2023,$5 M,$2 M
+Sub-Zero,2024,$6 M,$2 M
+Pilgrim's Pride,2021,$61 M,$0.00
+Pilgrim's Pride,2022,$279 M,$0.00
+Pilgrim's Pride,2023,$43 M,$34 M
+Pilgrim's Pride,2024,$386 M,$0.00
+Tyson,2021,$981 M,$0.00
+Tyson,2022,$900 M,$0.00
+Tyson,2023,$(29) M,$0.00
+Tyson,2024,$270 M,$0.00
+Cargill Meat Solutions ,2021,$203 M,$81 M
+Cargill Meat Solutions ,2022,$248 M,$99 M
+Cargill Meat Solutions ,2023,$266 M,$106 M
+Cargill Meat Solutions ,2024,$240 M,$96 M
+UBS USA Holdings ,2024,$2.2 B,$0.00
+UBS USA Holdings ,2023,$1.6 B,$4.4 B
+UBS USA Holdings ,2022,$1.4 B,$569 M
+UBS USA Holdings ,2021,$1.6 B,$428 M
+Trident Seafoods,2021,$27 M,$11 M
+Trident Seafoods,2022,$28 M,$11 M
+Trident Seafoods,2023,$26 M,$10 M
+Trident Seafoods,2024,$24 M,$10 M
+Pacific Seafood,2021,$58 M,$23 M
+Pacific Seafood,2022,$58 M,$23 M
+Pacific Seafood,2023,$57 M,$23 M
+Pacific Seafood,2024,$57 M,$23 M
+Mowi USA,2021,$31 M,$12 M
+Mowi USA,2022,$28 M,$11 M
+Mowi USA,2023,$29 M,$12 M
+Mowi USA,2024,$31 M,$12 M
+American Seafood Group,2021,$25 M,$10 M
+American Seafood Group,2022,$26 M,$10 M
+American Seafood Group,2023,$25 M,$10 M
+American Seafood Group,2024,$26 M,$10 M
+Taylor Shellfish Farms,2021,$4 M,$1 M
+Taylor Shellfish Farms,2022,$4 M,$1 M
+Taylor Shellfish Farms,2023,$4 M,$2 M
+Taylor Shellfish Farms,2024,$5 M,$2 M
+Ward Oyster Company ,2024,$0.09 M,$0.02 M
+Ward Oyster Company ,2023,$0.11 M,$0.03 M
+Ward Oyster Company ,2022,$0.12 M,$0.03 M
+Ward Oyster Company ,2021,$0.10 M,$0.02 M
+Chatham Shellfish Company,2024,$0.08 M,$0.02 M
+Chatham Shellfish Company,2023,$0.09 M,$0.02 M
+Chatham Shellfish Company,2022,$0.10 M,$0.02 M
+Chatham Shellfish Company,2021,$0.09 M,$0.02 M
+Tomales Bay Oyster Company ,2024,$0.07 M,$0.02 M
+Tomales Bay Oyster Company ,2023,$0.08 M,$0.02 M
+Tomales Bay Oyster Company ,2022,$0.09 M,$0.02 M
+Tomales Bay Oyster Company ,2021,$0.07 M,$0.02 M
+Bevans Oyster Company,2024,$0.05 M,$0.01 M
+Bevans Oyster Company,2023,$0.06 M,$0.01 M
+Bevans Oyster Company,2022,$0.06 M,$0.01 M
+Bevans Oyster Company,2021,$0.05 M,$0.01 M
+Handy Seafood Inc,2021,$2 M,$1 M
+Handy Seafood Inc,2022,$2 M,$1 M
+Handy Seafood Inc,2023,$2 M,$1 M
+Handy Seafood Inc,2024,$2 M,$1 M
+"Phillips Foods, Inc",2021,$5 M,$2 M
+"Phillips Foods, Inc",2022,$5 M,$2 M
+"Phillips Foods, Inc",2023,$5 M,$2 M
+"Phillips Foods, Inc",2024,$5 M,$2 M
+	J. M. Clayton Seafood Company,2024,$0.04 M,$0.01 M
+	J. M. Clayton Seafood Company,2023,$0.05 M,$0.01 M
+	J. M. Clayton Seafood Company,2022,$0.06 M,$0.01 M
+	J. M. Clayton Seafood Company,2021,$0.05 M,$0.01 M
+Boston Lobster Company,2024,$0.57 M,$0.13 M
+Boston Lobster Company,2023,$0.60 M,$0.14 M
+Boston Lobster Company,2022,$0.65 M,$0.15 M
+Boston Lobster Company,2021,$0.54 M,$0.13 M
+Clearwater Seafoods LP,2024,$4 M,$0.92 M
+Clearwater Seafoods LP,2023,$4 M,$0.94 M
+Clearwater Seafoods LP,2022,$4 M,$1 M
+Clearwater Seafoods LP,2021,$4 M,$0.84 M
+Little Bay Lobster ,2024,$0.37 M,$0.09 M
+Little Bay Lobster ,2023,$0.39 M,$0.09 M
+Little Bay Lobster ,2022,$0.45 M,$0.10 M
+Little Bay Lobster ,2021,$0.36 M,$0.08 M
+Taylor Farms ,2024,$63 M,$15 M
+Taylor Farms ,2023,$61 M,$14 M
+Taylor Farms ,2022,$64 M,$15 M
+Taylor Farms ,2021,$51 M,$12 M
+Grimmway Farms,2024,$12 M,$3 M
+Grimmway Farms,2023,$12 M,$3 M
+Grimmway Farms,2022,$13 M,$3 M
+Grimmway Farms,2021,$11 M,$3 M
+Boskovich Farms,2024,$2 M,$0.00
+Boskovich Farms,2023,$2 M,$0.00
+Boskovich Farms,2022,$2 M,$0.00
+Boskovich Farms,2021,$2 M,$0.00
+Pero Family Farms,2024,$2 M,$0.00
+Pero Family Farms,2023,$2 M,$0.00
+Pero Family Farms,2022,$2 M,$0.00
+Pero Family Farms,2021,$1 M,$0.00
+Torrey Farms,2024,$1 M,$0.28 M
+Torrey Farms,2023,$1 M,$0.26 M
+Torrey Farms,2022,$1 M,$0.29 M
+Torrey Farms,2021,$1 M,$0.24 M
+Mastronardi Produce,2024,$16 M,$4 M
+Mastronardi Produce,2023,$16 M,$4 M
+Mastronardi Produce,2022,$14 M,$3 M
+Mastronardi Produce,2021,$12 M,$3 M
+Windset Farms,2024,$4 M,$1 M
+Windset Farms,2023,$3 M,$1 M
+Windset Farms,2022,$4 M,$1 M
+Windset Farms,2021,$3 M,$1 M
+Village Farms,2024,$0.08 M,$0.00
+Village Farms,2023,$0.41 M,$0.00
+Village Farms,2022,$0.00 M,$0.00
+Village Farms,2021,$0.00 M,$0.00
+BrightFarms,2021,$1 M,$0.00
+BrightFarms,2022,$2 M,$1 M
+BrightFarms,2023,$2 M,$1 M
+BrightFarms,2024,$3 M,$1 M
+J.R. Simplot Company,2024,$94 M,$22 M
+J.R. Simplot Company,2023,$89 M,$21 M
+J.R. Simplot Company,2022,$81 M,$19 M
+J.R. Simplot Company,2021,$68 M,$16 M
+Basic American Foods,2024,$11 M,$2 M
+Basic American Foods,2023,$10 M,$2 M
+Basic American Foods,2022,$11 M,$3 M
+Basic American Foods,2021,$9 M,$2 M
+Barilla (Barilla America),2021,$20 M,$8 M
+Barilla (Barilla America),2022,$21 M,$8 M
+Barilla (Barilla America),2023,$22 M,$9 M
+Barilla (Barilla America),2024,$22 M,$9 M
+Costco ,2024,$2.5 B,$0.00
+Costco ,2023,$2.2 B,$0.00
+Costco ,2022,$2.0 B,$0.00
+Costco ,2021,$1.5 B,$0.00
+FoodMaxx,2024,$5 M,$1 M
+FoodMaxx,2023,$5 M,$1 M
+FoodMaxx,2022,$5 M,$1 M
+FoodMaxx,2021,$4 M,$1 M
+Price Chopper ,2021,$91 M,$37 M
+Price Chopper ,2022,$100 M,$40 M
+Price Chopper ,2023,$100 M,$40 M
+Price Chopper ,2024,$101 M,$40 M
+Starbucks,2024,$1.2 B,$0 M
+Starbucks,2023,$1.3 B,$0 M
+Starbucks,2022,$925 M,$0.00
+Starbucks,2021,$1.3 B,$0.00
+Albertsons,2024,$276 M,$0.00
+Albertsons,2023,$406 M,$0.00
+Albertsons,2022,$409 M,$0.00
+Albertsons,2021,$261 M,$180 M
+Whole Foods Market,2024,$71 M,$17 M
+Whole Foods Market,2023,$70 M,$16 M
+Whole Foods Market,2022,$68 M,$16 M
+Whole Foods Market,2021,$65 M,$15 M

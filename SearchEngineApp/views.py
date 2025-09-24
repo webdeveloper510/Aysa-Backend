@@ -554,6 +554,11 @@ class TaxSemanticSearchView(APIView):
     def GetMatchedRowDict(self , model , user_query: str ,Input_df : pd.DataFrame, similarity_score : float) -> dict:
         try:
             df =Input_df.copy()
+            
+            # Remove dupicate rows
+            df = df.drop_duplicates(subset=["Company Name", "Year"])
+
+            print("After ", df.shape)
             query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
 
             # Convert all full Text  embeddings to tensor
@@ -621,7 +626,6 @@ class TaxSemanticSearchView(APIView):
 
             # Reaf full model and save mode
             df = pd.read_pickle(tax_embedding_df_path)
-
             original_df = df.copy()
 
             # Call function to get year status from  the user query ...
@@ -665,7 +669,7 @@ class TaxSemanticSearchView(APIView):
                   
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
-                    return Internal_server_response(MatchedRow)
+                    return BAD_RESPONSE(MatchedRow)
                 
                 # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
                 elif isinstance(MatchedRow , dict):
@@ -680,14 +684,13 @@ class TaxSemanticSearchView(APIView):
 
                     # SORT DATAFRAME BASED ON THE YEAR COLUMN
                     sorted_df = filtered_df.sort_values(by="Year" , ascending=False)
-                    
-                    # print("sorted_df : \n ", sorted_df[["Company Name", "Year", "Taxes Paid", "Taxes Avoided"]])
 
                     # IF LENGTH OF THE SORTED DATAFRAME GET ONLY FIRST 4 ROWS
                     if len(sorted_df) > 4:
                         sorted_df = sorted_df.iloc[0:4]
 
                     return ProductResponse("success",sorted_df.to_dict(orient="records"))
+                
                 
                 # IF THERE IS NO DATA RETURN DATA NOT FOUND RESPONSE
                 else:
