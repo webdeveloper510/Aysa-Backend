@@ -1188,3 +1188,4 @@ class TrainModelView(APIView):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Failed to upload new data files, error: {str(e)} in line {exc_tb.tb_lineno}"
             return Internal_server_response(error_message)
+        

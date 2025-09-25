@@ -1,18 +1,22 @@
 from django.test import TestCase
 
-import pandas as pd
+# import pandas as pd
 
-df1 = pd.read_csv("/home/mandeep/Desktop/mandeep_personal/InsightHub/SearchMind/test.csv")
-df2 = pd.read_csv("/home/mandeep/Desktop/mandeep_personal/InsightHub/SearchMind/test1.csv")
+# latest_df = pd.read_csv("/home/mandeep/Desktop/mandeep_personal/InsightHub/SearchMind/static/media/Profit Data/latest1.csv")
+# existing_df = pd.read_csv("/home/mandeep/Desktop/mandeep_personal/InsightHub/SearchMind/static/media/Profit Data/profit_margin.csv")
 
-print(df1.head())
-print(df2.head())
+# latest_df.columns = latest_df.columns.str.strip()
+# existing_df.columns = existing_df.columns.str.strip()
 
-df_combined = pd.concat([df1, df2], ignore_index=True)
-df_combined.drop_duplicates(inplace=True, ignore_index=True)
+# existing_df["Latest Url"] =  latest_df["Link to Product Pictures"]
+# existing_df["Latest Url"] = existing_df["Latest Url"].fillna(existing_df["Link to Product Pictures"])
 
-print()
-print(df_combined)
+# existing_df =existing_df.drop("Link to Product Pictures", axis=1)
+# existing_df = existing_df.rename({"Latest Url": "Link to Product Picture"})
+
+# existing_df.to_csv("/home/mandeep/Desktop/mandeep_personal/InsightHub/SearchMind/static/media/Profit Data/profit_margin.csv", index=False)
+
+
 
 
 
