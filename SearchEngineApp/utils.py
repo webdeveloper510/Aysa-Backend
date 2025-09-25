@@ -145,11 +145,10 @@ def check_columns(tab_type: str, dataframe: pd.DataFrame) -> bool:
     expected_columns = PRODUCT_DATA_COLUMNS
     if tab_type == "tax":
         expected_columns = TAX_DATA_COLUMNS
-    elif tab_type == "ceo-worker":
-        if "Pay Ratio" in dataframe_columns:
-                expected_columns = PHONE_CEO_WORKER_DATA_COLUMNS
-        else:
-            expected_columns = WEBSITE_CEO_WORKER_DATA_COLUMNS
+    elif tab_type == "phone":
+        expected_columns = PHONE_CEO_WORKER_DATA_COLUMNS
+    elif tab_type == "desktop":
+        expected_columns = WEBSITE_CEO_WORKER_DATA_COLUMNS
 
     # Normalize expected columns too
     expected_columns = [col.strip() for col in expected_columns]

@@ -1006,22 +1006,27 @@ class TrainModelView(APIView):
         if tab_type == "tax":
             embedding_base_dir=  "Tax"
 
-        elif tab_type =="ceo-worker":
+        elif tab_type =="phone" or tab_type =="desktop":
             embedding_base_dir = "CEO-Worker"
 
         Emedding_dir_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", embedding_base_dir)
         os.makedirs(Emedding_dir_path , exist_ok=True)
         return Emedding_dir_path
     
-    def DATA_DIR_PATH(self, tab_type):
+    def get_existing_file_path(self, tab_type):
         # Saved dir 
-        Base_dir = "Profit Data"
+        default_filename = os.path.join("Profit Data" , "profit_margin.csv")
         if tab_type =="tax":
-            Base_dir ="Tax Data"
+            default_filename =os.path.join("Tax Data" , "Tax_Avoidance.csv")
 
-        elif tab_type =="ceo-worker":
-            Base_dir="CEO Worker Data"
-        return Base_dir
+        elif tab_type =="phone":
+            default_filename =os.path.join("CEO Worker Data" , "Phone_Tablet.csv")
+
+        elif tab_type =="desktop":
+            default_filename =os.path.join("CEO Worker Data" , "Website.csv")
+
+        existing_file_path = os.path.join(os.getcwd() , "static", "media", default_filename)
+        return existing_file_path
     
         
     def Handle_invalid_filename(self,filename, tab_type):
@@ -1030,17 +1035,18 @@ class TrainModelView(APIView):
         correct_filename = 'profit_margin.csv'
         if tab_type == 'tax' and filename != 'Tax_Avoidance.csv':
             correct_filename =  'Tax_Avoidance.csv'
-        elif tab_type =="ceo-worker" and filename not in file_names_array:
-            correct_filename = ', '.join(file_names_array) 
+        elif tab_type =="phone"  and filename not in file_names_array:
+            correct_filename = "Phone_Tablet.csv"
         
+        elif tab_type =="desktop" and filename not in file_names_array:
+            correct_filename = "Website.csv"
         return correct_filename
-
 
 
     def post(self , request , format=None):
         try:
             file_names_array = ["profit_margin.csv", "Tax_Avoidance.csv", "Website.csv", "Phone_Tablet.csv"]
-            tab_types =["profit" , "tax", "ceo-worker"]
+            tab_types =["profit" , "tax", "phone", "desktop"]
 
             # Get Payload 
             payload = request.data
@@ -1067,7 +1073,6 @@ class TrainModelView(APIView):
             if uploaded_file.name not in file_names_array:
                 corrected_filename = self.Handle_invalid_filename(uploaded_file.name, TAB_TYPE)
                 return BAD_RESPONSE(f"Invalid file name. Correct file name is : {corrected_filename}")
-
             
             # GET TAB TYPE and check it is correct or not 
            
@@ -1075,33 +1080,65 @@ class TrainModelView(APIView):
                 return BAD_RESPONSE(f"Invalid Tab Type , Valid Tab type is {', '.join(tab_types)}")
             
             # Check dataframe columns 
-            df = pd.read_csv(uploaded_file)
-            column_status , expected_columns = check_columns(TAB_TYPE ,df)
+            new_df = pd.read_csv(uploaded_file)
+            column_status , expected_columns = check_columns(TAB_TYPE ,new_df)
             if not column_status:
                 return FILE_NOT_ACCEPTABLE_RESPONSE(f"Columns does not matched , Accepted columns list is : {expected_columns}")
 
-            # Get Base dir where csv load 
-            Base_dir = self.DATA_DIR_PATH(TAB_TYPE)
-           
-            # Define a Base Dir Path and create dir
-            BASE_DIR_PATH = os.path.join(os.getcwd() , "static" , "media" , Base_dir)
-            os.makedirs(BASE_DIR_PATH , exist_ok=True)
+            # Get Existing CSV file 
+            existing_file_path = self.get_existing_file_path(TAB_TYPE)
+            
+            df1 = pd.read_csv(existing_file_path)
 
-            # Define file path
-            file_path = os.path.join(BASE_DIR_PATH , uploaded_file.name)
+            # Remove extra spaces from the columns
+            df1.columns = df1.columns.str.strip()
+            new_df.columns = new_df.columns.str.strip()
 
-            # Replace old file with new file
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                print(f"Old File replace with new file : {file_path}")
+            # skip list based on TAB_TYPE
+            skip_cols = ["Link to Product Pictures"] if TAB_TYPE == "profit" else []
 
-            with open(file_path , "wb+") as destination: 
-                for chunk in uploaded_file.chunks():
-                    destination.write(chunk)
+            # 1) Make copies for comparison only
+            df1_cmp = df1.copy()
+            new_cmp = new_df.copy()
+
+            # 2) Work only on columns common to both dataframes
+            common_cols = df1.columns.intersection(new_df.columns)
+
+            for col in common_cols:
+                if col in skip_cols:
+                    continue
+                # only lowercase string-like columns (safe check)
+                if pd.api.types.is_string_dtype(df1[col]) or pd.api.types.is_string_dtype(new_df[col]):
+                    # use .where to preserve NaN (don't convert NaN to 'nan')
+                    df1_cmp[col] = df1[col].where(df1[col].notna(), None).astype(object).map(
+                        lambda x: x.lower().strip() if isinstance(x, str) else x
+                    )
+                    new_cmp[col] = new_df[col].where(new_df[col].notna(), None).astype(object).map(
+                        lambda x: x.lower().strip() if isinstance(x, str) else x
+                    )
+
+            # Find rows in new_df that are not present in df1 (comparison on the *_cmp copies)
+            mask = ~new_cmp.apply(tuple, axis=1).isin(df1_cmp.apply(tuple, axis=1))
+            df2_new = new_df[mask].copy()   # IMPORTANT: select rows from original new_df to preserve original case & skipped cols
+            
+            #  Merge and save only if new rows exist
+            if not df2_new.empty:
+                # Optionally drop duplicates inside df2_new itself (if needed)
+                df2_new = df2_new.drop_duplicates(ignore_index=True)
+
+                # Merge df
+                merged = pd.concat([df1, df2_new], ignore_index=True)
+
+                merged.to_csv(existing_file_path, index=False)
+                print(f"File updated with {len(df2_new)} new rows ")
+            else:
+                df1.to_csv(existing_file_path , index=False)
+
+            print("File saved with new data ....")
 
             if TAB_TYPE =="profit":
                 # Call a function from product stucture file 
-                model_response = AllProductDetailMain(self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path(), file_path)
+                model_response = AllProductDetailMain(self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path(), existing_file_path)
 
                 # send response when response return Dataframe
                 if isinstance(model_response , pd.DataFrame):
@@ -1119,7 +1156,7 @@ class TrainModelView(APIView):
                     return Internal_server_response(model_response)
             
             elif TAB_TYPE == "tax":
-                TaxModelResponse = TaxMainFunc(file_path, self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path())
+                TaxModelResponse = TaxMainFunc(existing_file_path, self.embedding_model_base_dir_path(TAB_TYPE), self.transfer_model_base_dir_path())
 
                 if TaxModelResponse =="success":
                     TaxModelResponse = "Tax Model Train successfully ..."
@@ -1128,7 +1165,7 @@ class TrainModelView(APIView):
                     "message": TaxModelResponse,
                 }, status=status.HTTP_200_OK)
 
-            elif TAB_TYPE =="ceo-worker":
+            elif TAB_TYPE =="phone" or TAB_TYPE=="desktop":
                 #CSV file name
                 Tablet_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Phone_Tablet.csv")
                 Website_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Website.csv")

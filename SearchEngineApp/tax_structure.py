@@ -94,6 +94,17 @@ class TaxModelStructure:
 
             df["tax_text_embedding"] = list(embeddings_full_text)
 
+            # Remove 0 values with N/A
+            df["Taxes Paid"] = df["Taxes Paid"].str.replace(
+                    r'^\$0+(\.0+)?(\s*(billion|million|b|m))?$',  # regex
+                    "N/A",
+                    regex=True)
+            
+            df["Taxes Avoided"] = df["Taxes Avoided"].str.replace(
+                    r'^\$0+(\.0+)?(\s*(billion|million|b|m))?$',  # regex
+                    "N/A",
+                    regex=True)
+            
             # save embedding df
             full_text_embedding_path = os.path.join(embedding_dir_path,"tax_embedding.pkl")
 

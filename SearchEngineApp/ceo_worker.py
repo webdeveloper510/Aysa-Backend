@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+import re
 import torch
 import joblib
 from sentence_transformers import SentenceTransformer , util
@@ -93,17 +94,30 @@ class CeoWorkerModelStructure:
             # Phone Tablet Embedding
             phone_embeddings_full_text = model.encode(phone_df['phone_text'].tolist(), show_progress_bar=True)
             phone_df["phone_text_embedding"] = list(phone_embeddings_full_text)
+            phone_df["CEO Total Compensation"] = phone_df["CEO Total Compensation"].str.replace(
+                r'^\s*\$0+(?:\.0+)?(?:\s*(?:billion|million|b|m))?\s*$',
+                "N/A",
+                regex=True,
+                flags=re.IGNORECASE
+            )
+
             full_text_embedding_path = os.path.join(embedding_dir_path,"ceo_phone_embedding.pkl")
             phone_df.to_pickle(full_text_embedding_path)
-            print( f"CEO Worker Phone / Tablet DataFrame saved to {full_text_embedding_path}")
 
             # Phone Tablet Embedding
             desktop_embeddings_full_text = model.encode(desktop_df['desktop_text'].tolist(), show_progress_bar=True)
             desktop_df["desktop_text_embedding"] = list(desktop_embeddings_full_text)
+            # Remove 0 values with N/A
+            desktop_df["CEO Total Compensation"] = desktop_df["CEO Total Compensation"].str.replace(
+                r'^\s*\$0+(?:\.0+)?(?:\s*(?:billion|million|b|m))?\s*$',
+                "N/A",
+                regex=True,
+                flags=re.IGNORECASE
+            )
+            
             full_text_embedding_path = os.path.join(embedding_dir_path,"ceo_desktop_embedding.pkl")
             desktop_df.to_pickle(full_text_embedding_path)
             print( f"CEO Worker Website  DataFrame saved to {full_text_embedding_path}")
-
             return "success"
         
         except Exception as e:
