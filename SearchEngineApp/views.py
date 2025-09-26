@@ -799,15 +799,12 @@ class TrackProductSearchCount(APIView):
 class TrackVisitorCount(APIView):
     def post(self , request , format= None):
         try:
-            
-            date_str = request.data.get("date_str")
             user_browser_id = request.data.get("browser_id")
             if not user_browser_id:
                 return BAD_RESPONSE(f"Browser ID is required , please send id with using key : 'browser_id'. ")
             
             # function to track vistor count 
             current_date = datetime.now().date()
-
             track_visitor_obj, created = VistorTrackCountModel.objects.get_or_create(
                 visit_date=current_date,
                 user_browser_id=user_browser_id,
@@ -835,8 +832,13 @@ class GetVistorView(APIView):
         try:
             date_str = request.GET.get("date_str")
             if date_str:
-                queryset = VistorTrackCountModel.objects.filter(visit_date =date_str).all().values()
+                try:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                except ValueError:
+                    return BAD_RESPONSE("Date format is not correct. Use YYYY-MM-DD.")
 
+            if date_str:
+                queryset = VistorTrackCountModel.objects.filter(visit_date =date_str).all().values()
             else:
                 queryset = VistorTrackCountModel.objects.all().values()
 
