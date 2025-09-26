@@ -236,7 +236,7 @@ class ProductSemanticSearchView(APIView):
             CEO_WORKER_JSON_DATA = global_search_obj.Filter_CeoWorker_Data(device_type ,brand_name , production_year)
             
             # call function to update product track coubnt 
-            vistor_track_res = ProductSearch_Object_create_func(ProductName , payload.get("tab_type"))
+            vistor_track_res = ProductSearch_Object_create_func(brand_name , ProductName , payload.get("tab_type"))
             
             # Function -3
             Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
@@ -757,7 +757,7 @@ class TokenProtectedView(APIView):
 
 
 # APi to get product Visitor Track count data
-class GetProductVisitorCount(APIView):
+class TrackProductSearchCount(APIView):
     def get(self,request):
         try:
 
@@ -769,16 +769,16 @@ class GetProductVisitorCount(APIView):
                 return DATA_NOT_FOUND("No data found .")
 
             df = pd.DataFrame(list(Product_Data_obj))
+            
+            df["brand_name"] = df["brand_name"].str.title()
+            df["product_name"] = df["product_name"].str.title()
 
             # Convert to datetime
             df["created_at"] = pd.to_datetime(df["created_at"])
-
-            # Extract only date
             df["date_only"] = df["created_at"].dt.date
 
             df = df.loc[df["date_only"].astype(str) == str(date_str)]
-            
-
+            df = df.drop(columns=["created_at","updated_at", "date_only"], axis=1)
             if df.empty:
 
                 return DATA_NOT_FOUND(f"No Data exist for Date : {date_str}")
@@ -795,6 +795,78 @@ class GetProductVisitorCount(APIView):
             print(error_message)
             return Internal_server_response(error_message)
         
+# Api for Track Visiotor count
+class TrackVisitorCount(APIView):
+    def post(self , request , format= None):
+        try:
+            
+            date_str = request.data.get("date_str")
+            user_browser_id = request.data.get("browser_id")
+            if not user_browser_id:
+                return BAD_RESPONSE(f"Browser ID is required , please send id with using key : 'browser_id'. ")
+            
+            # function to track vistor count 
+            current_date = datetime.now().date()
+
+            track_visitor_obj, created = VistorTrackCountModel.objects.get_or_create(
+                visit_date=current_date,
+                user_browser_id=user_browser_id,
+                defaults={
+                    "visit_count": 1  # start from 1 if new record
+                }
+            )
+            if not created:  # if it already exists, increment
+                track_visitor_obj.visit_count += 1
+                track_visitor_obj.save()
+
+            return Response({
+                "message": "success",
+                "status": status.HTTP_200_OK
+            },status=status.HTTP_200_OK)
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to create track  visitor count  Record, error ocuur : {str(e)} in line no : {exc_tb.tb_lineno}"
+            return Internal_server_response(error_message)
+
+# API FOR GET TRACK VISTOR BASED ON DATE
+class GetVistorView(APIView):
+    def get(self,request):
+        try:
+            date_str = request.GET.get("date_str")
+            if date_str:
+                queryset = VistorTrackCountModel.objects.filter(visit_date =date_str).all().values()
+
+            else:
+                queryset = VistorTrackCountModel.objects.all().values()
+
+            # If data not found
+            if not queryset:
+                return Response({
+                    "message": f"Data not found for : {date_str}" if date_str else "Data Not Found",
+                    "status": 400
+                }, status=400)
+
+            # Create dataframe
+            df = pd.DataFrame(list(queryset))
+            
+            # GET total visit
+            if date_str:
+                total_visits = df.loc[df["visit_date"].astype(str) == str(date_str) ,"visit_count"].sum()
+            else:
+                total_visits = df["visit_count"].sum()
+
+            return Response({
+                "message": f"Data get successfully for : {date_str}" if date_str else "Data get successfully",
+                "status": 200,
+                "total_visit_count": total_visits
+            }, status=200)
+
+        except Exception as e:
+            exc_type , exc_obj , exc_tb = sys.exc_info()
+            error_message = f"[ERROR] Failed to get track  visitor count data, error ocuur : {str(e)} in line no : {exc_tb.tb_lineno}"
+            return Internal_server_response(error_message)
+
 
 """     ###################################           GLOBAL API'S                    ###############################       """
 class GlobalSearchAPIView(APIView):

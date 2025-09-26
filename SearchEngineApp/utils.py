@@ -83,12 +83,12 @@ def get_year(text: str) -> str:
 
 
 # function to update track count of Product
-def ProductSearch_Object_create_func(product_name : str , tab_type : str):
+def ProductSearch_Object_create_func(brand_name : str ,product_name : str , tab_type : str):
     try:
         # get or create record for today
         visit_model_obj, created = ProductSearchTrack.objects.get_or_create(
             
-            #visit_day = current_date,
+            brand_name = brand_name,
             product_name=product_name,
             tab_type = tab_type,
             defaults={
@@ -105,6 +105,7 @@ def ProductSearch_Object_create_func(product_name : str , tab_type : str):
         error_message = f"[ERROR] Failed to get track count value, error: {str(e)} in line {exc_tb.tb_lineno}"
         return error_message
     
+
 
 # function to validate token
 def validate_token(token: str):

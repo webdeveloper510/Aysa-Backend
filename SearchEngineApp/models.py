@@ -1,6 +1,6 @@
 from django.db import models
 
-
+# Model to keep record of Product Search Count
 class ProductSearchTrack(models.Model):
     TAB_CHOICES = [
         ('profit', 'Profit'),
@@ -9,8 +9,9 @@ class ProductSearchTrack(models.Model):
     ]
 
     #visit_date = models.DateField()
-    product_name = models.CharField(max_length=255)
-    tab_type = models.CharField(max_length=20, choices=TAB_CHOICES)
+    brand_name = models.CharField(max_length=500)
+    product_name = models.CharField(max_length=500)
+    tab_type = models.CharField(max_length=100, choices=TAB_CHOICES)
     search_count = models.PositiveIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)  # optional
@@ -23,14 +24,17 @@ class ProductSearchTrack(models.Model):
     def __str__(self):
         return f"{self.product_name} ({self.tab_type}) - {self.search_count}"
 
+# Model to Track User visit Count
+class VistorTrackCountModel(models.Model):
+    user_browser_id = models.CharField(max_length=500)
+    visit_date = models.DateField()
+    visit_count = models.PositiveIntegerField(default=0)
 
-
+# Model to keep password for store admin password
 class AdminAuthenticationModel(models.Model):
     password = models.CharField(max_length = 1000)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now= True)
-
-['Brand', 'Product Name', 'Product Type', 'Category', 'Gender', 'Production Year', 'Link to Product Pictures', 'Release Price', 'Profit Margin', 'Wholesale Price']
 
 
 class ProfitData(models.Model):
