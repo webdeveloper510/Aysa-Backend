@@ -828,38 +828,23 @@ class TrackVisitorCount(APIView):
 
 # API FOR GET TRACK VISTOR BASED ON DATE
 class GetVistorView(APIView):
-    def get(self,request):
+    def get(self,format=None):
         try:
-            date_str = request.GET.get("date_str")
-            if date_str:
-                try:
-                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                except ValueError:
-                    return BAD_RESPONSE("Date format is not correct. Use YYYY-MM-DD.")
-
-            if date_str:
-                queryset = VistorTrackCountModel.objects.filter(visit_date =date_str).all().values()
-            else:
-                queryset = VistorTrackCountModel.objects.all().values()
+            queryset = VistorTrackCountModel.objects.all().values()
 
             # If data not found
             if not queryset:
                 return Response({
-                    "message": f"Data not found for : {date_str}" if date_str else "Data Not Found",
+                    "message": "Data Not Found",
                     "status": 400
                 }, status=400)
 
             # Create dataframe
             df = pd.DataFrame(list(queryset))
-            
-            # GET total visit
-            if date_str:
-                total_visits = df.loc[df["visit_date"].astype(str) == str(date_str) ,"visit_count"].sum()
-            else:
-                total_visits = df["visit_count"].sum()
+            total_visits = df["visit_count"].sum()
 
             return Response({
-                "message": f"Data get successfully for : {date_str}" if date_str else "Data get successfully",
+                "message":"Data get successfully",
                 "status": 200,
                 "total_visit_count": total_visits
             }, status=200)
