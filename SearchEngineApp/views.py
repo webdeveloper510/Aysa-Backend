@@ -434,16 +434,24 @@ class TaxSemanticSearchView(APIView):
                 if filtered_df.empty:
                     return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
                 
-                print('filtered_df : \n  ', filtered_df)
                 # call function to get most similar row
                 MatchedRow = self.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
-                
+               
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
                     return Internal_server_response(MatchedRow)
                 
                 # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
                 elif isinstance(MatchedRow , dict):
+
+                    # Get matched row data 
+                    matched_company_name = MatchedRow.get("Company Name")
+                    matched_year = MatchedRow.get("Year")
+                    product_name = f"{matched_company_name} {matched_year}"
+
+                    # call function to update product track coubnt 
+                    vistor_track_res = ProductSearch_Object_create_func(matched_company_name , product_name , payload.get("tab_type"))
+                
                     serached_df = pd.DataFrame([MatchedRow])
                     
                     # print("serached_df : \n ", serached_df[["Company Name", "Year", "Taxes Paid", "Taxes Avoided"]])
@@ -469,6 +477,9 @@ class TaxSemanticSearchView(APIView):
                 elif isinstance(MatchedRow , dict):
 
                     CompanyName = str(MatchedRow.get("Company Name")).lower().strip()
+
+                    # call function to update product track coubnt 
+                    vistor_track_res = ProductSearch_Object_create_func(CompanyName.title() , CompanyName.title() , payload.get("tab_type"))
 
                     # FILTERED DATAFRAME BASED ON THE COMPANY NAME
                     filtered_df = original_df.loc[original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName]
@@ -605,6 +616,7 @@ class CEOWorkerSemanticSearchView(APIView):
                 
                 # call function to get most similar row
                 MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
+                print("CEO work semantic search MatchedRow : \n ", MatchedRow )
                 
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
@@ -612,6 +624,14 @@ class CEOWorkerSemanticSearchView(APIView):
                 
                 # RETURN SUCCESS RESPONSE IF MATCHED ROW IS DICT
                 elif isinstance(MatchedRow , dict):
+
+                    # Get matched row data 
+                    matched_company_name = MatchedRow.get("Company Name")
+                    matched_year = MatchedRow.get("Year")
+                    product_name = f"{matched_company_name} {matched_year}"
+
+                    # call function to update product track coubnt 
+                    vistor_track_res = ProductSearch_Object_create_func(matched_company_name , product_name , payload.get("tab_type"))
                     searched_df = pd.DataFrame([MatchedRow])
                     
                     #print("searched_df : \n ", searched_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
@@ -635,6 +655,9 @@ class CEOWorkerSemanticSearchView(APIView):
                 elif isinstance(MatchedRow , dict):
 
                     CompanyName = str(MatchedRow.get("Company Name")).lower().strip()
+
+                    vistor_track_res = ProductSearch_Object_create_func(CompanyName.title() , CompanyName.title() , payload.get("tab_type"))
+
 
                     # FILTERED DATAFRAME BASED ON THE COMPANY NAME
                     filtered_df = original_df.loc[original_df["Company Name"].astype(str).str.lower().str.strip() == CompanyName]
@@ -767,7 +790,7 @@ class TrackProductSearchCount(APIView):
 
             if not Product_Data_obj:
                 return DATA_NOT_FOUND("No data found .")
-
+            
             df = pd.DataFrame(list(Product_Data_obj))
             
             df["brand_name"] = df["brand_name"].str.title()
@@ -779,14 +802,15 @@ class TrackProductSearchCount(APIView):
 
             df = df.loc[df["date_only"].astype(str) == str(date_str)]
             df = df.drop(columns=["created_at","updated_at", "date_only"], axis=1)
-            if df.empty:
 
-                return DATA_NOT_FOUND(f"No Data exist for Date : {date_str}")
+            total_visits = df["search_count"].sum()
+           
             
             return Response({
                 "message": f"No Data Found for Date : {date_str}" if df.empty else f"Data get successfully of date : {date_str}" ,
                 "status": status.HTTP_200_OK,
-                "data": df.to_dict(orient="records")
+                "total_search": total_visits,
+                "data": df.to_dict(orient="records"),
             })
         
         except Exception as e:
