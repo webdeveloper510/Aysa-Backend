@@ -616,7 +616,6 @@ class CEOWorkerSemanticSearchView(APIView):
                 
                 # call function to get most similar row
                 MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
-                print("CEO work semantic search MatchedRow : \n ", MatchedRow )
                 
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
@@ -627,16 +626,16 @@ class CEOWorkerSemanticSearchView(APIView):
 
                     # Get matched row data 
                     matched_company_name = MatchedRow.get("Company Name")
+                    matched_ceo_name = MatchedRow.get("CEO Name")
                     matched_year = MatchedRow.get("Year")
-                    product_name = f"{matched_company_name} {matched_year}"
+                    brand_name = f"{matched_company_name} {matched_year}"
 
                     # call function to update product track coubnt 
-                    vistor_track_res = ProductSearch_Object_create_func(matched_company_name , product_name , payload.get("tab_type"))
+                    vistor_track_res = ProductSearch_Object_create_func(brand_name , matched_ceo_name , payload.get("tab_type"))
                     searched_df = pd.DataFrame([MatchedRow])
                     
                     #print("searched_df : \n ", searched_df[["Company Name", "Year", "CEO Name", "CEO Total Compensation", "Frontline Worker Salary"]])
                     searched_df = searched_df.drop(columns=["tax_similarity", "tax_text_embedding", "text"])
-                    print("searched_df : \n ", searched_df)
                     
                     return ProductResponse("success",searched_df.to_dict(orient="records"))
                 
@@ -655,8 +654,9 @@ class CEOWorkerSemanticSearchView(APIView):
                 elif isinstance(MatchedRow , dict):
 
                     CompanyName = str(MatchedRow.get("Company Name")).lower().strip()
+                    CEOWorkerName = str(MatchedRow.get("CEO Name")).lower().strip()
 
-                    vistor_track_res = ProductSearch_Object_create_func(CompanyName.title() , CompanyName.title() , payload.get("tab_type"))
+                    vistor_track_res = ProductSearch_Object_create_func(CompanyName.title() , CEOWorkerName.title() , payload.get("tab_type"))
 
 
                     # FILTERED DATAFRAME BASED ON THE COMPANY NAME
