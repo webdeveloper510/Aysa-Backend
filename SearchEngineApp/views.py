@@ -132,11 +132,12 @@ class ProductSemanticSearchView(APIView):
             if isinstance(PROFIT_MARGIN_SIMILARITY_SCORE, str):
                 PROFIT_MARGIN_SIMILARITY_SCORE = round(float(PROFIT_MARGIN_SIMILARITY_SCORE),2)
 
-            # Required Fields
-            required_fields= ['query','tab_type', 'device_type']
+            # Required Fields\
+            required_fields= ['query','tab_type', 'device_type' , 'target_year']
 
             # Get Payload data
             payload = request.data
+       
 
             # Handle missing field
             missing_fields = [field for field in required_fields if payload.get(field) is None  or not payload.get(field)]
@@ -154,6 +155,11 @@ class ProductSemanticSearchView(APIView):
                     "message": "Invalid device type , Please choose one from them ['mobile' , 'desktop']" ,
                     "status": 400,
                 }, status=status.HTTP_400_BAD_REQUEST)
+            
+          
+            target_year =int(payload.get("target_year"))
+            # print("target_year===================>",target_year)
+
 
             # Create a object of gloabl search APIVIEW
             global_search_obj = GlobalSearchAPIView()
@@ -187,6 +193,7 @@ class ProductSemanticSearchView(APIView):
                 # HANDLE IF FUNCTION RETURN ERROR
                 elif isinstance(result_df ,pd.DataFrame):
                     json_output= result_df.to_dict(orient="records")
+                    #print("json_output=================>",json_output)
 
                     CEO_WORKER_JSON_DATA=[]
                     if json_output:
@@ -210,7 +217,8 @@ class ProductSemanticSearchView(APIView):
                 return ProfitProductResponse("No Data Matched", [], [])
 
             # Function -2
-            paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df)     # Get matched row parameter dict
+            paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df,target_year)     # Get matched row parameter dict
+            #print("matched_row_data_dict=========================>",paramter_dict,matched_row_data_dict)
 
             # create a dataframe from matched row data dict
             searched_df = pd.DataFrame([matched_row_data_dict])
@@ -365,10 +373,15 @@ class TaxSemanticSearchView(APIView):
 
             # SORT VALUES 
             embedding_df = (df.sort_values('tax_similarity', ascending=False).head(TOP_N))
-
+            
             # Filter Dataframe based on the threshold value
-            filtered_df = embedding_df.loc[embedding_df["tax_similarity"].astype(float) >= similarity_score]
 
+            matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
+            
+
+           
+            filtered_df = embedding_df.loc[embedding_df["tax_similarity"].astype(float) >= similarity_score]
+      
             if filtered_df.empty:
 
                 # Clean matched text before searching
@@ -430,6 +443,8 @@ class TaxSemanticSearchView(APIView):
                 
                 # Filter datfarame based on the year
                 filtered_df = df.loc[df["Year"].astype(int) == int(FilterYear)]
+
+                #print(filtered_df)
 
                 if filtered_df.empty:
                     return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
@@ -937,7 +952,7 @@ class GlobalSearchAPIView(APIView):
     def post(self,request, format=None):
         try:
             # Get Query from User
-            required_field =["query", "device_type"]
+            required_field =["query", "device_type", "target_year"]
 
             # get payload
             payload = request.data
@@ -951,6 +966,7 @@ class GlobalSearchAPIView(APIView):
             
 
             device_type =str(payload.get("device_type")).lower().strip()
+            
 
             if device_type not in ["mobile", "desktop"]:
                 return Response({
@@ -959,10 +975,10 @@ class GlobalSearchAPIView(APIView):
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # Import Base url from the setting file
-   
+            target_year =int(payload.get("target_year"))
 
             # Payload data
-            data = {"query":payload.get("query") , "tab_type": "profit", "device_type":device_type }
+            data = {"query":payload.get("query") , "tab_type": "profit", "device_type":device_type , "target_year":target_year }
             headers = {
                 "content_type": "application/json"
             }

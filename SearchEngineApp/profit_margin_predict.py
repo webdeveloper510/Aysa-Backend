@@ -102,9 +102,22 @@ class ProfitMarginPreidction:
         return embedding_df
 
     # function to get matched row and get required paramter
-    def GetMatchedRow_AndParameter(self , embedding_df : pd.DataFrame)-> dict:
-        matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]           # Get Most highest similarity rows
-        matched_row_data = matched_row.to_dict() 
+    def GetMatchedRow_AndParameter(self , embedding_df : pd.DataFrame, target_year:int=2025)-> dict:
+
+
+        filtered_df = embedding_df[embedding_df["Production Year"] == target_year]
+
+        # Check if filtered dataframe is not empty
+        if not filtered_df.empty:
+            # Get the row with the highest similarity score for that year
+            matched_row = filtered_df.loc[filtered_df["similarity_score"].idxmax()]
+            matched_row_data = matched_row.to_dict()
+        else:
+            matched_row_data = None  # or handle case when no matching year
+
+
+        # matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]           # Get Most highest similarity rows
+        # matched_row_data = matched_row.to_dict() 
                                                    # Convert Series row in dict
         # Get paramter from the dataframe
         matched_brand =str(matched_row_data.get("Brand")).lower().strip()
