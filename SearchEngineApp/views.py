@@ -14,6 +14,7 @@ from pathlib import Path
 import pandas as pd
 import torch
 import csv
+from datetime import date
 
 # import Project files
 from .response import *
@@ -833,7 +834,7 @@ class TrackProductSearchCount(APIView):
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
             print(error_message)
             return Internal_server_response(error_message)
-        
+
 # Api for Track Visiotor count
 class TrackVisitorCount(APIView):
     def post(self , request , format= None):
@@ -852,8 +853,12 @@ class TrackVisitorCount(APIView):
                 }
             )
             if not created:  # if it already exists, increment
-                track_visitor_obj.visit_count += 1
-                track_visitor_obj.save()
+                today = date.today() 
+                """ Added a condition to check, if the user requesting the browser in the same day it'll not increase the count for the browser to the user."""
+                if track_visitor_obj.visit_date != today:
+                    track_visitor_obj.visit_count += 1
+                    track_visitor_obj.save()
+                
 
             return Response({
                 "message": "success",
