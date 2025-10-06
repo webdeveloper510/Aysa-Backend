@@ -875,7 +875,6 @@ class GetVistorView(APIView):
     def get(self,format=None):
         try:
             queryset = VistorTrackCountModel.objects.all().values()
-
             # If data not found
             if not queryset:
                 return Response({
@@ -887,10 +886,19 @@ class GetVistorView(APIView):
             df = pd.DataFrame(list(queryset))
             total_visits = df["visit_count"].sum()
 
+            # Get Today's Visitors
+            today = date.today() 
+            df['visit_date'] = pd.to_datetime(df['visit_date']).dt.date
+            filtered_df = df[df['visit_date'] == today]
+            print(filtered_df)
+            todays_visitiors = filtered_df["visit_count"].sum()
+
+
             return Response({
                 "message":"Data get successfully",
                 "status": 200,
-                "total_visit_count": total_visits
+                "total_visit_count": total_visits,
+                "total_todays_visit_counts": todays_visitiors
             }, status=200)
 
         except Exception as e:
