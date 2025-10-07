@@ -81,11 +81,14 @@ def get_year(text: str) -> str:
     match = re.search(r"(19|20)\d{2}", text)  # no word boundaries
     return match.group(0) if match else "None"
 
-
+from datetime import date
 # function to update track count of Product
 def ProductSearch_Object_create_func(brand_name : str ,product_name : str , tab_type : str):
     try:
         # get or create record for today
+        # Get the current date
+        today = date.today()
+
         visit_model_obj, created = ProductSearchTrack.objects.get_or_create(
             
             brand_name = brand_name,
@@ -93,12 +96,19 @@ def ProductSearch_Object_create_func(brand_name : str ,product_name : str , tab_
             tab_type = tab_type,
             defaults={
                 'search_count':  0,
-                }
+                },
         )
-
-        visit_model_obj.search_count += 1
-        visit_model_obj.save()
-        return "success"
+        if visit_model_obj.created_at.date() != today:
+            # If created_at is not today, create a new record with search_count = 1
+            visit_model_obj.search_count = 1
+            visit_model_obj.created_at = today  # Update the created_at to today's date
+            visit_model_obj.save()
+            return "New record created with search count 1"
+        else:
+            # If created_at is today, just update the search_count
+            visit_model_obj.search_count += 1
+            visit_model_obj.save()
+            return "Search count updated"
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

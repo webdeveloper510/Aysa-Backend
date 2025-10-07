@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from datetime import datetime , timedelta
+from datetime import datetime , timedelta, date
 
 # Import python packages
 import os 
@@ -14,7 +14,6 @@ from pathlib import Path
 import pandas as pd
 import torch
 import csv
-from datetime import date
 
 # import Project files
 from .response import *
@@ -821,7 +820,6 @@ class TrackProductSearchCount(APIView):
 
             total_visits = df["search_count"].sum()
            
-            # grouped = df.groupby('tab_type').apply(lambda group: group.to_dict(orient='records')).to_dict()
             grouped = df.groupby('tab_type').agg({'search_count': 'sum'}).to_dict(orient='index')
             result_data = {tab: {'search_count': data['search_count']} for tab, data in grouped.items()}
             print(result_data)
