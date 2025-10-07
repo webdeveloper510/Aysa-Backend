@@ -821,12 +821,15 @@ class TrackProductSearchCount(APIView):
 
             total_visits = df["search_count"].sum()
            
-            
+            grouped = df.groupby('tab_type').apply(lambda group: group.to_dict(orient='records')).to_dict()
+            result_data = [{tab: records} for tab, records in grouped.items()]
+
             return Response({
                 "message": f"No Data Found for Date : {date_str}" if df.empty else f"Data get successfully of date : {date_str}" ,
                 "status": status.HTTP_200_OK,
                 "total_search": total_visits,
-                "data": df.to_dict(orient="records"),
+                # "data": df.to_dict(orient="records"),
+                "data": result_data
             })
         
         except Exception as e:
