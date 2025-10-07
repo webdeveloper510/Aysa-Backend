@@ -237,12 +237,12 @@ class ProductSemanticSearchView(APIView):
             production_year = int(matched_row_json[0]["Production Year"])
             searched_product_name = matched_row_json[0]["Product Name"]
             searched_product_type = matched_row_json[0]["Product Type"]
-            ProductName = searched_product_name + searched_product_type
+            # ProductName = searched_product_name + searched_product_type
+            ProductName = searched_product_name
 
 
             # GET CEO WORKER GAP DATA BASED ON THE PROFIT MARGIN DATA
             CEO_WORKER_JSON_DATA = global_search_obj.Filter_CeoWorker_Data(device_type ,brand_name , production_year)
-            
             # call function to update product track coubnt 
             vistor_track_res = ProductSearch_Object_create_func(brand_name , ProductName , payload.get("tab_type"))
             
