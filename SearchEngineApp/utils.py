@@ -88,7 +88,6 @@ def ProductSearch_Object_create_func(brand_name : str ,product_name : str , tab_
         # get or create record for today
         # Get the current date
         today = date.today()
-        print("Brand Name", brand_name, "Product Name", product_name)
         visit_model_obj, created = ProductSearchTrack.objects.get_or_create(
             
             brand_name = brand_name,

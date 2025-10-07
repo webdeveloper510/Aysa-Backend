@@ -845,7 +845,7 @@ class AnalysisTable(APIView):
 
             date_str = request.GET.get("date")
 
-            Product_Data_obj = ProductSearchTrack.objects.all().values()
+            Product_Data_obj = ProductSearchTrack.objects.all().values().order_by('-updated_at')
 
             if not Product_Data_obj:
                 return DATA_NOT_FOUND("No data found .")
