@@ -20,6 +20,8 @@ urlpatterns = [
     path("get-visitor/", GetVistorView.as_view()),
     path("admin-login", AdminAuthenticationView.as_view()),
     path("auth-check", TokenProtectedView.as_view()),
+    path("analysis-table", AnalysisTable.as_view()),
+    
     
     # GLOBAL API URLS
     path("global-search", GlobalSearchAPIView.as_view()),

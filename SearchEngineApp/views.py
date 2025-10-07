@@ -821,8 +821,10 @@ class TrackProductSearchCount(APIView):
 
             total_visits = df["search_count"].sum()
            
-            grouped = df.groupby('tab_type').apply(lambda group: group.to_dict(orient='records')).to_dict()
-            result_data = [{tab: records} for tab, records in grouped.items()]
+            # grouped = df.groupby('tab_type').apply(lambda group: group.to_dict(orient='records')).to_dict()
+            grouped = df.groupby('tab_type').agg({'search_count': 'sum'}).to_dict(orient='index')
+            result_data = {tab: {'search_count': data['search_count']} for tab, data in grouped.items()}
+            print(result_data)
 
             return Response({
                 "message": f"No Data Found for Date : {date_str}" if df.empty else f"Data get successfully of date : {date_str}" ,
@@ -837,6 +839,50 @@ class TrackProductSearchCount(APIView):
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
             print(error_message)
             return Internal_server_response(error_message)
+
+
+class AnalysisTable(APIView):
+    def get(self,request):
+        try:
+
+            date_str = request.GET.get("date")
+
+            Product_Data_obj = ProductSearchTrack.objects.all().values()
+
+            if not Product_Data_obj:
+                return DATA_NOT_FOUND("No data found .")
+            
+            df = pd.DataFrame(list(Product_Data_obj))
+            
+            df["brand_name"] = df["brand_name"].str.title()
+            df["product_name"] = df["product_name"].str.title()
+
+            # Convert to datetime
+            df["created_at"] = pd.to_datetime(df["created_at"])
+            df["date_only"] = df["created_at"].dt.date
+
+            df = df.loc[df["date_only"].astype(str) == str(date_str)]
+            df = df.drop(columns=["created_at","updated_at", "date_only"], axis=1)
+
+            total_visits = df["search_count"].sum()
+           
+            # grouped = df.groupby('tab_type').apply(lambda group: group.to_dict(orient='records')).to_dict()
+         
+
+            return Response({
+                "message": f"No Data Found for Date : {date_str}" if df.empty else f"Data get successfully of date : {date_str}" ,
+                "status": status.HTTP_200_OK,
+                "total_search": total_visits,
+                "data": df.to_dict(orient="records"),
+                # "data": grouped
+            })
+        
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
+            print(error_message)
+            return Internal_server_response(error_message)
+
 
 # Api for Track Visiotor count
 class TrackVisitorCount(APIView):
