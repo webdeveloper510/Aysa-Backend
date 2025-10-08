@@ -124,6 +124,7 @@ class ProductSemanticSearchView(APIView):
             return error_message
 
     def FilterMatchedRow_AndParameter(self, Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload):
+
 #     # Function -2
         paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df,target_year)     # Get matched row parameter dict
         #print("matched_row_data_dict=========================>",paramter_dict,matched_row_data_dict)
@@ -297,8 +298,7 @@ class ProductSemanticSearchView(APIView):
             
             if Embedding_df.empty:
                 Embedding_df = Embedding_df_.sort_values(by="similarity_score", ascending=False).head(2)
-                print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
-
+                target_year = Embedding_df["Production Year"]
                 return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
             
                 # return ProfitProductResponse("No Data Matched", [], [])
