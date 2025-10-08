@@ -276,7 +276,7 @@ class ProductSemanticSearchView(APIView):
                 # HANDLE IF FUNCTION RETURN ERROR
                 elif isinstance(result_df ,pd.DataFrame):
                     json_output= result_df.to_dict(orient="records")
-                    #print("json_output=================>",json_output)
+                    print("json_output=================>",json_output)
 
                     CEO_WORKER_JSON_DATA=[]
                     if json_output:
@@ -290,7 +290,7 @@ class ProductSemanticSearchView(APIView):
                 
             # Function -1
             Embedding_df_  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            # print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
+            # print("Embedding_df : \n ", Embedding_df_[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
             #print()
 
              # Filter out dataframe if similarity score greater than threshold Value
@@ -302,6 +302,8 @@ class ProductSemanticSearchView(APIView):
                 return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
             
                 # return ProfitProductResponse("No Data Matched", [], [])
+            # print("Embedding_df : \n ", Embedding_df_[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
+            target_year = Embedding_df["Production Year"]
             return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
             # # Function -2
             """Shifted to function FilterMatchedRow_AndParameter to handle the condition """
