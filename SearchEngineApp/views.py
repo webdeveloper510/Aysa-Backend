@@ -303,7 +303,7 @@ class ProductSemanticSearchView(APIView):
             
                 # return ProfitProductResponse("No Data Matched", [], [])
             # print("Embedding_df : \n ", Embedding_df_[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
-            target_year = Embedding_df["Production Year"]
+            # target_year = Embedding_df["Production Year"]
             return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
             # # Function -2
             """Shifted to function FilterMatchedRow_AndParameter to handle the condition """
