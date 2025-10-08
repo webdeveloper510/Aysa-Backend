@@ -123,7 +123,89 @@ class ProductSemanticSearchView(APIView):
             error_message = f"[ERROR] failed to get Products for matched single category , error is : {str(e)} in line no : {exc_tb.tb_lineno}"
             return error_message
 
-    
+    def FilterMatchedRow_AndParameter(self, Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload):
+#     # Function -2
+        paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df,target_year)     # Get matched row parameter dict
+        #print("matched_row_data_dict=========================>",paramter_dict,matched_row_data_dict)
+
+        # create a dataframe from matched row data dict
+        searched_df = pd.DataFrame([matched_row_data_dict])
+
+        # if searched dataframe is empty  return empty json 
+        if searched_df.empty:
+            return ProfitProductResponse("failed",[], [])
+
+        # Remove unneccary columns from searched dataframe
+        searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
+        matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
+
+
+        # Get Required Parameter from the Matched Dataframe
+        brand_name = str(matched_row_json[0]["Brand"]).lower().strip()
+        production_year = int(matched_row_json[0]["Production Year"])
+        searched_product_name = matched_row_json[0]["Product Name"]
+        searched_product_type = matched_row_json[0]["Product Type"]
+        # ProductName = searched_product_name + searched_product_type
+        ProductName = searched_product_name
+
+
+        # GET CEO WORKER GAP DATA BASED ON THE PROFIT MARGIN DATA
+        CEO_WORKER_JSON_DATA = global_search_obj.Filter_CeoWorker_Data(device_type ,brand_name , production_year)
+        # call function to update product track coubnt 
+        vistor_track_res = ProductSearch_Object_create_func(brand_name , ProductName , payload.get("tab_type"))
+        
+        # Function -3
+        Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
+
+        #print("Product_Category_df : \n", Product_Category_df)
+        #print()
+
+        # Return Response if only matched row dataframe is true
+        if Product_Category_df.empty:
+            return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
+
+        # Function -4
+        Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
+        #print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+        #print()
+
+        # Return Response if only matched row dataframe is true
+        if Product_Yearly_df.empty:
+            return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
+
+        # Function -5
+        Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
+        #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[50:90])
+
+        if Product_Gender_df.empty:
+            return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
+
+        # Function -6
+        brand_product_type_list= Profit_Obj.Filter_rows_list(paramter_dict , Product_Gender_df) 
+
+        # Function -7 
+        filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list)
+
+        if isinstance(filtered_df , list):
+            print("-- Skipping There is no any compare data found")
+            return ProfitProductResponse('success', searched_df.to_dict(orient="records"), [])
+
+        # Drop Unneccessary columns if it filtered_df is dataframe
+        if isinstance(filtered_df , pd.DataFrame) and not filtered_df.empty:
+            filtered_df = filtered_df.drop(columns=["text","similarity_score", "text_embedding", "brand_embedding", "brand"],  errors="ignore")      # remove unneccessary dataframe
+
+        #Add percentage sign
+        filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
+
+        # Merge bot dataframe
+        merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
+        
+        # Only return three product in API
+        if len(merge_df) > 3:
+            merge_df = merge_df.iloc[0:3]
+
+        return ProfitProductResponse('success', merge_df.to_dict(orient="records"), CEO_WORKER_JSON_DATA)
+        print()
    # Main function 
     def post(self, request, format=None):
         try:
@@ -206,97 +288,23 @@ class ProductSemanticSearchView(APIView):
                     return ProfitProductResponse("success", json_output, CEO_WORKER_JSON_DATA)
                 
             # Function -1
-            Embedding_df  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            #print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
+            Embedding_df_  = Profit_Obj.apply_embedding()            # call function to get embedding df
+            # print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
             #print()
 
              # Filter out dataframe if similarity score greater than threshold Value
-            Embedding_df = Embedding_df.loc[Embedding_df["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
+            Embedding_df = Embedding_df_.loc[Embedding_df_["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
             
             if Embedding_df.empty:
-                return ProfitProductResponse("No Data Matched", [], [])
+                Embedding_df = Embedding_df_.sort_values(by="similarity_score", ascending=False).head(2)
+                print("Embedding_df : \n ", Embedding_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
 
-            # Function -2
-            paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df,target_year)     # Get matched row parameter dict
-            #print("matched_row_data_dict=========================>",paramter_dict,matched_row_data_dict)
-
-            # create a dataframe from matched row data dict
-            searched_df = pd.DataFrame([matched_row_data_dict])
-
-            # if searched dataframe is empty  return empty json 
-            if searched_df.empty:
-                return ProfitProductResponse("failed",[], [])
-
-            # Remove unneccary columns from searched dataframe
-            searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
-            matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
-
-
-            # Get Required Parameter from the Matched Dataframe
-            brand_name = str(matched_row_json[0]["Brand"]).lower().strip()
-            production_year = int(matched_row_json[0]["Production Year"])
-            searched_product_name = matched_row_json[0]["Product Name"]
-            searched_product_type = matched_row_json[0]["Product Type"]
-            # ProductName = searched_product_name + searched_product_type
-            ProductName = searched_product_name
-
-
-            # GET CEO WORKER GAP DATA BASED ON THE PROFIT MARGIN DATA
-            CEO_WORKER_JSON_DATA = global_search_obj.Filter_CeoWorker_Data(device_type ,brand_name , production_year)
-            # call function to update product track coubnt 
-            vistor_track_res = ProductSearch_Object_create_func(brand_name , ProductName , payload.get("tab_type"))
+                return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
             
-            # Function -3
-            Product_Category_df = Profit_Obj.Get_Category_based_df(paramter_dict)  
-
-            #print("Product_Category_df : \n", Product_Category_df)
-            #print()
-
-            # Return Response if only matched row dataframe is true
-            if Product_Category_df.empty:
-                return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
-
-            # Function -4
-            Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-            #print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
-            #print()
-
-            # Return Response if only matched row dataframe is true
-            if Product_Yearly_df.empty:
-                return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
-
-            # Function -5
-            Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
-            #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[50:90])
-
-            if Product_Gender_df.empty:
-                return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
-
-            # Function -6
-            brand_product_type_list= Profit_Obj.Filter_rows_list(paramter_dict , Product_Gender_df) 
-
-            # Function -7 
-            filtered_df = Profit_Obj.Filtered_Dataframe(brand_product_type_list)
-
-            if isinstance(filtered_df , list):
-                print("-- Skipping There is no any compare data found")
-                return ProfitProductResponse('success', searched_df.to_dict(orient="records"), [])
-
-            # Drop Unneccessary columns if it filtered_df is dataframe
-            if isinstance(filtered_df , pd.DataFrame) and not filtered_df.empty:
-                filtered_df = filtered_df.drop(columns=["text","similarity_score", "text_embedding", "brand_embedding", "brand"],  errors="ignore")      # remove unneccessary dataframe
-
-            #Add percentage sign
-            filtered_df["Profit Margin"] = filtered_df["Profit Margin"].astype(float).map(lambda x: f"{x:.2f} %")
- 
-            # Merge bot dataframe
-            merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
-            
-            # Only return three product in API
-            if len(merge_df) > 3:
-                merge_df = merge_df.iloc[0:3]
-
-            return ProfitProductResponse('success', merge_df.to_dict(orient="records"), CEO_WORKER_JSON_DATA)
+                # return ProfitProductResponse("No Data Matched", [], [])
+            return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
+            # # Function -2
+            """Shifted to function FilterMatchedRow_AndParameter to handle the condition """
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
