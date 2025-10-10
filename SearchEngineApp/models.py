@@ -17,8 +17,9 @@ class ProductSearchTrack(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # optional
     updated_at = models.DateTimeField(auto_now=True)      # optional
 
-    class Meta:
-        unique_together = ('product_name', 'tab_type')  
+    # ?Removed this 
+    # class Meta:
+    #     unique_together = ('product_name', 'tab_type')  
         # ensures each product+tab combination is unique
 
     def __str__(self):
