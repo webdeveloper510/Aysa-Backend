@@ -1021,7 +1021,7 @@ class GlobalSearchAPIView(APIView):
     def post(self,request, format=None):
         try:
             # Get Query from User
-            required_field =["query", "device_type", "target_year"]
+            required_field =["query", "device_type"]
 
             # get payload
             payload = request.data
@@ -1043,11 +1043,9 @@ class GlobalSearchAPIView(APIView):
                     "status": 400,
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # Import Base url from the setting file
-            target_year =int(payload.get("target_year"))
 
             # Payload data
-            data = {"query":payload.get("query") , "tab_type": "profit", "device_type":device_type , "target_year":target_year }
+            data = {"query":payload.get("query") , "tab_type": "profit", "device_type":device_type}
             headers = {
                 "content_type": "application/json"
             }
