@@ -115,12 +115,11 @@ class ProfitMarginPreidction:
         matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]
         matched_row_data = matched_row.to_dict()
        
-
         # Get Year of Most highest similarity row
         matched_year = int(matched_row_data.get("Production Year"))
 
         # Implement logic to check user asked year is matched with model predict row data
-        if matched_year != int(filter_year):
+        if filter_year != 'None' and matched_year != int(filter_year):
             print("Year does not matched =========================")
             GetYearBasedDF = embedding_df.loc[
                 (embedding_df["Production Year"].astype(int) == int(filter_year))
