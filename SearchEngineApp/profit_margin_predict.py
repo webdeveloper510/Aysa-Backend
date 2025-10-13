@@ -23,19 +23,6 @@ class ProfitMarginPreidction:
         self.user_query = user_query
         self.original_df = pickle_df.copy()
 
-    # function to convert profit margin api
-    def convert_profit_margin(self,df: pd.DataFrame) -> pd.DataFrame:
-        # Remove all characters except digits and dot
-        df["Profit Margin"] = (
-            df["Profit Margin"]
-            .astype(str)
-            .str.replace(r"[^0-9.-]", "", regex=True)  # keep digits, minus, dot
-            .replace("", "0")  # if empty string, set to 0
-            .astype(float)
-        )
-        return df
-    
-
     # function to  change profit margin value...
     # Remove all characters except digits and dot
     def convert_profit_margin(self , df : pd.DataFrame) -> pd.DataFrame:
@@ -88,18 +75,24 @@ class ProfitMarginPreidction:
         query_embedding = self.model.encode(self.user_query, convert_to_tensor=True).to(device)      # convert user query into vector   
         # Convert all full Text  embeddings to tensor
         # tensor([-0.0947, -0.0559, 0.0754, 0.0389, ...], device='cuda:0')
+
         full_embeddings = [torch.tensor(e).to(device) for e in self.df['text_embedding']]  
         full_text_embedding_tensor = torch.stack(full_embeddings)                #(num_rows, embedding_dimension)   like     [10000, 384]
         similarity_score = util.cos_sim(query_embedding, full_text_embedding_tensor)[0].cpu().numpy()
+       
+        brand_embeddings = [torch.tensor(e).to(device) for e in self.df['brand_embedding']]  
+        brand_name_embedding_tensor = torch.stack(brand_embeddings)               
+        brand_similarity_score = util.cos_sim(query_embedding, brand_name_embedding_tensor)[0].cpu().numpy()
+
         self.df['similarity_score'] = similarity_score
+        self.df['brand_similarity_score'] = brand_similarity_score
         
         # remove unnessary columns from the Embeddingf df
         embedding_df = (
-            self.df.drop(columns=["text_embedding"])
+            self.df.drop(columns=["text_embedding", "brand_embedding"])
             .sort_values('similarity_score', ascending=False)
             .head(top_n)
             )
-        
         return embedding_df
 
 
@@ -112,22 +105,30 @@ class ProfitMarginPreidction:
         # Extract key fields
         matched_year = int(matched_row_data.get("Production Year"))
         matched_brand = str(matched_row_data.get("Brand")).lower().strip()
+        matched_category = str(matched_row_data.get("Category")).lower().strip()
 
         # Check if user-provided year matches the highest-similarity row's year
         if filter_year != 'None' and matched_year != int(filter_year):
             print("Year does not match =========================")
+            sort_brand_df = embedding_df.sort_values("brand_similarity_score", ascending=False).head(top_n)
 
+            sorted_df_matched_row = sort_brand_df.loc[sort_brand_df["brand_similarity_score"].idxmax()]
+            # Get brand name 
+            MatchedBrand = str(sorted_df_matched_row["Brand"]).lower().strip()
+            
             # Filter dataframe for the same brand and requested year
             GetYearBasedDF = embedding_df.loc[
-                (embedding_df["Brand"].astype(str).str.lower().str.strip() == matched_brand) &
+                (embedding_df["Brand"].astype(str).str.lower().str.strip() == MatchedBrand) &
                 (embedding_df["Production Year"].astype(int) == int(filter_year))
             ]
 
+            # if user query year does not exist
             if GetYearBasedDF.empty:
+
                 # No data for requested year → pick a random available year for same brand
                 unique_years_list = (
                     embedding_df.loc[
-                        embedding_df['Brand'].astype(str).str.lower().str.strip() == matched_brand,
+                        embedding_df['Brand'].astype(str).str.lower().str.strip() == MatchedBrand,
                         'Production Year'
                     ]
                     .dropna()
@@ -137,12 +138,12 @@ class ProfitMarginPreidction:
                 )
 
                 if not unique_years_list:
-                    print("No available years found for brand:", matched_brand)
+                    print("No available years found for brand:", MatchedBrand)
                     return None, None
 
                 random_year = random.choice(unique_years_list)
                 random_year_df = embedding_df.loc[
-                    (embedding_df["Brand"].astype(str).str.lower().str.strip() == matched_brand) &
+                    (embedding_df["Brand"].astype(str).str.lower().str.strip() == MatchedBrand) &
                     (embedding_df["Production Year"].astype(int) == int(random_year))
                 ]
 
@@ -153,7 +154,7 @@ class ProfitMarginPreidction:
                 # Data exists for requested year — take highest similarity row from that year
                 matched_row = GetYearBasedDF.loc[GetYearBasedDF["similarity_score"].idxmax()]
                 matched_row_data = matched_row.to_dict()
-
+        
         # Extract final parameters
         matched_brand = str(matched_row_data.get("Brand")).lower().strip()
         matched_category = str(matched_row_data.get("Category")).lower().strip()

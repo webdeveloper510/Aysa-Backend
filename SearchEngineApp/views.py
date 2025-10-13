@@ -140,7 +140,7 @@ class ProductSemanticSearchView(APIView):
             return ProfitProductResponse("failed",[], [])
 
         # Remove unneccary columns from searched dataframe
-        searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand'], errors="ignore", axis=1)
+        searched_df = searched_df.drop(columns=["text", 'similarity_score','brand_embedding', 'brand', "brand_similarity_score"], errors="ignore", axis=1)
         matched_row_json = searched_df.to_dict(orient="records")            # convert json into dict
 
 
