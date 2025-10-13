@@ -98,9 +98,10 @@ class ProductModelStructure:
 
             # make a copy of dataframe
             df = df.copy()
-            # Add two column with different columns groups
-            df["text"] = (df["Brand"] +" " + df["Product Name"] + " " +df["Product Type"])
-            df["brand"] = df["Brand"]
+            
+            #Add two column with different columns groups
+            df["text"] = (df["Brand"] +" " + df["Product Name"] + " " +df["Product Type"] + " " +df["Production Year"].astype(str))
+            df["brand"] = df["Brand"] 
 
             # Apply preprocess columns on both column
             df["text"] = df["text"].apply(preprocess_text)

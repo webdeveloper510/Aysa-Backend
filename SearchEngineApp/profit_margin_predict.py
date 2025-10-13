@@ -12,7 +12,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Take a  parameter to filter out dataframe
 top_n = 80
-similarity = 0.75
+#similarity = 0.75
 
 class ProfitMarginPreidction:
 
@@ -102,30 +102,45 @@ class ProfitMarginPreidction:
         return embedding_df
 
     # function to get matched row and get required paramter
-    def GetMatchedRow_AndParameter(self , embedding_df : pd.DataFrame, target_year:int=2025)-> dict:
+    def GetMatchedRow_AndParameter(self ,filter_year , embedding_df : pd.DataFrame)-> dict:
+        
+        # Filter out dataframe based on the year 
+        yearly_filtered_df = embedding_df.loc[embedding_df["Production Year"].astype(int) == int(filter_year)] if filter_year != "None" else embedding_df
 
+        # Handle if there is no data exist for filter year
+        if yearly_filtered_df.empty:
+            return None , None
 
-        filtered_df = embedding_df[embedding_df["Production Year"] == target_year]
+        # Get the row with the highest similarity score for that year
+        matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]
+        matched_row_data = matched_row.to_dict()
+       
 
-        # Check if filtered dataframe is not empty
-        if not filtered_df.empty:
-            # Get the row with the highest similarity score for that year
-            matched_row = filtered_df.loc[filtered_df["similarity_score"].idxmax()]
+        # Get Year of Most highest similarity row
+        matched_year = int(matched_row_data.get("Production Year"))
+
+        # Implement logic to check user asked year is matched with model predict row data
+        if matched_year != int(filter_year):
+            print("Year does not matched =========================")
+            GetYearBasedDF = embedding_df.loc[
+                (embedding_df["Production Year"].astype(int) == int(filter_year))
+            ]
+            
+            # If Target Year does not exist in dataframe 
+            if GetYearBasedDF.empty:
+                return None , None
+            
+            # again get most highest similarity matched row based on the user asked year
+            matched_row = GetYearBasedDF.loc[GetYearBasedDF["similarity_score"].idxmax()]
             matched_row_data = matched_row.to_dict()
-        else:
-            matched_row_data = None  # or handle case when no matching year
 
-
-        # matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]           # Get Most highest similarity rows
-        # matched_row_data = matched_row.to_dict() 
-                                                   # Convert Series row in dict
-        # Get paramter from the dataframe
+         # Get paramter from the dataframe
         matched_brand =str(matched_row_data.get("Brand")).lower().strip()
-        matched_category = str(matched_row.get("Category")).lower().strip()
-        matched_year = int(matched_row.get("Production Year"))
-        matched_product_type = str(matched_row.get("Product Type")).lower().strip()
-        matched_variant_map = str(matched_row.get("Type Mapped")).lower().strip()
-        matched_gender = str(matched_row.get("Gender")).lower().strip()
+        matched_category = str(matched_row_data.get("Category")).lower().strip()
+        matched_year = int(matched_row_data.get("Production Year"))
+        matched_product_type = str(matched_row_data.get("Product Type")).lower().strip()
+        matched_variant_map = str(matched_row_data.get("Type Mapped")).lower().strip()
+        matched_gender = str(matched_row_data.get("Gender")).lower().strip()
 
         # Make a response dict
         response_dict = {
@@ -137,6 +152,7 @@ class ProfitMarginPreidction:
                             "matched_variant_map": matched_variant_map
                         }
         
+        print("response_dict ", response_dict)
         return response_dict , matched_row_data
 
     # function to return filter out dataframe based on the category value
@@ -199,13 +215,6 @@ class ProfitMarginPreidction:
         matched_product_type = str(response_dict.get("matched_product_type", "")).lower().strip()
         matched_variant_map = str(response_dict.get("matched_variant_map", "")).lower().strip()
         matched_category = response_dict.get("matched_category", "")
-
-        print({
-            "matched_brand_name": matched_brand_name,
-            "matched_product_type": matched_product_type,
-            "matched_variant_map": matched_variant_map,
-            "matched_category": matched_category,
-        })
 
         filtered_rows = []
 

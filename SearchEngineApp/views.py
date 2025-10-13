@@ -123,11 +123,14 @@ class ProductSemanticSearchView(APIView):
             error_message = f"[ERROR] failed to get Products for matched single category , error is : {str(e)} in line no : {exc_tb.tb_lineno}"
             return error_message
 
-    def FilterMatchedRow_AndParameter(self, Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload):
+    def FilterMatchedRow_AndParameter(self, Embedding_df, Profit_Obj, global_search_obj, device_type, payload, FilterYear):
+        
+        # Call function to get matched row data based on the user query
+        paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(FilterYear , Embedding_df)     # Get matched row parameter dict
 
-#     # Function -2
-        paramter_dict , matched_row_data_dict = Profit_Obj.GetMatchedRow_AndParameter(Embedding_df,target_year)     # Get matched row parameter dict
-        #print("matched_row_data_dict=========================>",paramter_dict,matched_row_data_dict)
+        # If searched data is not exist for filter year
+        if paramter_dict is None and matched_row_data_dict is None:
+            return DATA_NOT_FOUND(f"No Data Exist for Year : {FilterYear}")
 
         # create a dataframe from matched row data dict
         searched_df = pd.DataFrame([matched_row_data_dict])
@@ -207,17 +210,18 @@ class ProductSemanticSearchView(APIView):
 
         return ProfitProductResponse('success', merge_df.to_dict(orient="records"), CEO_WORKER_JSON_DATA)
         print()
+   
    # Main function 
     def post(self, request, format=None):
         try:
             PROFIT_MARGIN_SIMILARITY_SCORE = os.getenv("PROFIT_MARGIN_SIMILARITY_SCORE")            # use this in produict semantic search api
+
             # Get threshold value from environemnt file
             if isinstance(PROFIT_MARGIN_SIMILARITY_SCORE, str):
                 PROFIT_MARGIN_SIMILARITY_SCORE = round(float(PROFIT_MARGIN_SIMILARITY_SCORE),2)
 
             # Required Fields\
-            required_fields= ['query','tab_type', 'device_type' , 'target_year']
-
+            required_fields= ['query','tab_type', 'device_type']
             # Get Payload data
             payload = request.data
        
@@ -239,16 +243,14 @@ class ProductSemanticSearchView(APIView):
                     "status": 400,
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-          
-            target_year =int(payload.get("target_year"))
-            # print("target_year===================>",target_year)
-
-
             # Create a object of gloabl search APIVIEW
             global_search_obj = GlobalSearchAPIView()
 
             # get payload value in parameter
             user_query = str(payload.get("query")).lower().strip()
+
+            # call function to get year from user query 
+            FilterYear= get_year(user_query)
 
             # Define paths
             pickle_df_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Profit Margin" ,"profit_embedding.pkl")
@@ -290,21 +292,18 @@ class ProductSemanticSearchView(APIView):
                 
             # Function -1
             Embedding_df_  = Profit_Obj.apply_embedding()            # call function to get embedding df
-            # print("Embedding_df : \n ", Embedding_df_[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
-            #print()
 
-             # Filter out dataframe if similarity score greater than threshold Value
-            Embedding_df = Embedding_df_.loc[Embedding_df_["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]   
-            
+            # Filter out dataframe if similarity score greater than threshold Value
+            Embedding_df = Embedding_df_.loc[Embedding_df_["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]  
+
             if Embedding_df.empty:
+                print("---- Similarity is not found ....")
                 Embedding_df = Embedding_df_.sort_values(by="similarity_score", ascending=False).head(2)
                 target_year = Embedding_df["Production Year"]
-                return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
-            
+                return self.FilterMatchedRow_AndParameter(Embedding_df, Profit_Obj, global_search_obj, device_type, payload, target_year)
                 # return ProfitProductResponse("No Data Matched", [], [])
-            # print("Embedding_df : \n ", Embedding_df_[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped", "similarity_score"]].iloc[0:50])
-            # target_year = Embedding_df["Production Year"]
-            return self.FilterMatchedRow_AndParameter(Embedding_df, target_year, Profit_Obj, global_search_obj, device_type, payload)
+
+            return self.FilterMatchedRow_AndParameter(Embedding_df, Profit_Obj, global_search_obj, device_type, payload, FilterYear)
             # # Function -2
             """Shifted to function FilterMatchedRow_AndParameter to handle the condition """
 
@@ -457,7 +456,7 @@ class TaxSemanticSearchView(APIView):
                 #print(filtered_df)
 
                 if filtered_df.empty:
-                    return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
+                    return DATA_NOT_FOUND(f"No Data Exist for Year : {FilterYear}")
                 
                 # call function to get most similar row
                 MatchedRow = self.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
@@ -637,7 +636,7 @@ class CEOWorkerSemanticSearchView(APIView):
                 filtered_df = df.loc[df["Year"].astype(int) == int(FilterYear)]
 
                 if filtered_df.empty:
-                    return DATA_NOT_FOUND(f"No Data Exist of Year : {FilterYear}")
+                    return DATA_NOT_FOUND(f"No Data Exist for Year : {FilterYear}")
                 
                 # call function to get most similar row
                 MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
