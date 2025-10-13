@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import sys
 import torch
+import random
 from sentence_transformers import SentenceTransformer , util
 from thefuzz import fuzz
 import warnings
@@ -101,58 +102,77 @@ class ProfitMarginPreidction:
         
         return embedding_df
 
-    # function to get matched row and get required paramter
-    def GetMatchedRow_AndParameter(self ,filter_year , embedding_df : pd.DataFrame)-> dict:
-        
-        # Filter out dataframe based on the year 
-        yearly_filtered_df = embedding_df.loc[embedding_df["Production Year"].astype(int) == int(filter_year)] if filter_year != "None" else embedding_df
 
-        # Handle if there is no data exist for filter year
-        if yearly_filtered_df.empty:
-            return None , None
+    def GetMatchedRow_AndParameter(self, filter_year, embedding_df: pd.DataFrame) -> dict:
 
-        # Get the row with the highest similarity score for that year
+        # Get the row with the highest similarity score
         matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]
         matched_row_data = matched_row.to_dict()
-       
-        # Get Year of Most highest similarity row
-        matched_year = int(matched_row_data.get("Production Year"))
 
-        # Implement logic to check user asked year is matched with model predict row data
+        # Extract key fields
+        matched_year = int(matched_row_data.get("Production Year"))
+        matched_brand = str(matched_row_data.get("Brand")).lower().strip()
+
+        # Check if user-provided year matches the highest-similarity row's year
         if filter_year != 'None' and matched_year != int(filter_year):
-            print("Year does not matched =========================")
+            print("Year does not match =========================")
+
+            # Filter dataframe for the same brand and requested year
             GetYearBasedDF = embedding_df.loc[
+                (embedding_df["Brand"].astype(str).str.lower().str.strip() == matched_brand) &
                 (embedding_df["Production Year"].astype(int) == int(filter_year))
             ]
-            
-            # If Target Year does not exist in dataframe 
-            if GetYearBasedDF.empty:
-                return None , None
-            
-            # again get most highest similarity matched row based on the user asked year
-            matched_row = GetYearBasedDF.loc[GetYearBasedDF["similarity_score"].idxmax()]
-            matched_row_data = matched_row.to_dict()
 
-         # Get paramter from the dataframe
-        matched_brand =str(matched_row_data.get("Brand")).lower().strip()
+            if GetYearBasedDF.empty:
+                # No data for requested year → pick a random available year for same brand
+                unique_years_list = (
+                    embedding_df.loc[
+                        embedding_df['Brand'].astype(str).str.lower().str.strip() == matched_brand,
+                        'Production Year'
+                    ]
+                    .dropna()
+                    .astype(int)
+                    .unique()
+                    .tolist()
+                )
+
+                if not unique_years_list:
+                    print("No available years found for brand:", matched_brand)
+                    return None, None
+
+                random_year = random.choice(unique_years_list)
+                random_year_df = embedding_df.loc[
+                    (embedding_df["Brand"].astype(str).str.lower().str.strip() == matched_brand) &
+                    (embedding_df["Production Year"].astype(int) == int(random_year))
+                ]
+
+                matched_row = random_year_df.loc[random_year_df["similarity_score"].idxmax()]
+                matched_row_data = matched_row.to_dict()
+
+            else:
+                # Data exists for requested year — take highest similarity row from that year
+                matched_row = GetYearBasedDF.loc[GetYearBasedDF["similarity_score"].idxmax()]
+                matched_row_data = matched_row.to_dict()
+
+        # Extract final parameters
+        matched_brand = str(matched_row_data.get("Brand")).lower().strip()
         matched_category = str(matched_row_data.get("Category")).lower().strip()
         matched_year = int(matched_row_data.get("Production Year"))
         matched_product_type = str(matched_row_data.get("Product Type")).lower().strip()
         matched_variant_map = str(matched_row_data.get("Type Mapped")).lower().strip()
         matched_gender = str(matched_row_data.get("Gender")).lower().strip()
 
-        # Make a response dict
+        # Prepare response
         response_dict = {
-                            "matched_brand" :  matched_brand,
-                            "matched_category" :  matched_category,
-                            "matched_year" :  matched_year,
-                            "matched_product_type" :  matched_product_type,
-                            "matched_gender" :  matched_gender,
-                            "matched_variant_map": matched_variant_map
-                        }
-        
-        print("response_dict ", response_dict)
-        return response_dict , matched_row_data
+            "matched_brand": matched_brand,
+            "matched_category": matched_category,
+            "matched_year": matched_year,
+            "matched_product_type": matched_product_type,
+            "matched_gender": matched_gender,
+            "matched_variant_map": matched_variant_map
+        }
+
+        return response_dict, matched_row_data
 
     # function to return filter out dataframe based on the category value
     def Get_Category_based_df(self,response_dict : dict) -> pd.DataFrame:
