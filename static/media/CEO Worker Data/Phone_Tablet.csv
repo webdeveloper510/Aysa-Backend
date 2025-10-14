@@ -552,13 +552,13 @@ Deezer,2021,Hans-Holger Albrecht,$41M,$45K,916X
 Deezer,2020,Hans-Holger Albrecht,$38M,$43K,877X
 Deezer,2019,Hans-Holger Albrecht,$36M,$42K,840X
 Deezer,2018,Hans-Holger Albrecht,$33M,$41K,805X
-Dell Technologies,2024,Michael Dell,$123M,$71K,1745X
-Dell Technologies,2023,Michael Dell,$116M,$69K,1687X
-Dell Technologies,2022,Michael Dell,$109M,$67K,1631X
-Dell Technologies,2021,Michael Dell,$103M,$65K,1577X
-Dell Technologies,2020,Michael Dell,$97M,$64K,1525X
-Dell Technologies,2019,Michael Dell,$92M,$62K,1475X
-Dell Technologies,2018,Michael Dell,$87M,$61K,1426X
+Dell ,2024,Michael Dell,$123M,$71K,1745X
+Dell ,2023,Michael Dell,$116M,$69K,1687X
+Dell ,2022,Michael Dell,$109M,$67K,1631X
+Dell ,2021,Michael Dell,$103M,$65K,1577X
+Dell ,2020,Michael Dell,$97M,$64K,1525X
+Dell ,2019,Michael Dell,$92M,$62K,1475X
+Dell ,2018,Michael Dell,$87M,$61K,1426X
 Diageo,2024,Ivan Menezes,$45M,$43K,1047X
 Diageo,2023,Ivan Menezes,$42M,$42K,1012X
 Diageo,2022,Ivan Menezes,$40M,$41K,979X
@@ -692,13 +692,13 @@ Fitbit,2021,James Park,$6M,$34K,167X
 Fitbit,2020,James Park,$5M,$34K,158X
 Fitbit,2019,James Park,$5M,$34K,149X
 Fitbit,2018,James Park,$5M,$34K,140X
-Fitbit (Google),2024,James Park,$111M,$66K,1682X
-Fitbit (Google),2023,James Park,$105M,$64K,1626X
-Fitbit (Google),2022,James Park,$99M,$63K,1573X
-Fitbit (Google),2021,James Park,$93M,$61K,1521X
-Fitbit (Google),2020,James Park,$88M,$60K,1470X
-Fitbit (Google),2019,James Park,$83M,$58K,1422X
-Fitbit (Google),2018,James Park,$78M,$57K,1375X
+Fitbit  ,2024,James Park,$111M,$66K,1682X
+Fitbit  ,2023,James Park,$105M,$64K,1626X
+Fitbit  ,2022,James Park,$99M,$63K,1573X
+Fitbit  ,2021,James Park,$93M,$61K,1521X
+Fitbit  ,2020,James Park,$88M,$60K,1470X
+Fitbit  ,2019,James Park,$83M,$58K,1422X
+Fitbit  ,2018,James Park,$78M,$57K,1375X
 Ford,2024,James Duncan Farley Jr,$21M,$36K,583X
 Ford,2023,James Duncan Farley Jr,$20M,$36K,556X
 Ford,2022,James Duncan Farley Jr,$20M,$36K,542X
@@ -909,13 +909,13 @@ Hormel Foods,2021,Jim Snee,$21M,$31K,685X
 Hormel Foods,2020,Jim Snee,$20M,$30K,662X
 Hormel Foods,2019,Jim Snee,$19M,$29K,640X
 Hormel Foods,2018,Jim Snee,$18M,$28K,619X
-HP Inc.,2024,Enrique Lores,$87M,$57K,1526X
-HP Inc.,2023,Enrique Lores,$82M,$56K,1476X
-HP Inc.,2022,Enrique Lores,$77M,$54K,1427X
-HP Inc.,2021,Enrique Lores,$73M,$53K,1380X
-HP Inc.,2020,Enrique Lores,$69M,$52K,1334X
-HP Inc.,2019,Enrique Lores,$65M,$50K,1290X
-HP Inc.,2018,Enrique Lores,$61M,$49K,1248X
+HP ,2024,Enrique Lores,$87M,$57K,1526X
+HP ,2023,Enrique Lores,$82M,$56K,1476X
+HP ,2022,Enrique Lores,$77M,$54K,1427X
+HP ,2021,Enrique Lores,$73M,$53K,1380X
+HP ,2020,Enrique Lores,$69M,$52K,1334X
+HP ,2019,Enrique Lores,$65M,$50K,1290X
+HP ,2018,Enrique Lores,$61M,$49K,1248X
 Huawei,2024,Ren Zhengfei,$111M,$66K,1682X
 Huawei,2023,Ren Zhengfei,$105M,$64K,1626X
 Huawei,2022,Ren Zhengfei,$99M,$63K,1573X
@@ -1161,13 +1161,13 @@ Lucid,2021,Marc Winterhof,$4M,$35K,103X
 Lucid,2020,Marc Winterhof,$3M,$35K,95X
 Lucid,2019,Marc Winterhof,$3M,$35K,86X
 Lucid,2018,Marc Winterhof,$3M,$35K,78X
-LVMH (Perfumes & Cosmetics),2024,Bernard Arnault,$59M,$52K,1146X
-LVMH (Perfumes & Cosmetics),2023,Bernard Arnault,$56M,$50K,1108X
-LVMH (Perfumes & Cosmetics),2022,Bernard Arnault,$53M,$49K,1071X
-LVMH (Perfumes & Cosmetics),2021,Bernard Arnault,$50M,$48K,1036X
-LVMH (Perfumes & Cosmetics),2020,Bernard Arnault,$47M,$47K,1002X
-LVMH (Perfumes & Cosmetics),2019,Bernard Arnault,$44M,$46K,969X
-LVMH (Perfumes & Cosmetics),2018,Bernard Arnault,$42M,$44K,937X
+LouisVuitton,2024,Bernard Arnault,$59M,$52K,1146X
+LouisVuitton,2023,Bernard Arnault,$56M,$50K,1108X
+LouisVuitton,2022,Bernard Arnault,$53M,$49K,1071X
+LouisVuitton,2021,Bernard Arnault,$50M,$48K,1036X
+LouisVuitton,2020,Bernard Arnault,$47M,$47K,1002X
+LouisVuitton,2019,Bernard Arnault,$44M,$46K,969X
+LouisVuitton,2018,Bernard Arnault,$42M,$44K,937X
 Lululemon,2024,Calvin McDonald,$2M,$25K,60X
 Lululemon,2023,Calvin McDonald,$1M,$25K,58X
 Lululemon,2022,Calvin McDonald,$1M,$24K,57X
@@ -1714,13 +1714,13 @@ Salomon,2021,Jérôme Blanchet,$11M,$42K,255X
 Salomon,2020,Jérôme Blanchet,$10M,$41K,248X
 Salomon,2019,Jérôme Blanchet,$10M,$40K,241X
 Salomon,2018,Jérôme Blanchet,$9M,$39K,234X
-Samsung Electronics,2024,Han Jong-hee,$27M,$35K,783X
-Samsung Electronics,2023,Han Jong-hee,$25M,$34K,757X
-Samsung Electronics,2022,Han Jong-hee,$24M,$33K,732X
-Samsung Electronics,2021,Han Jong-hee,$23M,$32K,708X
-Samsung Electronics,2020,Han Jong-hee,$21M,$31K,684X
-Samsung Electronics,2019,Han Jong-hee,$20M,$30K,662X
-Samsung Electronics,2018,Han Jong-hee,$19M,$30K,640X
+Samsung  ,2024,Han Jong-hee,$27M,$35K,783X
+Samsung  ,2023,Han Jong-hee,$25M,$34K,757X
+Samsung  ,2022,Han Jong-hee,$24M,$33K,732X
+Samsung  ,2021,Han Jong-hee,$23M,$32K,708X
+Samsung  ,2020,Han Jong-hee,$21M,$31K,684X
+Samsung  ,2019,Han Jong-hee,$20M,$30K,662X
+Samsung  ,2018,Han Jong-hee,$19M,$30K,640X
 Sanderson Farms,2024,Joe F. Sanderson Jr.,$3M,$45K,63X
 Sanderson Farms,2023,Joe F. Sanderson Jr.,$3M,$45K,63X
 Sanderson Farms,2022,Joe F. Sanderson Jr.,$3M,$45K,63X
@@ -1904,7 +1904,7 @@ Tencent,2020,Ma Huateng,$32M,$40K,804X
 Tencent,2019,Ma Huateng,$30M,$39K,770X
 Tencent,2018,Ma Huateng,$28M,$38K,738X
 Tesla,2024,Elon Musk,$0M,$35K,0X
-Tesla,2023,Elon Musk,$19000M,$34K,553936X
+Tesla,2023,Elon Musk,$190M,$34K,553936X
 Tesla,2022,Elon Musk,$0M,$34K,0X
 Tesla,2021,Elon Musk,$56000M,$34K,1651917X
 Tesla,2020,Elon Musk,$0M,$34K,0X
@@ -2029,13 +2029,13 @@ X,2021,Linda Yaccarino,$67M,$59K,1126X
 X,2020,Linda Yaccarino,$63M,$58K,1079X
 X,2019,Linda Yaccarino,$58M,$57K,1033X
 X,2018,Linda Yaccarino,$55M,$55K,990X
-Tyson Foods,2024,Donnie D. King,$55M,$48K,1146X
-Tyson Foods,2023,Donnie D. King,$52M,$47K,1108X
-Tyson Foods,2022,Donnie D. King,$49M,$46K,1071X
-Tyson Foods,2021,Donnie D. King,$46M,$45K,1036X
-Tyson Foods,2020,Donnie D. King,$44M,$43K,1002X
-Tyson Foods,2019,Donnie D. King,$41M,$42K,969X
-Tyson Foods,2018,Donnie D. King,$39M,$41K,937X
+Tyson  ,2024,Donnie D. King,$55M,$48K,1146X
+Tyson  ,2023,Donnie D. King,$52M,$47K,1108X
+Tyson  ,2022,Donnie D. King,$49M,$46K,1071X
+Tyson  ,2021,Donnie D. King,$46M,$45K,1036X
+Tyson  ,2020,Donnie D. King,$44M,$43K,1002X
+Tyson  ,2019,Donnie D. King,$41M,$42K,969X
+Tyson  ,2018,Donnie D. King,$39M,$41K,937X
 UCB,2024,Jean-Christophe Tellier,$57M,$50K,1140X
 UCB,2023,Jean-Christophe Tellier,$54M,$49K,1102X
 UCB,2022,Jean-Christophe Tellier,$51M,$48K,1066X
@@ -2406,3 +2406,181 @@ Ameriprise Financial,2024,James Cracchiolo,$29M,$134K,214X
 Ameriprise Financial,2023,James Cracchiolo,$26M,$134K,191X
 Ameriprise Financial,2022,James Cracchiolo,$24M,$134K,179X
 Ameriprise Financial,2021,James Cracchiolo,$23M,$134K,168X
+Versace  ,2024,John D. Idol,$10.5M,$31.5K,335X
+Versace  ,2023,John D. Idol,$14.4M,$29K,497X
+Patek Philippe,2024,Thierry Stern,$5M ,$90K ,56X 
+Patek Philippe,2023,Thierry Stern,$4.8M ,$88K ,55X 
+Patek Philippe,2022,Thierry Stern,$4.5M ,$86K ,52X 
+Patek Philippe,2021,Thierry Stern,$4.2M ,$85K ,49X 
+Audemars Piguet,2024,Ilaria Resta,$4.5M ,$87K ,52X 
+Audemars Piguet,2023,Ilaria Resta,$4.3M ,$85K ,51X 
+Audemars Piguet,2022,François-Henry Bennahmias,$4.2M ,$83K ,51X 
+Audemars Piguet,2021,François-Henry Bennahmias,$4M ,$82K ,49X 
+Huawei,2024,Ren Zhengfei,$10M ,$45K ,222X 
+Huawei,2023,Ren Zhengfei,$9.5M ,$44K ,216X 
+Huawei,2022,Ren Zhengfei,$9M ,$43K ,209X 
+Huawei,2021,Ren Zhengfei,$8.5M ,$42K ,202X 
+Acer,2024,Jason Chen,$11M ,$70K ,157X 
+Acer,2023,Jason Chen,$12M ,$70K ,171X 
+Acer,2022,Jason Chen,$12.2M,$70K,174X
+Acer,2021,Jason Chen,$18.7M,$70K,267X
+HTC,2024,Cher Wang,$3M ,$30K ,100X 
+HTC,2023,Cher Wang,$2.8M ,$30K ,93X 
+HTC,2022,Cher Wang,$2.5M ,$29K ,86X 
+HTC,2021,Cher Wang,$2.3M ,$29K ,79X 
+Banana Republic (Gap Inc.),2024,Richard Dickson,$20M,$9.2K,2105X
+Banana Republic (Gap Inc.),2023,Richard Dickson,$12M,$9K,1263X 
+Banana Republic (Gap Inc.),2022,Sonia Syngal,$18M,$8K,2118X 
+Banana Republic (Gap Inc.),2021,Sonia Syngal,$15M,$8K,1875X 
+General Motors,2024,Mary Barra,$30M,$9.5K,310X
+General Motors,2023,Mary Barra,$28M,$9.1K,303X
+General Motors,2022,Mary Barra,$29M,$8K,362X
+General Motors,2021,Mary Barra,$30M,$7.K,419X
+J.Crew Group (private),2024,Libby Wadle,$6M,$30K,200X 
+J.Crew Group (private),2023,Libby Wadle,$5.5M,$29K,186X 
+J.Crew Group (private),2022,Libby Wadle,$5M,$28K,175X 
+J.Crew Group (private),2021,Libby Wadle,$4.5M,$28K,161X 
+LG Corporation (proxy: LG Electronics),2024,Cho Joo‑wan,$2.2M,$88K,26X 
+LG Corporation (proxy: LG Electronics),2023,Cho Joo‑wan,$1.9M,$85K,21X 
+LG Corporation (proxy: LG Electronics),2022,Cho Joo‑wan,$2M,$81K,25X 
+LG Corporation (proxy: LG Electronics),2021,Kwon Bong‑seok / transition to Cho Joo‑wan,$2.1M,$87K,25X 
+Nordstrom,2024,Erik Nordstrom,$5.3M,$35K,150X
+Nordstrom,2023,Erik Nordstrom,$4.5M,$35K,127X
+Nordstrom,2022,Erik Nordstrom,$4.8M,$35K,137X 
+Nordstrom,2021,Erik Nordstrom,$4.6M,$34K,133X 
+Cargill Meat Solutions,2024,Brian Sikes,$6M ,$40K,150X
+Cargill Meat Solutions,2023,Brian Sikes,$6M ,$40K,150X
+Cargill Meat Solutions,2022,David MacLennan,$6M ,$40K,150X
+Cargill Meat Solutions,2021,David MacLennan,$6M ,$40K,150X
+Trident Seafoods,2024,Joe Bundrant,$2M ,$50K,40X
+Trident Seafoods,2023,Joe Bundrant,$2M ,$50K,40X
+Trident Seafoods,2022,Joe Bundrant,$2M ,$50K,40X
+Trident Seafoods,2021,Joe Bundrant,$2M ,$50K,40X
+Mowi USA,2024,Ivan Vindheim,$1.07M,$40K,27X
+Mowi USA,2023,Ivan Vindheim,$1.2M ,$40K,30X
+Mowi USA,2022,Ivan Vindheim,$1.7M,$40K,42X
+Mowi USA,2021,Ivan Vindheim,$1.2M ,$40K,30X
+Pacific Seafoods,2024,Frank Dulcich,$3M ,$40K,75X
+Pacific Seafoods,2023,Frank Dulcich,$3M ,$40K,75X
+Pacific Seafoods,2022,Frank Dulcich,$3M ,$40K,75X
+Pacific Seafoods,2021,Frank Dulcich,$3M ,$40K,75X
+American Seafoods Group,2024,Inge Andreassen,$1.5M ,$40K,38X
+American Seafoods Group,2023,Einar Gustafsson,$1.5M ,$40K,38X
+American Seafoods Group,2022,Einar Gustafsson,$1.5M ,$40K,38X
+American Seafoods Group,2021,Mikel Durham,$1.5M ,$40K,38X
+Taylor Shellfish Farms,2024,Tom Stocks,$2M ,$45K,44X
+Taylor Shellfish Farms,2023,Tom Stocks,$2M ,$45K,44X
+Taylor Shellfish Farms,2022,Tom Stocks,$2M ,$45K,44X
+Taylor Shellfish Farms,2021,Tom Stocks,$2M ,$45K,44X
+Ward Oyster Company,2024,Chuck Ward ,$1M ,$35K,29X
+Ward Oyster Company,2023,Chuck Ward ,$1M ,$35K,29X
+Ward Oyster Company,2022,Chuck Ward ,$1M ,$35K,29X
+Ward Oyster Company,2021,Chuck Ward ,$1M ,$35K,29X
+Chatham Shellfish Company,2024,Stephen Wright,$1.5M ,$40K,38X
+Chatham Shellfish Company,2023,Stephen Wright,$1.5M ,$40K,38X
+Chatham Shellfish Company,2022,Stephen Wright,$1.5M ,$40K,38X
+Chatham Shellfish Company,2021,Stephen Wright,$1.5M ,$40K,38X
+Tomales Bay Oyster Company,2024,John Finger ,$1.2M ,$35K,34X
+Tomales Bay Oyster Company,2023,John Finger ,$1.2M ,$35K,34X
+Tomales Bay Oyster Company,2022,John Finger ,$1.2M ,$35K,34X
+Tomales Bay Oyster Company,2021,John Finger ,$1.2M ,$35K,34X
+Bevans Oyster Company,2024,Cheryl Hinson,$1M ,$35K,29X
+Bevans Oyster Company,2023,Cheryl Hinson,$1M ,$35K,29X
+Bevans Oyster Company,2022,Cheryl Hinson,$1M ,$35K,29X
+Bevans Oyster Company,2021,Cheryl Hinson,$1M ,$35K,29X
+Handy Seafood Inc,2024,Todd Conway,$2M ,$40K,50X
+Handy Seafood Inc,2023,Todd Conway,$2M ,$40K,50X
+Handy Seafood Inc,2022,Todd Conway,$2M ,$40K,50X
+Handy Seafood Inc,2021,Todd Conway,$2M ,$40K,50X
+"Phillips Foods, Inc",2024,Dean Flowers,$3M ,$35K,86X
+"Phillips Foods, Inc",2023,Dean Flowers,$3M ,$35K,86X
+"Phillips Foods, Inc",2022,Dean Flowers,$3M ,$35K,86X
+"Phillips Foods, Inc",2021,Dean Flowers,$3M ,$35K,86X
+J. M. Clayton Seafood Company,2024,Bill Clayton ,$1.5M ,$30K,50X
+J. M. Clayton Seafood Company,2023,Bill Clayton ,$1.5M ,$30K,50X
+J. M. Clayton Seafood Company,2022,Bill Clayton ,$1.5M ,$30K,50X
+J. M. Clayton Seafood Company,2021,Bill Clayton ,$1.5M ,$30K,50X
+Boston Lobster Company,2024,Neil Zarella,$1.5M ,$45K,33X
+Boston Lobster Company,2023,Neil Zarella,$1.5M ,$45K,33X
+Boston Lobster Company,2022,Neil Zarella,$1.5M ,$45K,33X
+Boston Lobster Company,2021,Neil Zarella,$1.5M ,$45K,33X
+Clearwater Seafoods LP,2024,Ian D. Smith,$3M ,$40K,75X
+Clearwater Seafoods LP,2023,Ian D. Smith,$3M ,$40K,75X
+Clearwater Seafoods LP,2022,Ian D. Smith,$3M ,$40K,75X
+Clearwater Seafoods LP,2021,Ian D. Smith,$3M ,$40K,75X
+Little Bay Lobster,2024,Johnathan Shafmaster,$1M ,$35K,29X
+Little Bay Lobster,2023,Johnathan Shafmaster,$1M ,$35K,29X
+Little Bay Lobster,2022,Johnathan Shafmaster,$1M ,$35K,29X
+Little Bay Lobster,2021,Johnathan Shafmaster,$1M ,$35K,29X
+Taylor Farms,2024,Bruce Taylor,$4M ,$31K,129X
+Taylor Farms,2023,Bruce Taylor,$4M ,$31K,129X
+Taylor Farms,2022,Bruce Taylor,$4M ,$31K,129X
+Taylor Farms,2021,Bruce Taylor,$4M ,$31K,129X
+Grimmway Farms,2024,Jeff Huckaby,$3M ,$35K,86X
+Grimmway Farms,2023,Jeff Huckaby,$3M ,$35K,86X
+Grimmway Farms,2022,Jeff Huckaby,$3M ,$35K,86X
+Grimmway Farms,2021,Jeff Huckaby,$3M ,$35K,86X
+Boskovich Farms,2024,George Boskovich Jr.,$2M ,$40K,50X
+Boskovich Farms,2023,George Boskovich Jr.,$2M ,$40K,50X
+Boskovich Farms,2022,George Boskovich Jr.,$2M ,$40K,50X
+Boskovich Farms,2021,George Boskovich Jr.,$2M ,$40K,50X
+Pero Family Farms,2024,Peter F. Pero IV,$2M ,$37K,54X
+Pero Family Farms,2023,Peter F. Pero IV,$2M ,$37K,54X
+Pero Family Farms,2022,Peter F. Pero IV,$2M ,$37K,54X
+Pero Family Farms,2021,Peter F. Pero IV,$2M ,$37K,54X
+Torrey Farms,2024,Maureen Torrey (est.),$2M ,$40K,50X
+Torrey Farms,2023,Maureen Torrey (est.),$2M ,$40K,50X
+Torrey Farms,2022,Maureen Torrey (est.),$2M ,$40K,50X
+Torrey Farms,2021,Maureen Torrey (est.),$2M ,$40K,50X
+Mastronardi Produce,2024,Paul Mastronardi,$3M ,$35K,86X
+Mastronardi Produce,2023,Paul Mastronardi,$3M ,$35K,86X
+Mastronardi Produce,2022,Paul Mastronardi,$3M ,$35K,86X
+Mastronardi Produce,2021,Paul Mastronardi,$3M ,$35K,86X
+Windset Farms,2024,Steven Newell,$2M ,$44K,45X
+Windset Farms,2023,Steven Newell,$2M ,$44K,45X
+Windset Farms,2022,Steven Newell,$2M ,$44K,45X
+Windset Farms,2021,Steven Newell,$2M ,$44K,45X
+Village Farms,2024,Michael A. DeGiglio,$1.7M,$36K,47X
+Village Farms,2023,Michael A. DeGiglio,$1.7M ,$36K,47X
+Village Farms,2022,Michael A. DeGiglio,$1.6M ,$35K,46X
+Village Farms,2021,Michael A. DeGiglio,$1.5M ,$34K,44X
+BrightFarms,2024,Steve Platt,$2M ,$40K,50X
+BrightFarms,2023,Steve Platt,$2M ,$40K,50X
+BrightFarms,2022,Steve Platt,$1.8M ,$39K,46X
+BrightFarms,2021,Steve Platt,$1.8M ,$38K,47X
+J.R. Simplot Company,2024,Garrett Lofto,$4M ,$45K,89X
+J.R. Simplot Company,2023,Garrett Lofto,$4M ,$45K,89X
+J.R. Simplot Company,2022,Garrett Lofto,$3.8M ,$44K,86X
+J.R. Simplot Company,2021,Garrett Lofto,$3.5M ,$43K,81X
+Basic American Foods,2024,George Hume,$3M ,$35K,86X
+Basic American Foods,2023,George Hume,$3M ,$35K,86X
+Basic American Foods,2022,George Hume,$2.8M ,$34K,82X
+Basic American Foods,2021,George Hume,$2.5M ,$33K,76X
+Barilla America,2024,Melissa Tendick,$2M ,$48K,42X
+Barilla America,2023,Melissa Tendick,$2M ,$48K,42X
+Barilla America,2022,Jean-Pierre Comte,$1.9M ,$47K,40X
+Barilla America,2021,Jean-Pierre Comte,$1.8M ,$46K,39X
+Costco,2024,Ron Vachris,$12.2M,$47K,259X
+Costco,2023,Craig Jelinek,$16.8M,$45K,373X
+Costco,2022,Craig Jelinek,$9.9M,$43K,230X
+Costco,2021,Craig Jelinek,$8.8M,$40K,220X
+FoodMaxx,2024,Rob Boney,$2M ,$32K,63X
+FoodMaxx,2023,Rob Boney,$2M ,$31K,65X
+FoodMaxx,2022,Rob Boney,$2M ,$30K,67X
+FoodMaxx,2021,Rob Boney,$2M ,$29K,69X
+Price Chopper,2024,John Persons,$3M ,$35K,86X
+Price Chopper,2023,Frank Curci,$3M ,$34K,88X
+Price Chopper,2022,Frank Curci,$3M ,$33K,91X
+Price Chopper,2021,Frank Curci,$3M ,$32K,94X
+Starbucks,2024,Brian Niccol,$95.8M,$15K,6387X
+Starbucks,2023,Laxman Narasimhan,$21.5M,$18K,1194X
+Starbucks,2022,Kevin Johnson,$18.3M,$17K,1076X
+Starbucks,2021,Kevin Johnson,$15M ,$16K,938X
+Albertsons,2024,Vivek Sankaran,$15.2M,$35K,434X
+Albertsons,2023,Vivek Sankaran,$15.1M,$34K,444X
+Albertsons,2022,Vivek Sankaran,$16.1M,$33K,488X
+Albertsons,2021,Vivek Sankaran,$8.6M,$32K,269X
+Whole Foods Market,2024,Jason Buechel,$5M ,$40K,125X
+Whole Foods Market,2023,Jason Buechel,$5M ,$39K,128X
+Whole Foods Market,2022,John Mackey,$5M ,$38K,132X
+Whole Foods Market,2021,John Mackey,$5M ,$37K,135X

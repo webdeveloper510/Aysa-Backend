@@ -101,6 +101,8 @@ class ProfitMarginPreidction:
         # Get the row with the highest similarity score
         matched_row = embedding_df.loc[embedding_df["similarity_score"].idxmax()]
         matched_row_data = matched_row.to_dict()
+        print("matched_row_data : \n ", matched_row_data)
+        print()
 
         # Extract key fields
         matched_year = int(matched_row_data.get("Production Year"))
@@ -111,14 +113,22 @@ class ProfitMarginPreidction:
         if filter_year != 'None' and matched_year != int(filter_year):
             print("Year does not match =========================")
             sort_brand_df = embedding_df.sort_values("brand_similarity_score", ascending=False).head(top_n)
-
+            print("sort_brand_df : \n ", sort_brand_df)
+            print()
             sorted_df_matched_row = sort_brand_df.loc[sort_brand_df["brand_similarity_score"].idxmax()]
-            # Get brand name 
-            MatchedBrand = str(sorted_df_matched_row["Brand"]).lower().strip()
+            brand_similarity = sorted_df_matched_row["brand_similarity_score"]
+
+            if brand_similarity > 0.60:
+
+                # Get brand name 
+                matched_brand = str(sorted_df_matched_row["Brand"]).lower().strip()
+
+
+            print("MatchedBrand ", matched_brand, 'brand_similarity ', brand_similarity , "type ", type(brand_similarity))
             
             # Filter dataframe for the same brand and requested year
             GetYearBasedDF = embedding_df.loc[
-                (embedding_df["Brand"].astype(str).str.lower().str.strip() == MatchedBrand) &
+                (embedding_df["Brand"].astype(str).str.lower().str.strip() == matched_brand) &
                 (embedding_df["Production Year"].astype(int) == int(filter_year))
             ]
 
@@ -128,7 +138,7 @@ class ProfitMarginPreidction:
                 # No data for requested year → pick a random available year for same brand
                 unique_years_list = (
                     embedding_df.loc[
-                        embedding_df['Brand'].astype(str).str.lower().str.strip() == MatchedBrand,
+                        embedding_df['Brand'].astype(str).str.lower().str.strip() == matched_brand,
                         'Production Year'
                     ]
                     .dropna()
@@ -138,12 +148,12 @@ class ProfitMarginPreidction:
                 )
 
                 if not unique_years_list:
-                    print("No available years found for brand:", MatchedBrand)
+                    print("No available years found for brand:", matched_brand)
                     return None, None
 
                 random_year = random.choice(unique_years_list)
                 random_year_df = embedding_df.loc[
-                    (embedding_df["Brand"].astype(str).str.lower().str.strip() == MatchedBrand) &
+                    (embedding_df["Brand"].astype(str).str.lower().str.strip() == matched_brand) &
                     (embedding_df["Production Year"].astype(int) == int(random_year))
                 ]
 

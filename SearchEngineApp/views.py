@@ -251,6 +251,7 @@ class ProductSemanticSearchView(APIView):
 
             # call function to get year from user query 
             FilterYear= get_year(user_query)
+            print("filter year ", FilterYear)
 
             # Define paths
             pickle_df_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Profit Margin" ,"profit_embedding.pkl")
@@ -294,19 +295,19 @@ class ProductSemanticSearchView(APIView):
             Embedding_df_  = Profit_Obj.apply_embedding()            # call function to get embedding df
 
             # Filter out dataframe if similarity score greater than threshold Value
-            Embedding_df = Embedding_df_.loc[Embedding_df_["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]  
+            Filtered_Embedding_df = Embedding_df_.loc[Embedding_df_["similarity_score"] > PROFIT_MARGIN_SIMILARITY_SCORE]  
 
-            if Embedding_df.empty:
+            # Handle if there is no matched data found and return most similar product
+            if Filtered_Embedding_df.empty:
                 print("---- Similarity is not found ....")
-                Embedding_df = Embedding_df_.sort_values(by="similarity_score", ascending=False).head(2)
-                target_year = Embedding_df["Production Year"]
-                return self.FilterMatchedRow_AndParameter(Embedding_df, Profit_Obj, global_search_obj, device_type, payload, target_year)
-                # return ProfitProductResponse("No Data Matched", [], [])
-
-            return self.FilterMatchedRow_AndParameter(Embedding_df, Profit_Obj, global_search_obj, device_type, payload, FilterYear)
-            # # Function -2
-            """Shifted to function FilterMatchedRow_AndParameter to handle the condition """
-
+                unmatched_filtered_df = Embedding_df_.loc[Embedding_df_["similarity_score"] > 0.50]  
+                if unmatched_filtered_df.empty:
+                    return ProfitProductResponse("No Data Matched", [], [])
+                else:
+                    return self.FilterMatchedRow_AndParameter(Embedding_df_, Profit_Obj, global_search_obj, device_type, payload, FilterYear)
+            
+            return self.FilterMatchedRow_AndParameter(Filtered_Embedding_df, Profit_Obj, global_search_obj, device_type, payload, FilterYear)
+        
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Occurred: {str(e)} (line {exc_tb.tb_lineno})"
@@ -368,8 +369,6 @@ class TaxSemanticSearchView(APIView):
 
             # Remove dupicate rows
             df = df.drop_duplicates(subset=["Company Name", "Year"])
-
-            print("After ", df.shape)
             query_embedding = model.encode(user_query, convert_to_tensor=True).to(self.device)
 
             # Convert all full Text  embeddings to tensor
@@ -382,17 +381,13 @@ class TaxSemanticSearchView(APIView):
 
             # SORT VALUES 
             embedding_df = (df.sort_values('tax_similarity', ascending=False).head(TOP_N))
-            
+
+            print("Tax embedding_df : \n ", embedding_df)
             # Filter Dataframe based on the threshold value
-
             matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
-            
-
-           
             filtered_df = embedding_df.loc[embedding_df["tax_similarity"].astype(float) >= similarity_score]
       
             if filtered_df.empty:
-
                 # Clean matched text before searching
                 clean_query = re.sub(r"\s+", " ", user_query.strip().lower())
                 normalized_matched = embedding_df["text"].astype(str).str.lower().str.replace(r"\s+", " ", regex=True).str.strip()
@@ -444,6 +439,9 @@ class TaxSemanticSearchView(APIView):
             df = pd.read_pickle(tax_embedding_df_path)
             original_df = df.copy()
 
+            print("original_df : \n ", original_df)
+            print()
+
             # Call function to get year status from  the user query ...
             FilterYear= get_year(user_query)
             
@@ -453,14 +451,12 @@ class TaxSemanticSearchView(APIView):
                 # Filter datfarame based on the year
                 filtered_df = df.loc[df["Year"].astype(int) == int(FilterYear)]
 
-                #print(filtered_df)
-
                 if filtered_df.empty:
                     return DATA_NOT_FOUND(f"No Data Exist for Year : {FilterYear}")
                 
                 # call function to get most similar row
                 MatchedRow = self.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
-               
+
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
                     return Internal_server_response(MatchedRow)
@@ -1066,17 +1062,16 @@ class GlobalSearchAPIView(APIView):
 
             response = requests.post(url , json= data , headers=headers)
 
+            # Get response Text.
+            response_text = response.text
+
+            # Handle if output json type is string
+            if isinstance(response_text , str):
+                import ast
+                response_text = ast.literal_eval(response_text)
+
             # Check if response status is 200
             if response.status_code ==200:
-                
-                # Get response data.
-                response_text = response.text
-
-                # Handle if output json type is string
-                if isinstance(response_text , str):
-                    import ast
-                    response_text = ast.literal_eval(response_text)
-                
                 # Get data response
                 response_status = response_text["status"]
                 if response_status == 200:
@@ -1118,11 +1113,19 @@ class GlobalSearchAPIView(APIView):
                         "message": response_text["message"],
                         "status": response_status
                     }, status=response_status)
-                
+            
+            # Handle if response status is 404 
+            elif response.status_code ==404:
+                return Response({
+                        "message": response_text["message"],
+                        "status": response_text["status"]
+                    }, status=response_text["status"])
+
             else :
                 return Response({
                     "message": 'Getting issue in product semantic search api'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         except Exception as e:
             exc_type , exc_obj , exc_tb = sys.exc_info()
             error_message = f"[ERROR] , Failed to Read Gloabl search Query, error occur is : {str(e)} in line no : {exc_tb.tb_lineno}"
@@ -1263,6 +1266,7 @@ class TrainModelView(APIView):
 
             # Get Existing CSV file 
             existing_file_path = self.get_existing_file_path(TAB_TYPE)
+
             
             df1 = pd.read_csv(existing_file_path)
 
@@ -1283,6 +1287,7 @@ class TrainModelView(APIView):
             for col in common_cols:
                 if col in skip_cols:
                     continue
+
                 # only lowercase string-like columns (safe check)
                 if pd.api.types.is_string_dtype(df1[col]) or pd.api.types.is_string_dtype(new_df[col]):
                     # use .where to preserve NaN (don't convert NaN to 'nan')
@@ -1345,6 +1350,10 @@ class TrainModelView(APIView):
                 #CSV file name
                 Tablet_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Phone_Tablet.csv")
                 Website_File_path= os.path.join(os.getcwd(), "static", "media", "CEO Worker Data","Website.csv")
+
+
+                print("Tablet_File_path ===> ", Tablet_File_path)
+                print("Website_File_path ===> " , Website_File_path)
 
                 # Transformer model 
                 TransferModelDir = os.path.join(os.getcwd() ,"transfer_model")

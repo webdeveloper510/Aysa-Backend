@@ -36,7 +36,7 @@ def SpellCorrector(input_str:str) -> str:
 # function to remove preprocessing
 def preprocess_text(text):
     text = str(text).lower()                          # Lowercase
-    text = re.sub(r'[^\w\s]', '', text)               # Remove punctuation
+    # text = re.sub(r'[^\w\s]', '', text)               # Remove punctuation
     text = re.sub(r'\s+', ' ', text).strip()          # Remove extra spaces
     return text
 

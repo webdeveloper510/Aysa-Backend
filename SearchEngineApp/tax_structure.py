@@ -71,7 +71,6 @@ class TaxModelStructure:
 
             # Apply preprocess columns on both column
             df["text"] = df["text"].apply(preprocess_text)
-
             return df
         
         except Exception as e:
