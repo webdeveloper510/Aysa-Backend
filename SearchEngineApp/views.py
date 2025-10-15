@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from datetime import datetime , timedelta, date
+from django.utils import timezone
+
 
 # Import python packages
 import os 
@@ -891,29 +893,41 @@ class AnalysisTable(APIView):
 class TrackVisitorCount(APIView):
     def post(self , request , format= None):
         try:
+            message= "Visitor visited again today."
             user_browser_id = request.data.get("browser_id")
             if not user_browser_id:
                 return BAD_RESPONSE(f"Browser ID is required , please send id with using key : 'browser_id'. ")
             
             # function to track vistor count 
             current_date = datetime.now().date()
-            track_visitor_obj, created = VistorTrackCountModel.objects.get_or_create(
-                visit_date=current_date,
-                user_browser_id=user_browser_id,
-                defaults={
-                    "visit_count": 1  # start from 1 if new record
-                }
-            )
-            if not created:  # if it already exists, increment
-                today = date.today() 
-                """ Added a condition to check, if the user requesting the browser in the same day it'll not increase the count for the browser to the user."""
-                if track_visitor_obj.visit_date != today:
-                    track_visitor_obj.visit_count += 1
-                    track_visitor_obj.save()
-                
+
+            # Get or create object
+            track_visitor_ob = VistorTrackCountModel.objects.filter(
+                user_browser_id=user_browser_id).first()
+
+            # If user does not exisy in table
+            if not track_visitor_ob:
+                VistorTrackCountModel.objects.create(
+                    user_browser_id=user_browser_id,
+                    created_date=current_date,
+                    total_visit_count= 1,
+                    daily_visit_count = 1,
+                    visit_date = current_date ,
+                )
+                message = "New visitor added."
+
+            # if user exist in database and visit again 
+            # update if visit date is not same day
+            elif track_visitor_ob.visit_date != current_date :
+                track_visitor_ob.visit_date  = current_date
+                track_visitor_ob.total_visit_count  += 1
+                track_visitor_ob.daily_visit_count  = 1
+                track_visitor_ob.save()
+                message = "Visitor returned on a new day."
+
 
             return Response({
-                "message": "success",
+                "message": message,
                 "status": status.HTTP_200_OK
             },status=status.HTTP_200_OK)
 
@@ -936,19 +950,21 @@ class GetVistorView(APIView):
 
             # Create dataframe
             df = pd.DataFrame(list(queryset))
-            total_visits = df["visit_count"].sum()
+            total_visits = df["total_visit_count"].sum()
 
             # Get Today's Visitors
             today = date.today() 
+
+            todays_visitiors = 0
             df['visit_date'] = pd.to_datetime(df['visit_date']).dt.date
             filtered_df = df[df['visit_date'] == today]
-            print(filtered_df)
-            todays_visitiors = filtered_df["visit_count"].sum()
-
+            if not filtered_df.empty:
+                todays_visitiors = filtered_df["daily_visit_count"].sum()
 
             return Response({
                 "message":"Data get successfully",
                 "status": 200,
+                "today_date":today , 
                 "total_visit_count": total_visits,
                 "total_todays_visit_counts": todays_visitiors
             }, status=200)

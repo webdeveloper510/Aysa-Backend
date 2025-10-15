@@ -29,7 +29,9 @@ class ProductSearchTrack(models.Model):
 class VistorTrackCountModel(models.Model):
     user_browser_id = models.CharField(max_length=500)
     visit_date = models.DateField()
-    visit_count = models.PositiveIntegerField(default=0)
+    total_visit_count = models.PositiveIntegerField(default=0)
+    daily_visit_count = models.PositiveIntegerField(default=0)
+    created_date =  models.DateField()
 
 # Model to keep password for store admin password
 class AdminAuthenticationModel(models.Model):
