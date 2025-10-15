@@ -21,6 +21,7 @@ class ProductModelStructure:
         self.csv_path = csv_path
         self.device= torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
     def DownloadUpdateModel(self , TransferModelDir):
         import os
         os.environ['HF_HOME'] = os.path.join(os.getcwd(), 'huggingface_cache')
@@ -35,6 +36,7 @@ class ProductModelStructure:
             model = SentenceTransformer(model_path)
 
         return model
+
 
     def DataAugmentation(self):
         print("Step 1: Data Augmentation and Create Dataframe ....")
