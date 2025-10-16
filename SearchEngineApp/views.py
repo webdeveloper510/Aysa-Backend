@@ -384,7 +384,7 @@ class TaxSemanticSearchView(APIView):
             # SORT VALUES 
             embedding_df = (df.sort_values('tax_similarity', ascending=False).head(TOP_N))
 
-            print("Tax embedding_df : \n ", embedding_df)
+            print("embedding_df : \n ", embedding_df)
             # Filter Dataframe based on the threshold value
             matched_row = embedding_df.loc[embedding_df["tax_similarity"].idxmax()]
             filtered_df = embedding_df.loc[embedding_df["tax_similarity"].astype(float) >= similarity_score]
@@ -563,6 +563,7 @@ class TaxAvenueView(APIView):
 class CEOWorkerSemanticSearchView(APIView):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
     def post(self , request , format=None):
         try:
             
@@ -637,6 +638,8 @@ class CEOWorkerSemanticSearchView(APIView):
                     return DATA_NOT_FOUND(f"No Data Exist for Year : {FilterYear}")
                 
                 # call function to get most similar row
+                TAX_CEO_WORKER_YEAR_SIMILARITY =0.65            # Do it for only ceo gap search data 
+                
                 MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
                 
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
