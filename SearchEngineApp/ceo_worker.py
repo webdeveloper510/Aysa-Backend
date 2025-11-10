@@ -105,7 +105,6 @@ class CeoWorkerModelStructure:
             phone_df.to_pickle(full_text_embedding_path)
             print( f"CEO Worker Phone  DataFrame saved to {full_text_embedding_path}")
 
-
             # Phone Tablet Embedding
             desktop_embeddings_full_text = model.encode(desktop_df['desktop_text'].tolist(), show_progress_bar=True)
             desktop_df["desktop_text_embedding"] = list(desktop_embeddings_full_text)

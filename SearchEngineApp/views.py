@@ -29,7 +29,7 @@ from sentence_transformers import SentenceTransformer , util
 from django.contrib.auth.hashers import make_password   , check_password
 from SearchMind.settings import *
 import requests
-
+from .redis_helper import *
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -251,6 +251,10 @@ class ProductSemanticSearchView(APIView):
             # get payload value in parameter
             user_query = str(payload.get("query")).lower().strip()
 
+            # CALL FUNCTION TO HANDLE INCORRECT WORDS IN QUERY
+            corrected_user_query = spell_corrector_func(user_query)
+            print("corrected user query ----> ", corrected_user_query)
+
             # call function to get year from user query 
             FilterYear= get_year(user_query)
             print("filter year ", FilterYear)
@@ -320,42 +324,25 @@ class ProductSemanticSearchView(APIView):
 class GetProfitMarginData(APIView):# #""
     def get(self,format=None):
         try:
-            #CSV file name
-            input_csv_file_path = os.path.join(os.getcwd(), "static", "media" , "Profit Data", 'profit_margin.csv')
-            if not os.path.exists(input_csv_file_path):
-                return DATA_NOT_FOUND(f"File Not Found with Name : {input_csv_file_path}")
-            
-            # Read csv 
-            df = pd.read_csv(input_csv_file_path)
-            
-            # Remove Extra spaces from the column Name
-            df.columns = df.columns.str.strip()
+            response =  get_product_data_use_redis()
 
-            # Drop Unneccsary columns
-            if "Unnamed: 8" in df.columns:
-                df = df.drop("Unnamed: 8", axis=1)
+            if isinstance(response ,str):
+                if response:
+                    return Response({
+                        "message": response,
+                        "status" : status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                        "data": []
+                    })
 
-            # Replace NaN/inf values with None so JSON can handle them
-            df = df.replace([np.inf, -np.inf], np.nan)   # convert inf to NaN
-            df = df.where(pd.notnull(df), None)          # convert NaN to None
-            
-            # Rename  column Name
-            df= df.rename({"Product Type": "Type"}, axis=1)
-
-            df = df.dropna(subset=['Product Name']) 
-            df.drop_duplicates(inplace=True) # Remove duplicacy from dataframe  
-
-            # Return Response
             return Response({
-                "message": "success" if not df.empty else "failed",
-                "status": status.HTTP_200_OK if not df.empty  else 404, 
-                "data": df.to_dict(orient="records") if not df.empty else []
-            }, status = status.HTTP_200_OK if not df.empty  else 404)
+                "message": "Data Get Successfully ..." if response else "Data Not Found",
+                "status" :200 if response else 404, 
+                "data": response if response else []
+                })
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"Failed to get profit margin data,  error occur: {str(e)} in (line {exc_tb.tb_lineno})"
-            print(error_message)
             return Internal_server_response(error_message)
 
 
@@ -533,24 +520,22 @@ class TaxSemanticSearchView(APIView):
 class TaxAvenueView(APIView):
     def get(self, request):
         try:
+            response =  get_tax_data_use_redis()
 
-            # Get Data from Tax model
-            tax_csv_file_path = os.path.join(os.getcwd(), "static", "media" , "Tax Data", 'Tax_Avoidance.csv')
+            if isinstance(response ,str):
+                if response:
+                    return Response({
+                        "message": response,
+                        "status" : status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                        "data": []
+                    })
 
-            # Read CSV
-            df = pd.read_csv(tax_csv_file_path)
-
-            # Clean NaN and infinity values
-            if not df.empty:
-                df.dropna(inplace=True)
-            
-            # Return Response
             return Response({
-                "message": "Tax Tab Data get successfully ....",
-                "status": status.HTTP_200_OK, 
-                "data": df.to_dict(orient="records") if not df.empty else []
-            }, status=status.HTTP_200_OK)
-            
+                "message": "Data Get Successfully ..." if response else "Data Not Found",
+                "status" :200 if response else 404, 
+                "data": response if response else []
+                })
+
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             error_message = f"[ERROR] Failed to get Tax Data error is {str(e)} in line {exc_tb.tb_lineno})"
@@ -713,27 +698,23 @@ class CEOWorkerSemanticSearchView(APIView):
 class CeoWorkerView(APIView):
     def get(self, request):
         try:
+            
+            response =  get_ceo_worker_data_use_redis()
 
-            # Get CEO WORKER Data from DATABASE
-            ceo_worker_file_path = os.path.join(os.getcwd() , "static", "media", "CEO Worker Data", "Website.csv")
+            if isinstance(response ,str):
+                if response:
+                    return Response({
+                        "message": response,
+                        "status" : status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                        "data": []
+                    })
 
-            # Read csv 
-            df = pd.read_csv(ceo_worker_file_path)
-            
-            # Handle if there is no data found
-            if df.empty:
-                return DATA_NOT_FOUND("No Data Found for CEO Worker Tab ")
-            
-            # Clean NaN and infinity values
-            if not df.empty:
-                df.dropna(inplace=True)
-            
-            # Return Response
             return Response({
-                "message": "CEO Worker Tab Data get successfully ....",
-                "status": status.HTTP_200_OK , 
-                "data": df.to_dict(orient="records") if not df.empty else []
-            }, status=status.HTTP_200_OK)
+                "message": "Data Get Successfully ..." if response else "Data Not Found",
+                "status" :200 if response else 404, 
+                "data": response if response else []
+                })
+          
             
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()

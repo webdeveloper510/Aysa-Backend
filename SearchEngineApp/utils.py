@@ -168,3 +168,23 @@ def check_columns(tab_type: str, dataframe: pd.DataFrame) -> bool:
         columns_status = False
 
     return columns_status , expected_columns
+
+
+
+# Function to handle incorrect words
+from spellchecker import SpellChecker
+def spell_corrector_func(input_sentence: str):
+    spell = SpellChecker()
+    words = input_sentence.split()
+    print("words ---> ", words)
+
+    corrected_words = []
+    for word in words:
+
+        print("spell unknown ", spell.unknown([word]))
+        corrected_word = spell.correction(word) if word in spell.unknown([word]) else word
+        print("corrected words ====> ", corrected_word , "word ===> ", word)
+        corrected_words.append(corrected_word)
+
+    corrected_sentence = " ".join(corrected_words)
+    return corrected_sentence

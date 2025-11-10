@@ -15,3 +15,7 @@ cryptography
 django-cors-headers
 textblob
 openpyxl
+
+pyspellchecker
+redis
+django_redis
