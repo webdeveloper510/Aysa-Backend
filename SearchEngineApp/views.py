@@ -1224,6 +1224,14 @@ class TrainModelView(APIView):
 
     def post(self , request , format=None):
         try:
+
+            product_redis_key = os.getenv("PRODUCT_DATA_REDIS_KEY_NAME")
+            tax_redis_key = os.getenv("TAX_DATA_REDIS_KEY_NAME")
+            ceo_worker_redis_key = os.getenv("PAYGAP_DATA_REDIS_KEY_NAME")
+
+            # Delete cache data from redis of product data , tax data and ceo worker data
+            redis_delete_cache_response = delete_cache_data([product_redis_key,tax_redis_key,ceo_worker_redis_key])
+
             file_names_array = ["profit_margin.csv", "Tax_Avoidance.csv", "Website.csv", "Phone_Tablet.csv"]
             tab_types =["profit" , "tax", "phone", "desktop"]
 
