@@ -251,10 +251,6 @@ class ProductSemanticSearchView(APIView):
             # get payload value in parameter
             user_query = str(payload.get("query")).lower().strip()
 
-            # CALL FUNCTION TO HANDLE INCORRECT WORDS IN QUERY
-            corrected_user_query = spell_corrector_func(user_query)
-            print("corrected user query ----> ", corrected_user_query)
-
             # call function to get year from user query 
             FilterYear= get_year(user_query)
             print("filter year ", FilterYear)
