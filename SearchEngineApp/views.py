@@ -324,7 +324,7 @@ class ProductSemanticSearchView(APIView):
 class GetProfitMarginData(APIView):# #""
     def get(self,format=None):
         try:
-            response =  get_product_data_use_redis()
+            response , message =  get_product_data_use_redis()
 
             if isinstance(response ,str):
                 if response:
@@ -335,7 +335,7 @@ class GetProfitMarginData(APIView):# #""
                     })
 
             return Response({
-                "message": "Data Get Successfully ..." if response else "Data Not Found",
+                "message": message if response else "Data Not Found",
                 "status" :200 if response else 404, 
                 "data": response if response else []
                 })
@@ -520,7 +520,7 @@ class TaxSemanticSearchView(APIView):
 class TaxAvenueView(APIView):
     def get(self, request):
         try:
-            response =  get_tax_data_use_redis()
+            response , message=  get_tax_data_use_redis()
 
             if isinstance(response ,str):
                 if response:
@@ -531,7 +531,7 @@ class TaxAvenueView(APIView):
                     })
 
             return Response({
-                "message": "Data Get Successfully ..." if response else "Data Not Found",
+                "message": message if response else "Data Not Found",
                 "status" :200 if response else 404, 
                 "data": response if response else []
                 })
@@ -699,7 +699,7 @@ class CeoWorkerView(APIView):
     def get(self, request):
         try:
             
-            response =  get_ceo_worker_data_use_redis()
+            response , message=  get_ceo_worker_data_use_redis()
 
             if isinstance(response ,str):
                 if response:
@@ -710,7 +710,7 @@ class CeoWorkerView(APIView):
                     })
 
             return Response({
-                "message": "Data Get Successfully ..." if response else "Data Not Found",
+                "message":message if response else "Data Not Found",
                 "status" :200 if response else 404, 
                 "data": response if response else []
                 })

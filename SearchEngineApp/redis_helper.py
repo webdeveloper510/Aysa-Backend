@@ -15,14 +15,15 @@ redis_instance = redis.StrictRedis(REDIS_HOST, REDIS_PORT , 1)   # 1 Eepresent t
 # function to get profit margin data 
 def get_product_data_use_redis():
     try:
-
+        
+        message = "Data Come From Database"
         redis_key = os.getenv("PRODUCT_DATA_REDIS_KEY_NAME")            # Get key Name from the env file
         
         # Get cache Data
         cached_data = redis_instance.get(redis_key) 
         if cached_data is not None:
-            print("data comes from cache")
-            return json.loads(cached_data)
+            message = "Data Come From Cache"
+            return json.loads(cached_data) , message
 
         #CSV file name
         input_csv_file_path = os.path.join(os.getcwd(), "static", "media" , "Profit Data", 'profit_margin.csv')
@@ -54,7 +55,7 @@ def get_product_data_use_redis():
         redis_instance.set(redis_key, json.dumps(json_data) ,ex=3600)
 
         print("Product Data Saved in Redis cache with name {}".format(redis_key))
-        return json_data
+        return json_data , message
     
 
     except Exception as e:
@@ -69,14 +70,13 @@ def get_tax_data_use_redis():
 
         redis_key = os.getenv("TAX_DATA_REDIS_KEY_NAME")            # Get key Name from the env file
         
+        message = "Data Come From Database"
         # Get cache Data
         cached_data = redis_instance.get(redis_key) 
         if cached_data is not None:
-            print("Data come from cache")
-            return json.loads(cached_data)
+            message= "Data Come From Cache"
+            return json.loads(cached_data) , message
 
-    
-        print("Data come from database")
         # Get Data from Tax model
         tax_csv_file_path = os.path.join(os.getcwd(), "static", "media" , "Tax Data", 'Tax_Avoidance.csv')
 
@@ -91,7 +91,7 @@ def get_tax_data_use_redis():
 
         redis_instance.set(redis_key, json.dumps(json_data) ,ex=3600)
         print("Tax Data Saved in Redis cache with name {}".format(redis_key))
-        return json_data
+        return json_data , message
     
 
     except Exception as e:
@@ -106,14 +106,15 @@ def get_ceo_worker_data_use_redis():
 
         redis_key = os.getenv("PAYGAP_DATA_REDIS_KEY_NAME")            # Get key Name from the env file
         
+        message = "Data Come From Database"
+        
         # Get cache Data
         cached_data = redis_instance.get(redis_key) 
         if cached_data is not None:
-            print("Data come from cache")
-            return json.loads(cached_data)
+            message = "Data Come From Cache"
+            return json.loads(cached_data) , message
 
     
-        print("Data come from database")
         # Get Data from Tax model
         ceo_worker_file_path = os.path.join(os.getcwd(), "static", "media" ,"CEO Worker Data", "Website.csv")
 
@@ -128,7 +129,7 @@ def get_ceo_worker_data_use_redis():
 
         redis_instance.set(redis_key, json.dumps(json_data) ,ex=3600)
         print("CEO WORKER Data Saved in Redis cache with name {}".format(redis_key))
-        return json_data
+        return json_data , message
     
 
     except Exception as e:
