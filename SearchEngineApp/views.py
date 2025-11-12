@@ -115,8 +115,8 @@ class ProductSemanticSearchView(APIView):
 
             # Format output
             filtered_unique["Brand"] = filtered_unique["Brand"].str.title()
-            if len(filtered_unique) > 3:
-                filtered_unique = filtered_unique.iloc[0:3]
+            if len(filtered_unique) > 4:
+                filtered_unique = filtered_unique.iloc[0:4]
 
             return filtered_unique
 
@@ -172,8 +172,8 @@ class ProductSemanticSearchView(APIView):
 
         # Function -4
         Product_Yearly_df = Profit_Obj.Get_year_based_df(paramter_dict , Product_Category_df) 
-        #print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
-        #print()
+        # print("Product_Yearly_df : \n ", Product_Yearly_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
+        # print()
 
         # Return Response if only matched row dataframe is true
         if Product_Yearly_df.empty:
@@ -181,7 +181,7 @@ class ProductSemanticSearchView(APIView):
 
         # Function -5
         Product_Gender_df = Profit_Obj.Get_gender_based_df(paramter_dict , Product_Yearly_df) 
-        #print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]].iloc[50:90])
+        # print("Product_Gender_df : \n ", Product_Gender_df[["Brand", "Product Name", "Product Type", "Production Year", "Gender", "Category", "Type Mapped"]])
 
         if Product_Gender_df.empty:
             return ProfitProductResponse("success",matched_row_json, CEO_WORKER_JSON_DATA)
@@ -207,8 +207,8 @@ class ProductSemanticSearchView(APIView):
         merge_df = pd.concat([searched_df , filtered_df], ignore_index=True)    # concat both dataframe  
         
         # Only return three product in API
-        if len(merge_df) > 3:
-            merge_df = merge_df.iloc[0:3]
+        if len(merge_df) > 4:
+            merge_df = merge_df.iloc[0:4]
 
         return ProfitProductResponse('success', merge_df.to_dict(orient="records"), CEO_WORKER_JSON_DATA)
         print()
@@ -251,9 +251,11 @@ class ProductSemanticSearchView(APIView):
             # get payload value in parameter
             user_query = str(payload.get("query")).lower().strip()
 
+            # Call profit margin spell corrector functions
+            correction_query = profit_margin_spell_corrector(user_query)
+
             # call function to get year from user query 
-            FilterYear= get_year(user_query)
-            print("filter year ", FilterYear)
+            FilterYear= get_year(correction_query)
 
             # Define paths
             pickle_df_path = os.path.join(os.getcwd() ,"static", "media", "EmbeddingDir", "Profit Margin" ,"profit_embedding.pkl")
@@ -264,10 +266,10 @@ class ProductSemanticSearchView(APIView):
             pickle_df = pd.read_pickle(pickle_df_path)
 
             # CALL A CLASS TO PREDICT PROFIT MARGIN DATA 
-            Profit_Obj  = ProfitMarginPreidction(pickle_df,model,user_query)
+            Profit_Obj  = ProfitMarginPreidction(pickle_df,model,correction_query)
 
             # Handle when user has asked about only brand name
-            user_query_filter_list = self.FilterUserQuery(user_query)
+            user_query_filter_list = self.FilterUserQuery(correction_query)
 
             if len(user_query_filter_list)  ==1:
                 

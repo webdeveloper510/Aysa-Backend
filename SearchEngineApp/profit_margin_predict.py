@@ -212,23 +212,25 @@ class ProfitMarginPreidction:
     def Get_gender_based_df(self, response_dict: dict, yearly_df: pd.DataFrame) -> pd.DataFrame:
         # Make Gender column lowercase and strip extra spaces
         yearly_df.loc[:,"Gender"] = yearly_df["Gender"].str.strip().str.lower()
-
         # Get matched_gender from response_dict
         matched_gender = response_dict.get("matched_gender")
+
 
         if matched_gender:
             matched_gender = matched_gender.lower()
             if matched_gender in ["men", "women"]:
                 # Replace "unisex" with matched gender
                 yearly_df.loc[: ,"Gender"] = yearly_df["Gender"].replace("unisex", matched_gender)
+
             elif matched_gender == "unisex":
                 # Replace "men" and "women" with "unisex"
                 yearly_df.loc[:,"Gender"] = yearly_df["Gender"].replace({"men": "unisex", "women": "unisex"})
 
             # Filter dataframe based on matched gender
-            return yearly_df[yearly_df["Gender"] == matched_gender]
-        
-        return pd.DataFrame()  # Return an empty dataframe if no matched_gender
+            gender_based_df = yearly_df[yearly_df["Gender"] == matched_gender]
+            return  gender_based_df
+        else:
+            return pd.DataFrame()  # Return an empty dataframe if no matched_gender
 
     
     # This function Returning Two lists
@@ -260,10 +262,12 @@ class ProfitMarginPreidction:
                 row_product_type in matched_product_type
             ):
                 filtered_rows.append(row)
+
+
                 
         # If less than 2 unique brands, second pass: check by variant
         compare_df = pd.DataFrame(filtered_rows)
-        if compare_df.empty or compare_df["Brand"].nunique() < 2:
+        if compare_df.empty or compare_df["Brand"].nunique() < 3:
             print(" - Searching for second brand ........")
             for idx, row in genderly_df.iterrows():
                 row_brand = str(row.get("Brand", "")).lower().strip()
@@ -284,6 +288,7 @@ class ProfitMarginPreidction:
     def Filtered_Dataframe(self,brand_product_type_list: list) -> pd.DataFrame:
  
         filtered_df = pd.DataFrame(brand_product_type_list)
+
         
         # Return Empty list when filtered df is empty 
         if filtered_df.empty:
@@ -330,6 +335,8 @@ class ProfitMarginPreidction:
             if max_profit !=  min_profit:
                 filtered_df = filtered_df.drop_duplicates(subset=["Profit Margin"], keep="first")
 
+            print("filtered df : \n ", filtered_df)
+            print()
 
         elif len(agg_df) ==1 : 
             print('agg df elif condition is running ')

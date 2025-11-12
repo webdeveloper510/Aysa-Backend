@@ -5,8 +5,10 @@ from datetime import datetime , timedelta
 import sys
 import os
 import pandas as pd
+import pickle
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
+
 PRODUCT_DATA_COLUMNS = ['Brand', 'Product Name', 'Product Type', 'Category', 'Gender', 'Production Year', 'Profit Margin', 'Profit Made', 'Release Price', 'Wholesale Price', 'Link to Product Pictures']
 
 TAX_DATA_COLUMNS = ['Company Name', 'Year', 'Taxes Paid', 'Taxes Avoided']
@@ -168,3 +170,16 @@ def check_columns(tab_type: str, dataframe: pd.DataFrame) -> bool:
         columns_status = False
 
     return columns_status , expected_columns
+
+
+# Profit Margin Spell Corrector Model
+def profit_margin_spell_corrector(input_text : str):
+
+    model_path = os.path.join(os.getcwd(),"spello_model" , "my_spello_model.pkl")
+
+    with open(model_path, "rb") as f:
+        load_model = pickle.load(f)
+
+    result = load_model.spell_correct(input_text)
+    return result["spell_corrected_text"]
+
