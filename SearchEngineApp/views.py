@@ -30,6 +30,7 @@ from django.contrib.auth.hashers import make_password   , check_password
 from SearchMind.settings import *
 import requests
 from .redis_helper import *
+from .spello_train_model import *
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -252,7 +253,8 @@ class ProductSemanticSearchView(APIView):
             user_query = str(payload.get("query")).lower().strip()
 
             # Call profit margin spell corrector functions
-            correction_query = profit_margin_spell_corrector(user_query)
+            product_spello_obj = SpellcorrectorModelInference()
+            correction_query = product_spello_obj.product_spell_corrector(user_query)
 
             # call function to get year from user query 
             FilterYear= get_year(correction_query)
@@ -414,7 +416,11 @@ class TaxSemanticSearchView(APIView):
             
             # Take Payload query value in parameter
             user_query = payload.get("query")
-         
+
+            # Call Tax spell corrector functions
+            product_spello_obj = SpellcorrectorModelInference()
+            correction_query = product_spello_obj.tax_spell_corrector(user_query)
+
             # Define paths
             tax_embedding_df_path = os.path.join(os.getcwd(),"static", "media",  "EmbeddingDir", "Tax", "tax_embedding.pkl")
             transfer_model_path = os.path.join(os.getcwd(), "transfer_model", 'all-MiniLM-L6-v2')
@@ -430,7 +436,7 @@ class TaxSemanticSearchView(APIView):
             print()
 
             # Call function to get year status from  the user query ...
-            FilterYear= get_year(user_query)
+            FilterYear= get_year(correction_query)
             
             if FilterYear != "None":
                 print('filter year ', FilterYear)
@@ -442,7 +448,7 @@ class TaxSemanticSearchView(APIView):
                     return DATA_NOT_FOUND(f"No Data Exist for Year : {FilterYear}")
                 
                 # call function to get most similar row
-                MatchedRow = self.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
+                MatchedRow = self.GetMatchedRowDict(model , correction_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
 
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
@@ -474,7 +480,7 @@ class TaxSemanticSearchView(APIView):
             else:
                 
                 # Add new column
-                MatchedRow = self.GetMatchedRowDict(model , user_query , df , TAX_CEO_WORKER_SIMILARITY)
+                MatchedRow = self.GetMatchedRowDict(model , correction_query , df , TAX_CEO_WORKER_SIMILARITY)
                   
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
@@ -576,6 +582,10 @@ class CEOWorkerSemanticSearchView(APIView):
             # Take Payload query value in parameter
             user_query = payload.get("query")
 
+            # Call paygap spell corrector functions
+            product_spello_obj = SpellcorrectorModelInference()
+            correction_query = product_spello_obj.tax_spell_corrector(user_query)
+
             # Paths 
             ceo_phone_embedding_df_path = os.path.join(os.getcwd(), "static" , "media" , "EmbeddingDir", "CEO-Worker", "ceo_phone_embedding.pkl")
             ceo_desktop_embedding_df_path = os.path.join(os.getcwd(),  "static" , "media" , "EmbeddingDir", "CEO-Worker", "ceo_desktop_embedding.pkl")
@@ -609,7 +619,7 @@ class CEOWorkerSemanticSearchView(APIView):
             original_df = df.copy()
 
             # Call function to get year status from  the user query ...
-            FilterYear= get_year(user_query)
+            FilterYear= get_year(correction_query)
 
             if FilterYear != "None":
                 print('filter year ', FilterYear)
@@ -623,7 +633,7 @@ class CEOWorkerSemanticSearchView(APIView):
                 # call function to get most similar row
                 TAX_CEO_WORKER_YEAR_SIMILARITY =0.65            # Do it for only ceo gap search data 
                 
-                MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
+                MatchedRow = tax_obj.GetMatchedRowDict(model , correction_query , filtered_df, TAX_CEO_WORKER_YEAR_SIMILARITY)
                 
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
@@ -652,7 +662,7 @@ class CEOWorkerSemanticSearchView(APIView):
                     return DATA_NOT_FOUND('DATA NOT FOUND')
             else:
                 # Add new column
-                MatchedRow = tax_obj.GetMatchedRowDict(model , user_query , df , TAX_CEO_WORKER_SIMILARITY)
+                MatchedRow = tax_obj.GetMatchedRowDict(model , correction_query , df , TAX_CEO_WORKER_SIMILARITY)
 
                 # RETURN BAD RESPONSE IF MATCHED ROW VARIABLE GET STING ERROR MESSAGE
                 if isinstance(MatchedRow , str):
