@@ -1237,8 +1237,15 @@ class TrainModelView(APIView):
             tax_redis_key = os.getenv("TAX_DATA_REDIS_KEY_NAME")
             ceo_worker_redis_key = os.getenv("PAYGAP_DATA_REDIS_KEY_NAME")
 
-            # Delete cache data from redis of product data , tax data and ceo worker data
+            """   Delete cache data from redis of product data , tax data and ceo worker data   """
             redis_delete_cache_response = delete_cache_data([product_redis_key,tax_redis_key,ceo_worker_redis_key])
+
+            """ ################      Call function to train spello model for new data and existing data     ###########################  """
+            spello_train_obj = TrainSpelloModel()
+            spello_train_obj.train_profit_margin_spell_corrector()
+            spello_train_obj.train_tax_spell_corrector()
+            spello_train_obj.train_paygap_spell_corrector()
+
 
             file_names_array = ["profit_margin.csv", "Tax_Avoidance.csv", "Website.csv", "Phone_Tablet.csv"]
             tab_types =["profit" , "tax", "phone", "desktop"]

@@ -100,6 +100,8 @@ class TrainSpelloModel:
         with open(product_spello_model_file_path, 'wb') as f:
             pickle.dump(sp, f)
 
+        return f"Model train successfully and saved in : {product_spello_model_file_path}"
+
     def train_tax_spell_corrector(self):
         sp = SpellCorrectionModel(language='en')
 
@@ -107,11 +109,13 @@ class TrainSpelloModel:
         cleaned_tax_data = self.normalize_tax_data()
         sp.train(cleaned_tax_data)
 
-        product_spello_model_file_path = os.path.join(self.trained_spello_model_base_dir ,"tax_spello_model.pkl")
+        tax_spello_model_file_path = os.path.join(self.trained_spello_model_base_dir ,"tax_spello_model.pkl")
 
         # Save the trained model
-        with open(product_spello_model_file_path, 'wb') as f:
+        with open(tax_spello_model_file_path, 'wb') as f:
             pickle.dump(sp, f)
+
+        return f"Model train successfully and saved in : {tax_spello_model_file_path}"
 
     def train_paygap_spell_corrector(self):
         sp = SpellCorrectionModel(language='en')
@@ -120,11 +124,13 @@ class TrainSpelloModel:
         cleaned_tax_data = self.normalize_CEO_WORKER_data()
         sp.train(cleaned_tax_data)
 
-        product_spello_model_file_path = os.path.join(self.trained_spello_model_base_dir ,"pay_gap_spello_model.pkl")
+        paygap_spello_model_file_path = os.path.join(self.trained_spello_model_base_dir ,"pay_gap_spello_model.pkl")
 
         # Save the trained model
-        with open(product_spello_model_file_path, 'wb') as f:
+        with open(paygap_spello_model_file_path, 'wb') as f:
             pickle.dump(sp, f)
+
+        return f"Model train successfully and saved in : {paygap_spello_model_file_path}"
 
 
 class SpellcorrectorModelInference:
